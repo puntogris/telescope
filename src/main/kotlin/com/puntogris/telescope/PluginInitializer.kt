@@ -11,3 +11,4 @@ class PluginInitializer : ProjectActivity {
         Database.init(project.name)
     }
 }
+

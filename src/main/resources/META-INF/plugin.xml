@@ -32,7 +32,8 @@
     </extensions>
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow id="DrawableFinder"
+        <toolWindow id="Telescope"
+                    icon="/icons/pluginIcon.svg"
                     anchor="left"
                     factoryClass="com.puntogris.telescope.ToolWindow"/>
     </extensions>

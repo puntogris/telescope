@@ -8,7 +8,6 @@ import com.intellij.openapi.vfs.findDirectory
 import com.intellij.openapi.vfs.readText
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
-import com.puntogris.telescope.domain.Convert
 import com.puntogris.telescope.domain.VectorDrawableConverter
 import com.puntogris.telescope.ui.CheckboxPanel
 import com.puntogris.telescope.ui.ListPanel

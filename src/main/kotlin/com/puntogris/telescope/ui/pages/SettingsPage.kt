@@ -83,7 +83,7 @@ class SettingsPage(private val project: Project) : JPanel() {
 
         val info = JLabel("This uses CLIP compatible models, you can check more about them here:")
         add(info)
-        add(Hyperlink("https://stackoverflow.com/questions/12589494/align-text-in-jlabel-to-the-right"))
+        add(Hyperlink("https://huggingface.co/models?other=clip-cpp-gguf"))
     }
 
     private fun title(): JLabel {

@@ -1,0 +1,26 @@
+[
+{
+  "directory": "/Users/joaquin/Documents/Proyectos/telescope/build/libs/shared/clip",
+  "command": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ -DGGML_USE_ACCELERATE -I/include -I/include/darwin -I/Users/joaquin/Documents/Proyectos/telescope/clip.cpp/. -I/Users/joaquin/Documents/Proyectos/telescope/clip.cpp/ggml/src/. -I/Users/joaquin/Documents/Proyectos/telescope/clip.cpp/ggml/src/../include -I/Users/joaquin/Documents/Proyectos/telescope/clip.cpp/ggml/src/../include/ggml -F/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/System/Library/Frameworks  -I/Users/joaquin/Library/Java/JavaVirtualMachines/openjdk-23.0.1/Contents/Home/include -I/Users/joaquin/Library/Java/JavaVirtualMachines/openjdk-23.0.1/Contents/Home/include/darwin -O3 -DNDEBUG -std=gnu++11 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk -march=native -o CMakeFiles/clip.dir/clip.cpp.o -c /Users/joaquin/Documents/Proyectos/telescope/clip.cpp/clip.cpp",
+  "file": "/Users/joaquin/Documents/Proyectos/telescope/clip.cpp/clip.cpp",
+  "output": "/Users/joaquin/Documents/Proyectos/telescope/build/libs/shared/clip/CMakeFiles/clip.dir/clip.cpp.o"
+},
+{
+  "directory": "/Users/joaquin/Documents/Proyectos/telescope/build/libs/shared/clip/ggml/src",
+  "command": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc -DGGML_USE_ACCELERATE -D_DARWIN_C_SOURCE -D_XOPEN_SOURCE=600 -I/include -I/include/darwin -I/Users/joaquin/Documents/Proyectos/telescope/clip.cpp/ggml/src/. -I/Users/joaquin/Documents/Proyectos/telescope/clip.cpp/ggml/src/../include -I/Users/joaquin/Documents/Proyectos/telescope/clip.cpp/ggml/src/../include/ggml -F/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/System/Library/Frameworks -O3 -DNDEBUG -std=gnu11 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk -march=native -Wall -Wpedantic -Wformat=2 -Wno-unused -Wstrict-prototypes -Werror=vla -Wunused -Wextra -Wcast-qual -Wdouble-promotion -Wshadow -Wno-unused-function -Wmissing-prototypes -o CMakeFiles/ggml.dir/ggml.c.o -c /Users/joaquin/Documents/Proyectos/telescope/clip.cpp/ggml/src/ggml.c",
+  "file": "/Users/joaquin/Documents/Proyectos/telescope/clip.cpp/ggml/src/ggml.c",
+  "output": "/Users/joaquin/Documents/Proyectos/telescope/build/libs/shared/clip/ggml/src/CMakeFiles/ggml.dir/ggml.c.o"
+},
+{
+  "directory": "/Users/joaquin/Documents/Proyectos/telescope/build/libs/shared/clip/ggml/src",
+  "command": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc -DGGML_USE_ACCELERATE -D_DARWIN_C_SOURCE -D_XOPEN_SOURCE=600 -I/include -I/include/darwin -I/Users/joaquin/Documents/Proyectos/telescope/clip.cpp/ggml/src/. -I/Users/joaquin/Documents/Proyectos/telescope/clip.cpp/ggml/src/../include -I/Users/joaquin/Documents/Proyectos/telescope/clip.cpp/ggml/src/../include/ggml -F/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/System/Library/Frameworks -O3 -DNDEBUG -std=gnu11 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk -march=native -Wall -Wpedantic -Wformat=2 -Wno-unused -Wstrict-prototypes -Werror=vla -Wunused -Wextra -Wcast-qual -Wdouble-promotion -Wshadow -Wno-unused-function -Wmissing-prototypes -o CMakeFiles/ggml.dir/ggml-alloc.c.o -c /Users/joaquin/Documents/Proyectos/telescope/clip.cpp/ggml/src/ggml-alloc.c",
+  "file": "/Users/joaquin/Documents/Proyectos/telescope/clip.cpp/ggml/src/ggml-alloc.c",
+  "output": "/Users/joaquin/Documents/Proyectos/telescope/build/libs/shared/clip/ggml/src/CMakeFiles/ggml.dir/ggml-alloc.c.o"
+},
+{
+  "directory": "/Users/joaquin/Documents/Proyectos/telescope/build/libs/shared/clip/models",
+  "command": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ -DGGML_USE_ACCELERATE -I/include -I/include/darwin -I/Users/joaquin/Documents/Proyectos/telescope/clip.cpp/. -I/Users/joaquin/Documents/Proyectos/telescope/clip.cpp/ggml/src/. -I/Users/joaquin/Documents/Proyectos/telescope/clip.cpp/ggml/src/../include -I/Users/joaquin/Documents/Proyectos/telescope/clip.cpp/ggml/src/../include/ggml  -I/Users/joaquin/Library/Java/JavaVirtualMachines/openjdk-23.0.1/Contents/Home/include -I/Users/joaquin/Library/Java/JavaVirtualMachines/openjdk-23.0.1/Contents/Home/include/darwin -O3 -DNDEBUG -std=gnu++11 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk -march=native -o CMakeFiles/quantize.dir/quantize.cpp.o -c /Users/joaquin/Documents/Proyectos/telescope/clip.cpp/models/quantize.cpp",
+  "file": "/Users/joaquin/Documents/Proyectos/telescope/clip.cpp/models/quantize.cpp",
+  "output": "/Users/joaquin/Documents/Proyectos/telescope/build/libs/shared/clip/models/CMakeFiles/quantize.dir/quantize.cpp.o"
+}
+]

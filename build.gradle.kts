@@ -13,19 +13,15 @@ repositories {
 }
 
 dependencies {
-    implementation("org.apache.xmlgraphics:batik-all:1.18") {
-        exclude("xml-apis")
-    }
+    implementation("org.apache.xmlgraphics:batik-all:1.18")
     implementation("org.xerial:sqlite-jdbc:3.47.0.0")
+    implementation(project(":clip"))
 }
 // Configure Gradle IntelliJ Plugin
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
 intellij {
     version.set("2023.1.5")
-    type.set("IC") // Target IDE Platform
-
-    plugins.set(listOf(/* Plugin Dependencies */))
-
+    type.set("IC")
 }
 
 tasks {

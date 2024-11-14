@@ -28,13 +28,13 @@
 
     </extensions>
     <extensions defaultExtensionNs="com.intellij">
-        <postStartupActivity implementation="com.puntogris.telescope.PluginInitializer"/>
+        <postStartupActivity implementation="com.puntogris.telescope.plugin.PluginInitializer"/>
     </extensions>
 
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="Telescope"
                     icon="/icons/pluginIcon.svg"
                     anchor="left"
-                    factoryClass="com.puntogris.telescope.ToolWindow"/>
+                    factoryClass="com.puntogris.telescope.plugin.ToolWindow"/>
     </extensions>
 </idea-plugin>

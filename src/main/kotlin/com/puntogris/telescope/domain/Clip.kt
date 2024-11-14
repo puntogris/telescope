@@ -29,4 +29,8 @@ object Clip {
             FloatArray(1)
         }
     }
+
+    fun encodeText(text: String) :FloatArray {
+       return  clip.encodeText(text, NUMB_THREADS, VECTOR_DIMS, true)
+    }
 }

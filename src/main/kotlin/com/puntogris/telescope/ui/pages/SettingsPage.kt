@@ -5,6 +5,8 @@ import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.fileChooser.FileChooser
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
+import com.intellij.openapi.progress.ProgressIndicator
+import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.components.JBLabel
@@ -13,9 +15,13 @@ import com.puntogris.telescope.domain.Clip
 import com.puntogris.telescope.ui.components.Hyperlink
 import java.awt.*
 import java.awt.datatransfer.DataFlavor
+import java.net.URL
+import java.nio.file.Files
+import java.nio.file.Paths
 import javax.swing.*
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
+import kotlin.io.path.absolutePathString
 
 
 const val AI_MODEL_PATH_KEY = "AI_MODEL_PATH_KEY"
@@ -27,6 +33,7 @@ val FLAG_CHANGED_TOPIC = Topic.create("FlagChanged", FlagChangedListener::class.
 
 class SettingsPage(private val project: Project) : JPanel() {
 
+    val pathInput = JBTextField(30)
 
     private val documentListener = object : DocumentListener {
         override fun insertUpdate(e: DocumentEvent?) {
@@ -65,6 +72,10 @@ class SettingsPage(private val project: Project) : JPanel() {
 
         val downloadLabel = JLabel("If you don't want to use a custom one i recommend you this one at only 85MB")
         val downloadButton = JButton("Download default and apply")
+
+        downloadButton.addActionListener {
+            startDownload()
+        }
         add(downloadLabel)
         add(downloadButton)
 
@@ -87,10 +98,10 @@ class SettingsPage(private val project: Project) : JPanel() {
             alignmentX = LEFT_ALIGNMENT
         }
     }
+ //
 
     private fun inputComponent(project: Project): JPanel {
         val inputPanel = JPanel(BorderLayout())
-        val pathInput = JBTextField(30)
         pathInput.text = PropertiesComponent.getInstance().getValue(AI_MODEL_PATH_KEY, "")
         pathInput.document.addDocumentListener(documentListener)
 
@@ -146,6 +157,83 @@ class SettingsPage(private val project: Project) : JPanel() {
 
         if (file != null) {
             onFileSelected(file.path)
+        }
+    }
+
+    private fun chooseFolder(project: Project): String {
+        val fileDescription = FileChooserDescriptor(false, true, false, false, false, false)
+        fileDescription.withFileFilter {
+            it.extension == "gguf"
+        }
+       return  FileChooser.chooseFile(fileDescription, project, null)?.path ?: ""
+    }
+
+    private fun startDownload() {
+        val folder = chooseFolder(project)
+        if (folder.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Folder invalid!")
+            return
+        }
+        val url = "https://huggingface.co/mys/ggml_CLIP-ViT-B-32-laion2B-s34B-b79K/resolve/main/CLIP-ViT-B-32-laion2B-s34B-b79K_ggml-model-f16.gguf"
+        val name = "CLIP-ViT-B-32-laion2B-s34B-b79K_ggml-model-f16.gguf"
+        val path = "${folder}/${name}"
+        // Create a background task to download the file
+        object : Task.Backgroundable(project, "Downloading model", true) {
+            override fun run(indicator: ProgressIndicator) {
+                val fileUrl = URL(url)
+                val destinationPath = Paths.get(path)
+                thisLogger().warn("logeto_${destinationPath.absolutePathString()}")
+
+                // Start the download and update the progress
+                downloadFileWithProgress(fileUrl, destinationPath, indicator)
+            }
+        }.queue()
+    }
+
+    private fun downloadFileWithProgress(url: URL, destinationPath: java.nio.file.Path, indicator: ProgressIndicator) {
+        try {
+            // Open input stream to download the file
+            val inputStream = url.openStream()
+            val outputStream = Files.newOutputStream(destinationPath)
+
+            val buffer = ByteArray(4096)
+            var bytesRead: Int
+            var totalBytesRead = 0
+            val contentLength = url.openConnection().contentLengthLong
+
+            // Loop to read from input stream and write to output stream
+            while (inputStream.read(buffer).also { bytesRead = it } != -1) {
+                if (indicator.isCanceled) {
+                    break
+                }
+
+                outputStream.write(buffer, 0, bytesRead)
+                totalBytesRead += bytesRead
+
+                // Update the progress bar
+                val progress = totalBytesRead.toDouble() / contentLength
+                indicator.fraction = progress
+            }
+
+            // Close streams after download is complete
+            inputStream.close()
+            outputStream.close()
+
+            // Optional: Show a message when download is complete
+            if (indicator.isCanceled) {
+                JOptionPane.showMessageDialog(this, "Download Canceled!")
+            } else {
+                JOptionPane.showMessageDialog(this, "Download Complete!")
+                pathInput.text = destinationPath.absolutePathString()
+                PropertiesComponent.getInstance().setValue(AI_MODEL_PATH_KEY, destinationPath.absolutePathString())
+
+            }
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            SwingUtilities.invokeLater {
+                JOptionPane.showMessageDialog(this, "Error downloading file!")
+            }
         }
     }
 }

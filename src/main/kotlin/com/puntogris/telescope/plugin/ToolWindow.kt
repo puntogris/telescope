@@ -10,8 +10,9 @@ class ToolWindow : ToolWindowFactory {
 
     override fun createToolWindowContent(project: Project, window: ToolWindow) {
         val contentManager = window.contentManager
+
         val home = contentManager.factory.createContent(HomePage(project), "Home", false)
-        val settings = contentManager.factory.createContent(SettingsPage(), "Settings", false)
+        val settings = contentManager.factory.createContent(SettingsPage(project), "Settings", false)
 
         window.contentManager.addContent(home)
         window.contentManager.addContent(settings)

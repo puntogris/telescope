@@ -1,18 +1,24 @@
 package com.puntogris.telescope.domain
 
 import android.clip.cpp.CLIPAndroid
+import com.intellij.ide.util.PropertiesComponent
+import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.vfs.VirtualFile
+import com.puntogris.telescope.ui.pages.AI_MODEL_PATH_KEY
 
 object Clip {
 
-    private const val CLIP_MODEL_PATH = "/Users/joaquin/Documents/CLIP-ViT-B-32-laion2B-s34B-b79K_ggml-model-f16.gguf"
     private const val CLIP_VERBOSITY = 1
     private const val NUMB_THREADS = 4
     private const val VECTOR_DIMS = 512
 
     //TODO mb we should only load it once
     private val clip: CLIPAndroid
-        get() = CLIPAndroid().apply { load(CLIP_MODEL_PATH, CLIP_VERBOSITY) }
+        get() = CLIPAndroid().apply {
+            load(
+                PropertiesComponent.getInstance().getValue(AI_MODEL_PATH_KEY, ""), CLIP_VERBOSITY
+            )
+        }
 
     fun encodeFileImage(file: VirtualFile): FloatArray {
         val converted = Convert.toClipCompatible(file)
@@ -30,7 +36,24 @@ object Clip {
         }
     }
 
-    fun encodeText(text: String) :FloatArray {
-       return  clip.encodeText(text, NUMB_THREADS, VECTOR_DIMS, true)
+    fun encodeText(text: String): Result<FloatArray> {
+        try {
+            val r = clip
+            thisLogger().warn("logeto??okaa")
+            return Result.success(floatArrayOf())
+        } catch (e: Throwable) {
+            thisLogger().warn("logeto??fail")
+
+            return Result.failure(e)
+        }
+    }
+
+    fun testLoad(): Boolean {
+        try {
+            clip
+            return true
+        } catch (e: Throwable) {
+            return false
+        }
     }
 }

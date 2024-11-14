@@ -2,9 +2,14 @@ package com.puntogris.telescope.ui.components
 
 import com.intellij.icons.AllIcons
 import com.intellij.ide.util.PropertiesComponent
+import com.intellij.openapi.project.Project
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.util.maximumHeight
+import com.intellij.util.messages.Topic
+import com.puntogris.telescope.domain.Clip
+import com.puntogris.telescope.ui.pages.FLAG_CHANGED_TOPIC
+import com.puntogris.telescope.ui.pages.FlagChangedListener
 import java.awt.BorderLayout
 import java.awt.FlowLayout
 import javax.swing.JButton
@@ -12,14 +17,19 @@ import javax.swing.JPanel
 
 
 private const val FUZZY_CHECKBOX_STATE_KEY = "FUZZY_CHECKBOX_STATE_KEY"
-private const val EMBEDDING_CHECKBOX_STATE_KEY = "EMBEDDING_CHECKBOX_STATE_KEY"
+const val EMBEDDING_CHECKBOX_STATE_KEY = "EMBEDDING_CHECKBOX_STATE_KEY"
 
 class CheckboxPanel(
-    private val onRefreshClicked: () -> Unit
+    private val onRefreshClicked: () -> Unit,
+    private val project: Project
 ) : JPanel() {
+
+    private val embeddingCheckbox = JBCheckBox("Embeddings")
 
     init {
         layout = BorderLayout()
+
+        embeddingCheckbox.isEnabled = Clip.testLoad()
 
         val leftPanel = JPanel(FlowLayout(FlowLayout.LEFT, 5, 5))
         val rightPanel = JPanel(FlowLayout(FlowLayout.RIGHT, 5, 5))
@@ -33,9 +43,8 @@ class CheckboxPanel(
 
         val label = JBLabel("Filters:")
         val fuzzyCheckbox = JBCheckBox("Fuzzy")
-        fuzzyCheckbox.isSelected = PropertiesComponent.getInstance().getBoolean(FUZZY_CHECKBOX_STATE_KEY, false)
+        fuzzyCheckbox.isSelected = PropertiesComponent.getInstance().getBoolean(FUZZY_CHECKBOX_STATE_KEY, true)
 
-        val embeddingCheckbox = JBCheckBox("Embeddings")
         embeddingCheckbox.toolTipText = "To enable this enable on the settings page."
         embeddingCheckbox.isSelected = PropertiesComponent.getInstance().getBoolean(EMBEDDING_CHECKBOX_STATE_KEY, false)
 
@@ -59,5 +68,21 @@ class CheckboxPanel(
 
         add(leftPanel, BorderLayout.WEST)
         add(rightPanel, BorderLayout.EAST)
+
+        val connection = project.messageBus.connect()
+        connection.subscribe(FLAG_CHANGED_TOPIC, object : FlagChangedListener {
+            override fun onFlagChanged(newFlag: Boolean) {
+                embeddingCheckbox.isEnabled = newFlag
+                embeddingCheckbox.isSelected = true
+            }
+        })
+    }
+
+    fun disableEmbedding() {
+        embeddingCheckbox.isEnabled = false
+    }
+
+    fun enableEmbedding() {
+        embeddingCheckbox.isEnabled = true
     }
 }

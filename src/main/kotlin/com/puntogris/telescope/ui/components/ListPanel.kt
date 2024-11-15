@@ -59,7 +59,7 @@ class ListPanel(
             add(textLabel)
         }
 
-        class SVGPanel() : JPanel() {
+        class SVGPanel : JPanel() {
             private var svgDiagram: SVGDiagram? = null
 
             fun set(svgContent: String) {
@@ -68,23 +68,30 @@ class ListPanel(
                 val svgUri = svgUniverse.loadSVG(StringReader(svgContent), "svg")
                 svgDiagram = svgUniverse.getDiagram(svgUri)
 
-                // Set panel size to match SVG dimensions if available
-                svgDiagram?.let {
-                    preferredSize = Dimension(50, 50)
-                }
+                // Set panel size to the maximum bounding box (50x50)
+                preferredSize = Dimension(50, 50)
             }
 
             override fun paintComponent(g: Graphics) {
                 super.paintComponent(g)
                 val g2d = g as Graphics2D
 
-                // Calculate the scaling factors to fit SVG to target width and height
                 svgDiagram?.let {
-                    val scaleX = 50.0 / it.width
-                    val scaleY = 50.0 / it.height
-                    g2d.scale(scaleX, scaleY)
+                    // Calculate scaling factor to maintain aspect ratio
+                    val scale = 50.0 / maxOf(it.width, it.height)
+
+                    // Center the image by translating
+                    val translateX = (50 - it.width * scale) / 2
+                    val translateY = (50 - it.height * scale) / 2
+                    g2d.translate(translateX, translateY)
+
+                    // Apply scaling
+                    g2d.scale(scale, scale)
                     it.render(g2d)
-                    g2d.scale(1 / scaleX, 1 / scaleY) // Reset scaling to avoid affecting other drawings
+
+                    // Reset scaling and translation to avoid affecting other drawings
+                    g2d.scale(1 / scale, 1 / scale)
+                    g2d.translate(-translateX, -translateY)
                 }
             }
         }

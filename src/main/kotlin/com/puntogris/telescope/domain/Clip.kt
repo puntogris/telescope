@@ -1,10 +1,8 @@
 package com.puntogris.telescope.domain
 
 import android.clip.cpp.CLIPAndroid
-import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.vfs.VirtualFile
-import com.puntogris.telescope.ui.pages.AI_MODEL_PATH_KEY
 
 object Clip {
 
@@ -15,9 +13,7 @@ object Clip {
     //TODO mb we should only load it once
     private val clip: CLIPAndroid
         get() = CLIPAndroid().apply {
-            load(
-                PropertiesComponent.getInstance().getValue(AI_MODEL_PATH_KEY, ""), CLIP_VERBOSITY
-            )
+            load(GlobalStorage.getModelPath(), CLIP_VERBOSITY)
         }
 
     fun encodeFileImage(file: VirtualFile): FloatArray {
@@ -48,7 +44,7 @@ object Clip {
         }
     }
 
-    fun testLoad(): Boolean {
+    fun isValidModel(): Boolean {
         try {
             clip
             return true

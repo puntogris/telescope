@@ -1,7 +1,6 @@
 package com.puntogris.telescope.ui.pages
 
 import com.intellij.icons.AllIcons
-import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.fileChooser.FileChooser
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
@@ -10,30 +9,27 @@ import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.components.JBLabel
-import com.intellij.util.messages.Topic
+import com.puntogris.telescope.utils.documentText
 import com.puntogris.telescope.domain.Clip
+import com.puntogris.telescope.domain.GlobalStorage
+import com.puntogris.telescope.domain.SETTINGS_TOPIC
 import com.puntogris.telescope.ui.components.Hyperlink
+import org.kohsuke.rngom.util.Uri
 import java.awt.*
 import java.awt.datatransfer.DataFlavor
+import java.net.URI
 import java.net.URL
 import java.nio.file.Files
 import java.nio.file.Paths
+import java.nio.file.Path
 import javax.swing.*
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 import kotlin.io.path.absolutePathString
 
-
-const val AI_MODEL_PATH_KEY = "AI_MODEL_PATH_KEY"
-interface FlagChangedListener {
-    fun onFlagChanged(newFlag: Boolean)
-}
-
-val FLAG_CHANGED_TOPIC = Topic.create("FlagChanged", FlagChangedListener::class.java)
-
 class SettingsPage(private val project: Project) : JPanel() {
 
-    val pathInput = JBTextField(30)
+    private val pathInput = JBTextField(30)
 
     private val documentListener = object : DocumentListener {
         override fun insertUpdate(e: DocumentEvent?) {
@@ -51,12 +47,12 @@ class SettingsPage(private val project: Project) : JPanel() {
 
     private fun setEvent(e: DocumentEvent?) {
         if (e == null) {
-            PropertiesComponent.getInstance().setValue(AI_MODEL_PATH_KEY, "")
+            GlobalStorage.setModelPath("")
         } else {
-            PropertiesComponent.getInstance().setValue(AI_MODEL_PATH_KEY, e.document.getText(0, e.document.length))
+            GlobalStorage.setModelPath(e.documentText)
         }
-        val isValid = Clip.testLoad()
-        project.messageBus.syncPublisher(FLAG_CHANGED_TOPIC).onFlagChanged(isValid)
+        val isValid = Clip.isValidModel()
+        project.messageBus.syncPublisher(SETTINGS_TOPIC).onModelPathUpdated(isValid)
         thisLogger().warn("logeto_setting_$isValid")
     }
 
@@ -102,7 +98,7 @@ class SettingsPage(private val project: Project) : JPanel() {
 
     private fun inputComponent(project: Project): JPanel {
         val inputPanel = JPanel(BorderLayout())
-        pathInput.text = PropertiesComponent.getInstance().getValue(AI_MODEL_PATH_KEY, "")
+        pathInput.text = GlobalStorage.getModelPath()
         pathInput.document.addDocumentListener(documentListener)
 
 
@@ -180,9 +176,8 @@ class SettingsPage(private val project: Project) : JPanel() {
         // Create a background task to download the file
         object : Task.Backgroundable(project, "Downloading model", true) {
             override fun run(indicator: ProgressIndicator) {
-                val fileUrl = URL(url)
+                val fileUrl = URI(url).toURL()
                 val destinationPath = Paths.get(path)
-                thisLogger().warn("logeto_${destinationPath.absolutePathString()}")
 
                 // Start the download and update the progress
                 downloadFileWithProgress(fileUrl, destinationPath, indicator)
@@ -190,7 +185,7 @@ class SettingsPage(private val project: Project) : JPanel() {
         }.queue()
     }
 
-    private fun downloadFileWithProgress(url: URL, destinationPath: java.nio.file.Path, indicator: ProgressIndicator) {
+    private fun downloadFileWithProgress(url: URL, destinationPath: Path, indicator: ProgressIndicator) {
         try {
             // Open input stream to download the file
             val inputStream = url.openStream()
@@ -225,8 +220,7 @@ class SettingsPage(private val project: Project) : JPanel() {
             } else {
                 JOptionPane.showMessageDialog(this, "Download Complete!")
                 pathInput.text = destinationPath.absolutePathString()
-                PropertiesComponent.getInstance().setValue(AI_MODEL_PATH_KEY, destinationPath.absolutePathString())
-
+                GlobalStorage.setModelPath(destinationPath.absolutePathString())
             }
 
         } catch (e: Exception) {

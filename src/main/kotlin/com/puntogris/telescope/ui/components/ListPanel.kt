@@ -1,11 +1,15 @@
 package com.puntogris.telescope.ui.components
 
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.openapi.vfs.readText
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBList
 import com.intellij.ui.components.JBScrollPane
-import java.awt.Component
-import java.awt.FlowLayout
+import com.kitfox.svg.SVGDiagram
+import com.kitfox.svg.SVGUniverse
+import com.puntogris.telescope.domain.VectorDrawableConverter
+import java.awt.*
+import java.io.StringReader
 import javax.swing.*
 
 class ListPanel(
@@ -18,6 +22,7 @@ class ListPanel(
     private var lastSelectedPath = ""
 
     private val list = JBList<VirtualFile>()
+
     init {
         list.cellRenderer = FileListCellRenderer()
         list.model = listModel
@@ -44,13 +49,44 @@ class ListPanel(
     }
 
     private class FileListCellRenderer : JPanel(), ListCellRenderer<VirtualFile> {
-        private val iconLabel: XmlDrawable = XmlDrawable("")
         private val textLabel: JLabel = JBLabel()
+        private val svgLabel = SVGPanel()
 
         init {
             layout = FlowLayout(FlowLayout.LEFT, 5, 5)
-            add(iconLabel)
+            isOpaque = true // Make sure the panel is opaque
+            add(svgLabel)
             add(textLabel)
+        }
+
+        class SVGPanel() : JPanel() {
+            private var svgDiagram: SVGDiagram? = null
+
+            fun set(svgContent: String) {
+                // Load the SVG into the SVGUniverse
+                val svgUniverse = SVGUniverse()
+                val svgUri = svgUniverse.loadSVG(StringReader(svgContent), "svg")
+                svgDiagram = svgUniverse.getDiagram(svgUri)
+
+                // Set panel size to match SVG dimensions if available
+                svgDiagram?.let {
+                    preferredSize = Dimension(50, 50)
+                }
+            }
+
+            override fun paintComponent(g: Graphics) {
+                super.paintComponent(g)
+                val g2d = g as Graphics2D
+
+                // Calculate the scaling factors to fit SVG to target width and height
+                svgDiagram?.let {
+                    val scaleX = 50.0 / it.width
+                    val scaleY = 50.0 / it.height
+                    g2d.scale(scaleX, scaleY)
+                    it.render(g2d)
+                    g2d.scale(1 / scaleX, 1 / scaleY) // Reset scaling to avoid affecting other drawings
+                }
+            }
         }
 
         override fun getListCellRendererComponent(
@@ -62,11 +98,50 @@ class ListPanel(
         ): Component {
             textLabel.text = value.name
 
-            background = if (isSelected) list.selectionBackground else list.background
-            foreground = if (isSelected) list.selectionForeground else list.foreground
-            border = BorderFactory.createEmptyBorder(5, 5, 5, 5)
+
+            try {
+                val xml = value.readText()
+                if (value.extension == "xml" && xml.startsWith("<vector")) {
+                    val svg = replaceColors(VectorDrawableConverter().transform(xml))
+                    svgLabel.set(svg)
+                }
+            } catch (t: Throwable) {
+                // TODO map the most amount of drawable and for the rest show error icon
+            }
+
+            // Handle selection state
+            if (isSelected) {
+                background = list.selectionBackground
+                foreground = list.selectionForeground
+            } else {
+                background = list.background
+                foreground = list.foreground
+            }
+
+            textLabel.foreground = foreground
+
+            // Ensure the panel uses the correct background
+            isOpaque = true
+
+            // Set proper borders
+            border = if (cellHasFocus) {
+                BorderFactory.createLineBorder(list.selectionBackground)
+            } else {
+                BorderFactory.createEmptyBorder(1, 1, 1, 1)
+            }
 
             return this
+        }
+
+        //TODO we should find at least the res colors we know in each module
+        // save them in a map, maybe part of the sync process or list
+        fun replaceColors(svgText: String): String {
+            val fillRegex = """fill="[^"]*"""".toRegex()
+            val strokeRegex = """stroke="[^"]*"""".toRegex()
+
+            return svgText
+                .replace(fillRegex, """fill="#000000"""")
+                .replace(strokeRegex, """stroke="#000000"""")
         }
     }
 }

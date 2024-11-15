@@ -30,7 +30,7 @@ class XmlDrawable(xml: String) : JSVGCanvas(SVGUserAgentAdapter(), false, false)
         setSVGDocument(factory.createSVGDocument(null, StringReader(svgString)))
     }
 
-    private class NoOpErrorHandler : ErrorHandler {
+     class NoOpErrorHandler : ErrorHandler {
         override fun warning(exception: SAXParseException) = Unit
         override fun error(exception: SAXParseException) = Unit
         override fun fatalError(exception: SAXParseException) = Unit

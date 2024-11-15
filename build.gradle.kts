@@ -13,9 +13,13 @@ repositories {
 }
 
 dependencies {
-    implementation("org.apache.xmlgraphics:batik-all:1.18")
+    implementation("org.apache.xmlgraphics:batik-all:1.18") {
+        exclude("xml-apis")
+    }
+
     implementation("org.xerial:sqlite-jdbc:3.47.0.0")
     implementation(project(":clip"))
+    implementation(files("libs/svgSalamander-1.1.4.jar"))
 }
 // Configure Gradle IntelliJ Plugin
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html

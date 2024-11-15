@@ -43,6 +43,7 @@ class HomePage(project: Project): JPanel() {
 
     private fun getResDirectories(project: Project): List<VirtualFile> {
         return project.baseDir.children
+            .filter { it.isDirectory }
             .mapNotNull { it.findDirectory("src/main/res/drawable") }
             .flatMap { it.children.toList() }
     }

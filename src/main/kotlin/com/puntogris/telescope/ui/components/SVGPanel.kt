@@ -8,14 +8,19 @@ import java.awt.Graphics2D
 import java.io.StringReader
 import javax.swing.JPanel
 
-class SVGPanel(private val size: Double = 50.0) : JPanel() {
+class SVGPanel(svgString: String, private val size: Double = 50.0) : JPanel() {
+
     private var svgDiagram: SVGDiagram? = null
 
-    fun set(svgContent: String) {
+    init {
+        set(svgString, size)
+    }
+
+    fun set(svgContent: String, size: Double) {
         val svgUniverse = SVGUniverse()
         val svgUri = svgUniverse.loadSVG(StringReader(svgContent), "svg")
         svgDiagram = svgUniverse.getDiagram(svgUri)
-        preferredSize = Dimension(50, 50)
+        preferredSize = Dimension(size.toInt(), size.toInt())
     }
 
     override fun paintComponent(g: Graphics) {

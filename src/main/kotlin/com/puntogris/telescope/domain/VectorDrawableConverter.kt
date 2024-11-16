@@ -398,10 +398,10 @@ class VectorDrawableConverter {
 
         // Handle pretty printing if requested
         if (options["pretty"] == true) {
-            // You can use a Kotlin XML formatting library here
+            // You can use a Kotlin com.puntogris.telescope.utils.XML formatting library here
             // For example, using kotlin-xml-formatter or similar
             // For now, we'll return the unformatted string
-            // TODO: Implement XML formatting
+            // TODO: Implement com.puntogris.telescope.utils.XML formatting
         }
 
         return svgString

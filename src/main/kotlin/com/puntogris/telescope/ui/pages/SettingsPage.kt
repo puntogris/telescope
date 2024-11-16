@@ -1,60 +1,25 @@
 package com.puntogris.telescope.ui.pages
 
-import com.intellij.icons.AllIcons
-import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.fileChooser.FileChooser
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
-import com.intellij.ui.components.JBTextField
 import com.intellij.ui.components.JBLabel
-import com.puntogris.telescope.utils.documentText
-import com.puntogris.telescope.domain.Clip
-import com.puntogris.telescope.domain.GlobalStorage
-import com.puntogris.telescope.domain.SETTINGS_TOPIC
 import com.puntogris.telescope.ui.components.Hyperlink
-import org.kohsuke.rngom.util.Uri
+import com.puntogris.telescope.ui.components.PathComponent
 import java.awt.*
-import java.awt.datatransfer.DataFlavor
 import java.net.URI
 import java.net.URL
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.Path
 import javax.swing.*
-import javax.swing.event.DocumentEvent
-import javax.swing.event.DocumentListener
 import kotlin.io.path.absolutePathString
 
 class SettingsPage(private val project: Project) : JPanel() {
 
-    private val pathInput = JBTextField(30)
-
-    private val documentListener = object : DocumentListener {
-        override fun insertUpdate(e: DocumentEvent?) {
-            setEvent(e)
-        }
-
-        override fun removeUpdate(e: DocumentEvent?) {
-            setEvent(e)
-        }
-
-        override fun changedUpdate(e: DocumentEvent?) {
-            setEvent(e)
-        }
-    }
-
-    private fun setEvent(e: DocumentEvent?) {
-        if (e == null) {
-            GlobalStorage.setModelPath("")
-        } else {
-            GlobalStorage.setModelPath(e.documentText)
-        }
-        val isValid = Clip.isValidModel()
-        project.messageBus.syncPublisher(SETTINGS_TOPIC).onModelPathUpdated(isValid)
-        thisLogger().warn("logeto_setting_$isValid")
-    }
+    private val pathComponent = PathComponent(project)
 
     init {
         layout = BoxLayout(this, BoxLayout.Y_AXIS)
@@ -63,7 +28,7 @@ class SettingsPage(private val project: Project) : JPanel() {
         add(title())
         add(subtitle())
         add(Box.createRigidArea(Dimension(0, 10)))
-        add(inputComponent(project))
+        add(pathComponent)
         add(Box.createRigidArea(Dimension(0, 10)))
 
         val downloadLabel = JLabel("If you don't want to use a custom one i recommend you this one at only 85MB")
@@ -94,92 +59,31 @@ class SettingsPage(private val project: Project) : JPanel() {
             alignmentX = LEFT_ALIGNMENT
         }
     }
- //
-
-    private fun inputComponent(project: Project): JPanel {
-        val inputPanel = JPanel(BorderLayout())
-        pathInput.text = GlobalStorage.getModelPath()
-        pathInput.document.addDocumentListener(documentListener)
-
-
-        val panel = JPanel(BorderLayout(5, 0)).apply {
-            alignmentX = LEFT_ALIGNMENT
-
-            val height = pathInput.preferredSize.height
-            maximumSize = Dimension(Int.MAX_VALUE, height)
-            preferredSize = Dimension(preferredSize.width, height)
-        }
-        panel.alignmentX = LEFT_ALIGNMENT
-
-        val pathLabel = JBLabel("Model absolute path:")
-        inputPanel.add(pathLabel, BorderLayout.LINE_START)
-
-        val rightPanel = JPanel()
-        rightPanel.layout = BoxLayout(rightPanel, BoxLayout.X_AXIS)
-        val pasteButton = JButton(AllIcons.Actions.MenuPaste)
-        val filesButton = JButton(AllIcons.Actions.AddFile)
-
-        filesButton.addActionListener {
-            chooseFile(project,
-                onFileSelected = {
-                    pathInput.text = it
-                }
-            )
-        }
-        rightPanel.add(pasteButton)
-        rightPanel.add(filesButton)
-        pasteButton.addActionListener {
-            try {
-                val clipboard = Toolkit.getDefaultToolkit().systemClipboard
-                val content = clipboard.getData(DataFlavor.stringFlavor) as String
-                pathInput.text = content
-            } catch (ignored: Exception) {
-            }
-        }
-
-        panel.add(inputPanel, BorderLayout.WEST)
-        panel.add(pathInput, BorderLayout.CENTER)
-        panel.add(rightPanel, BorderLayout.EAST)
-
-        return panel
-    }
-
-    private fun chooseFile(project: Project, onFileSelected: (String) -> Unit) {
-        val fileDescription = FileChooserDescriptor(true, false, false, false, false, false)
-        fileDescription.withFileFilter {
-            it.extension == "gguf"
-        }
-        val file = FileChooser.chooseFile(fileDescription, project, null)
-
-        if (file != null) {
-            onFileSelected(file.path)
-        }
-    }
 
     private fun chooseFolder(project: Project): String {
         val fileDescription = FileChooserDescriptor(false, true, false, false, false, false)
         fileDescription.withFileFilter {
             it.extension == "gguf"
         }
-       return  FileChooser.chooseFile(fileDescription, project, null)?.path ?: ""
+        return FileChooser.chooseFile(fileDescription, project, null)?.path ?: ""
     }
 
     private fun startDownload() {
         val folder = chooseFolder(project)
         if (folder.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Folder invalid!")
+            showMessageDialog("Folder invalid!")
             return
         }
-        val url = "https://huggingface.co/mys/ggml_CLIP-ViT-B-32-laion2B-s34B-b79K/resolve/main/CLIP-ViT-B-32-laion2B-s34B-b79K_ggml-model-f16.gguf"
+        val url =
+            "https://huggingface.co/mys/ggml_CLIP-ViT-B-32-laion2B-s34B-b79K/resolve/main/CLIP-ViT-B-32-laion2B-s34B-b79K_ggml-model-f16.gguf"
         val name = "CLIP-ViT-B-32-laion2B-s34B-b79K_ggml-model-f16.gguf"
         val path = "${folder}/${name}"
-        // Create a background task to download the file
+
         object : Task.Backgroundable(project, "Downloading model", true) {
             override fun run(indicator: ProgressIndicator) {
                 val fileUrl = URI(url).toURL()
                 val destinationPath = Paths.get(path)
 
-                // Start the download and update the progress
                 downloadFileWithProgress(fileUrl, destinationPath, indicator)
             }
         }.queue()
@@ -187,7 +91,6 @@ class SettingsPage(private val project: Project) : JPanel() {
 
     private fun downloadFileWithProgress(url: URL, destinationPath: Path, indicator: ProgressIndicator) {
         try {
-            // Open input stream to download the file
             val inputStream = url.openStream()
             val outputStream = Files.newOutputStream(destinationPath)
 
@@ -196,7 +99,6 @@ class SettingsPage(private val project: Project) : JPanel() {
             var totalBytesRead = 0
             val contentLength = url.openConnection().contentLengthLong
 
-            // Loop to read from input stream and write to output stream
             while (inputStream.read(buffer).also { bytesRead = it } != -1) {
                 if (indicator.isCanceled) {
                     break
@@ -205,29 +107,29 @@ class SettingsPage(private val project: Project) : JPanel() {
                 outputStream.write(buffer, 0, bytesRead)
                 totalBytesRead += bytesRead
 
-                // Update the progress bar
                 val progress = totalBytesRead.toDouble() / contentLength
                 indicator.fraction = progress
             }
 
-            // Close streams after download is complete
             inputStream.close()
             outputStream.close()
 
-            // Optional: Show a message when download is complete
             if (indicator.isCanceled) {
-                JOptionPane.showMessageDialog(this, "Download Canceled!")
+                showMessageDialog("Download Canceled!")
             } else {
-                JOptionPane.showMessageDialog(this, "Download Complete!")
-                pathInput.text = destinationPath.absolutePathString()
-                GlobalStorage.setModelPath(destinationPath.absolutePathString())
+                showMessageDialog("Download Complete!")
+                pathComponent.updatePath(destinationPath.absolutePathString())
             }
 
         } catch (e: Exception) {
             e.printStackTrace()
-            SwingUtilities.invokeLater {
-                JOptionPane.showMessageDialog(this, "Error downloading file!")
-            }
+            showMessageDialog("Error downloading file!")
+        }
+    }
+
+    private fun showMessageDialog(message: String) {
+        SwingUtilities.invokeLater {
+            JOptionPane.showMessageDialog(this, message)
         }
     }
 }

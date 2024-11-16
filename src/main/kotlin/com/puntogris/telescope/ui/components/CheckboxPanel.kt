@@ -15,25 +15,23 @@ import javax.swing.JButton
 import javax.swing.JPanel
 
 class CheckboxPanel(
-    private val onRefreshClicked: () -> Unit,
-    private val project: Project
-) : JPanel() {
+    private val project: Project,
+    private val onRefreshClicked: () -> Unit
+) : JPanel(), SettingsListener {
+
+    private val fuzzyCheckbox = JBCheckBox("Fuzzy").apply {
+        isSelected = GlobalStorage.getFuzzyState()
+        addActionListener {
+            GlobalStorage.setFuzzyState(isSelected)
+        }
+    }
 
     private val embeddingCheckbox = JBCheckBox("Embeddings").apply {
         toolTipText = "To enable this enable on the settings page."
         isEnabled = Clip.isValidModel()
         isSelected = GlobalStorage.getEmbeddingsState()
-
         addActionListener {
             GlobalStorage.setEmbeddingsState(isSelected)
-        }
-    }
-
-    private val fuzzyCheckbox = JBCheckBox("Fuzzy").apply {
-        isSelected = GlobalStorage.getFuzzyState()
-
-        addActionListener {
-            GlobalStorage.setFuzzyState(isSelected)
         }
     }
 
@@ -60,12 +58,11 @@ class CheckboxPanel(
     }
 
     private fun subscribe() {
-        val connection = project.messageBus.connect()
-        connection.subscribe(SETTINGS_TOPIC, object : SettingsListener {
-            override fun onModelPathUpdated(validPath: Boolean) {
-                embeddingCheckbox.isEnabled = validPath
-                embeddingCheckbox.isSelected = true
-            }
-        })
+        project.messageBus.connect().subscribe(SETTINGS_TOPIC, this)
+    }
+
+    override fun onModelPathUpdated(validPath: Boolean) {
+        embeddingCheckbox.isEnabled = validPath
+        embeddingCheckbox.isSelected = true
     }
 }

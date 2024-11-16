@@ -12,28 +12,29 @@ import javax.swing.JPanel
 
 class HomePage(project: Project): JPanel() {
 
+    private val list = ListPanel(
+        files = getResDirectories(project),
+        onClick = {
+            val fileEditorManager = FileEditorManager.getInstance(project)
+            fileEditorManager.openFile(it, true)
+        }
+    )
+
+    private val checkbox = CheckboxPanel(
+        project = project,
+        onRefreshClicked = {
+
+        }
+    )
+
+    private val search = SearchPanel(
+        onChange = {
+            list.filter(it)
+        }
+    )
+
     init {
         layout = BoxLayout(this, BoxLayout.Y_AXIS)
-
-        val list = ListPanel(
-            files = getResDirectories(project),
-            onClick = {
-                val fileEditorManager = FileEditorManager.getInstance(project)
-                fileEditorManager.openFile(it, true)
-            }
-        )
-
-        val checkbox = CheckboxPanel(
-            onRefreshClicked = {
-
-            },
-            project
-        )
-        val search = SearchPanel(
-            onChange = {
-                list.filter(it)
-            }
-        )
 
         add(checkbox)
         add(search)

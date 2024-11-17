@@ -7,6 +7,7 @@ import java.awt.Image
 import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
+import javax.swing.SwingWorker
 import kotlin.io.path.absolutePathString
 
 object DiskCache {
@@ -16,9 +17,23 @@ object DiskCache {
     private var projectName: String? = null
     private var cacheDir: String? = null
 
+    fun init(name: String) {
+        projectName = name
+        cacheDir = getCacheDir()
+    }
+
     fun put(image: Image, format: String, path: String) {
-        val dir = File(getCacheDir(), path.hashCode().toString())
-        ImageIO.write(toBufferedImage(image), format.uppercase(), dir)
+        val worker = object : SwingWorker<Unit, Unit>() {
+            override fun doInBackground() {
+                try {
+                    val dir = File(getCacheDir(), path.hashCode().toString())
+                    ImageIO.write(toBufferedImage(image), format.uppercase(), dir)
+                } catch (ignored: Throwable) {
+                }
+
+            }
+        }
+        worker.execute()
     }
 
     fun getIfPresent(path: String): BufferedImage? {
@@ -45,10 +60,5 @@ object DiskCache {
             this.cacheDir = cacheDir.absolutePath
         }
         return cacheDir
-    }
-
-    fun init(name: String) {
-        projectName = name
-        cacheDir = getCacheDir()
     }
 }

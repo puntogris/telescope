@@ -46,6 +46,7 @@ object Files {
     //create embeddings and store in db
     fun refresh() {
         MemoryCache.svg.invalidateAll()
+        DiskCache.invalidateAll()
         if (GlobalStorage.getEmbeddingsState()) {
             // todo create new embeddings
         }

@@ -58,12 +58,12 @@ class XmlVector(private val fileContent: String, val path: String) : Preview() {
         return try {
             val cached = MemoryCache.svg.getIfPresent(path)
 
-            if (cached == null) {
+            if (cached != null) {
+                SVGPanel(cached)
+            } else {
                 val svg = VectorDrawableConverter().transform(fileContent).replaceUnknownColors()
                 MemoryCache.svg.put(path, svg)
                 SVGPanel(svg)
-            } else {
-                SVGPanel(cached)
             }
         } catch (ignored: Throwable) {
             defaultPreview
@@ -74,17 +74,15 @@ class XmlVector(private val fileContent: String, val path: String) : Preview() {
 class RasterImage(private val file: VirtualFile) : Preview() {
     override fun render(): JPanel {
         return try {
-            val cachedImage = DiskCache.getIfPresent(file.path)
+            val cached = DiskCache.getIfPresent(file.path)
 
-            val img = if (cachedImage != null) {
-                cachedImage
+            val img = if (cached != null) {
+                cached
             } else {
-                val image = ImageIO.read(file.inputStream)
-                    .getScaledInstance(IMAGE_SIZE, IMAGE_SIZE, Image.SCALE_SMOOTH)
-                DiskCache.put(image, file.extension.orEmpty(), file.path)
-                image
+                val img = ImageIO.read(file.inputStream).getScaledInstance(IMAGE_SIZE, IMAGE_SIZE, Image.SCALE_SMOOTH)
+                DiskCache.put(img, file.extension.orEmpty(), file.path)
+                img
             }
-
             return object : JPanel() {
                 init {
                     preferredSize = Dimension(IMAGE_SIZE, IMAGE_SIZE)
@@ -95,7 +93,6 @@ class RasterImage(private val file: VirtualFile) : Preview() {
                     g.drawImage(img, 0, 0, this)
                 }
             }
-
         } catch (ignored: Throwable) {
             defaultPreview
         }

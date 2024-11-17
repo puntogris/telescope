@@ -25,6 +25,9 @@ object DiskCache {
             override fun doInBackground() {
                 try {
                     val dir = File(cacheDir, path.hashCode().toString())
+                    if (!dir.exists()) {
+                        dir.mkdirs()
+                    }
                     ImageIO.write(image.toBufferedImage(), format.uppercase(), dir)
                 } catch (ignored: Throwable) {
                 }
@@ -35,10 +38,23 @@ object DiskCache {
 
     fun getIfPresent(path: String): BufferedImage? {
         val dir = File(cacheDir, path.hashCode().toString())
+
         if (dir.exists()) {
             return ImageIO.read(dir)
         }
         return null
+    }
+
+    fun invalidateAll() {
+        val worker = object : SwingWorker<Unit, Unit>() {
+            override fun doInBackground() {
+                try {
+                    File(requireNotNull(cacheDir)).deleteRecursively()
+                } catch (ignored: Throwable) {
+                }
+            }
+        }
+        worker.execute()
     }
 
     private fun getCacheDir(projectName: String): String? {

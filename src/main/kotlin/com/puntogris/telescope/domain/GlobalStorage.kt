@@ -5,6 +5,7 @@ import com.intellij.ide.util.PropertiesComponent
 private const val AI_MODEL_PATH_KEY = "AI_MODEL_PATH_KEY"
 private const val FUZZY_CHECKBOX_STATE_KEY = "FUZZY_CHECKBOX_STATE_KEY"
 private const val EMBEDDING_CHECKBOX_STATE_KEY = "EMBEDDING_CHECKBOX_STATE_KEY"
+
 object GlobalStorage {
 
     fun setModelPath(path: String) {

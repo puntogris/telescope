@@ -11,10 +11,12 @@ class SearchPanel(
     private val onChange: (String) -> Unit
 ) : JPanel(), DocumentListener {
 
+    private val searchField = JTextField(30).apply {
+        document.addDocumentListener(this@SearchPanel)
+    }
+
     init {
         maximumHeight = 40
-        val searchField = JTextField(30)
-        searchField.document.addDocumentListener(this)
         add(searchField)
     }
 
@@ -31,10 +33,6 @@ class SearchPanel(
     }
 
     private fun onEvent(e: DocumentEvent?) {
-        if (e == null) {
-            onChange("")
-        } else {
-            onChange(e.documentText)
-        }
+        onChange(e?.documentText.orEmpty())
     }
 }

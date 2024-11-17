@@ -29,10 +29,16 @@ class ListPanel(
         setViewportView(list)
     }
 
+    fun setFiles(files: List<VirtualFile>) {
+        listModel.clear()
+        listModel.addAll(files)
+    }
+
     fun filter(query: String) {
         listModel.clear()
-        files.filter { it.name.contains(query, ignoreCase = true) }
-            .forEach { listModel.addElement(it) }
+        listModel.addAll(
+            files.filter { it.name.contains(query, ignoreCase = true) }
+        )
     }
 
     override fun valueChanged(e: ListSelectionEvent?) {

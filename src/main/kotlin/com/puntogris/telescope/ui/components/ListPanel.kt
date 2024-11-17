@@ -4,8 +4,6 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBList
 import com.intellij.ui.components.JBScrollPane
-import com.intellij.util.ui.ImageUtil
-import com.puntogris.telescope.models.PreviewPanel
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -94,5 +92,4 @@ class ListPanel(
             return this
         }
     }
-
 }

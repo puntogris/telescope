@@ -33,3 +33,12 @@ fun toBufferedImage(img: Image): BufferedImage {
     // Return the buffered image
     return bimage
 }
+
+
+// TODO we should map res colors
+fun String.replaceUnknownColors(): String {
+    val fillRegex = """fill="[^"]*"""".toRegex()
+    val strokeRegex = """stroke="[^"]*"""".toRegex()
+
+    return replace(fillRegex, """fill="#000000"""").replace(strokeRegex, """stroke="#000000"""")
+}

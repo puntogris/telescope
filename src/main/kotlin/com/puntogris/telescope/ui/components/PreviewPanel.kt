@@ -1,4 +1,4 @@
-package com.puntogris.telescope.models
+package com.puntogris.telescope.ui.components
 
 import com.intellij.openapi.vfs.VirtualFile
 import javax.swing.JPanel

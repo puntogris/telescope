@@ -14,38 +14,35 @@ object DiskCache {
 
     private const val PLUGIN_PACKAGE = "com.puntogris.telescope"
 
-    private var projectName: String? = null
     private var cacheDir: String? = null
 
-    fun init(name: String) {
-        projectName = name
-        cacheDir = getCacheDir()
+    fun init(projectName: String) {
+        cacheDir = getCacheDir(projectName)
     }
 
     fun put(image: Image, format: String, path: String) {
         val worker = object : SwingWorker<Unit, Unit>() {
             override fun doInBackground() {
                 try {
-                    val dir = File(getCacheDir(), path.hashCode().toString())
-                    ImageIO.write(toBufferedImage(image), format.uppercase(), dir)
+                    val dir = File(cacheDir, path.hashCode().toString())
+                    ImageIO.write(image.toBufferedImage(), format.uppercase(), dir)
                 } catch (ignored: Throwable) {
                 }
-
             }
         }
         worker.execute()
     }
 
     fun getIfPresent(path: String): BufferedImage? {
-        val dir = File(getCacheDir(), path.hashCode().toString())
+        val dir = File(cacheDir, path.hashCode().toString())
         if (dir.exists()) {
             return ImageIO.read(dir)
         }
         return null
     }
 
-    private fun getCacheDir(): String? {
-        if (cacheDir != null || projectName == null) {
+    private fun getCacheDir(projectName: String): String? {
+        if (cacheDir != null) {
             return cacheDir
         }
 
@@ -53,11 +50,11 @@ object DiskCache {
         val pluginPath = pluginCacheDir?.pluginPath
 
         if (pluginPath != null) {
-            val cacheDir = File(pluginPath.absolutePathString(), "cache/$projectName")
-            if (!cacheDir.exists()) {
-                cacheDir.mkdirs()
+            val newCacheDir = File(pluginPath.absolutePathString(), "cache/$projectName")
+            if (!newCacheDir.exists()) {
+                newCacheDir.mkdirs()
             }
-            this.cacheDir = cacheDir.absolutePath
+            cacheDir = newCacheDir.absolutePath
         }
         return cacheDir
     }

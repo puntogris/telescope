@@ -14,26 +14,24 @@ val DocumentEvent.documentText: String
 /**
  * Converts a given Image into a BufferedImage
  *
- * @param img The Image to be converted
  * @return The converted BufferedImage
  */
-fun toBufferedImage(img: Image): BufferedImage {
-    if (img is BufferedImage) {
-        return img
+fun Image.toBufferedImage(): BufferedImage {
+    if (this is BufferedImage) {
+        return this
     }
 
     // Create a buffered image with transparency
-    val bimage = BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB)
+    val bimage = BufferedImage(getWidth(null), getHeight(null), BufferedImage.TYPE_INT_ARGB)
 
     // Draw the image on to the buffered image
     val bGr = bimage.createGraphics()
-    bGr.drawImage(img, 0, 0, null)
+    bGr.drawImage(this, 0, 0, null)
     bGr.dispose()
 
     // Return the buffered image
     return bimage
 }
-
 
 // TODO we should map res colors
 fun String.replaceUnknownColors(): String {

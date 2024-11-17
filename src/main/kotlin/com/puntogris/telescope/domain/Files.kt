@@ -45,7 +45,7 @@ object Files {
     //check path model state valid/checked -> enable/disable embeddings
     //create embeddings and store in db
     fun refresh() {
-        Cache.svg.invalidateAll()
+        MemoryCache.svg.invalidateAll()
         if (GlobalStorage.getEmbeddingsState()) {
             // todo create new embeddings
         }

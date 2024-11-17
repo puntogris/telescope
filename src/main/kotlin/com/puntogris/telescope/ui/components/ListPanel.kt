@@ -4,7 +4,11 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBList
 import com.intellij.ui.components.JBScrollPane
+import com.intellij.util.ui.ImageUtil
 import com.puntogris.telescope.models.PreviewPanel
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.awt.*
 import javax.swing.*
 import javax.swing.event.ListSelectionEvent
@@ -27,6 +31,14 @@ class ListPanel(
     init {
         listModel.addAll(files)
         setViewportView(list)
+
+        MainScope().launch {
+            delay(2100)
+            repaint()
+            revalidate()
+            invalidate()
+            list.repaint()
+        }
     }
 
     fun setFiles(files: List<VirtualFile>) {

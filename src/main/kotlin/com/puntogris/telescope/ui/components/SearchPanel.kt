@@ -2,10 +2,14 @@ package com.puntogris.telescope.ui.components
 
 import com.intellij.ui.util.maximumHeight
 import com.puntogris.telescope.utils.documentText
+import java.util.*
 import javax.swing.JPanel
 import javax.swing.JTextField
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
+import kotlin.concurrent.schedule
+
+private const val DEBOUNCE_MS = 200L
 
 class SearchPanel(
     private val onChange: (String) -> Unit
@@ -14,6 +18,8 @@ class SearchPanel(
     private val searchField = JTextField(30).apply {
         document.addDocumentListener(this@SearchPanel)
     }
+
+    private var debounceTimer: Timer? = null
 
     init {
         maximumHeight = 40
@@ -33,6 +39,11 @@ class SearchPanel(
     }
 
     private fun onEvent(e: DocumentEvent?) {
-        onChange(e?.documentText.orEmpty())
+        debounceTimer?.cancel()
+        debounceTimer = Timer().apply {
+            schedule(DEBOUNCE_MS) {
+                onChange(e?.documentText.orEmpty())
+            }
+        }
     }
 }

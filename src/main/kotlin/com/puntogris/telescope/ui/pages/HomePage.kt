@@ -21,7 +21,7 @@ class HomePage(project: Project) : JPanel() {
     private val checkbox = CheckboxPanel(
         project = project,
         onRefreshClicked = {
-            Files.refresh()
+            Files.refresh(project)
         }
     )
 

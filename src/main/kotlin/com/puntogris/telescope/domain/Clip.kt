@@ -13,7 +13,7 @@ object Clip {
     //TODO mb we should only load it once
     private val clip: CLIPAndroid
         get() = CLIPAndroid().apply {
-            load(GlobalStorage.getModelPath(), CLIP_VERBOSITY)
+            load("/Users/joaquin/Documents/CLIP-ViT-B-32-laion2B-s34B-b79K_ggml-model-f16.gguf", CLIP_VERBOSITY)
         }
 
     fun encodeFileImage(file: VirtualFile): FloatArray {
@@ -32,15 +32,11 @@ object Clip {
         }
     }
 
-    fun encodeText(text: String): Result<FloatArray> {
-        try {
-            val r = clip
-            thisLogger().warn("logeto??okaa")
-            return Result.success(floatArrayOf())
+    fun encodeText(text: String): FloatArray {
+        return try {
+            clip.encodeText(text, NUMB_THREADS, VECTOR_DIMS, true)
         } catch (e: Throwable) {
-            thisLogger().warn("logeto??fail")
-
-            return Result.failure(e)
+            floatArrayOf()
         }
     }
 

@@ -8,6 +8,7 @@ import org.apache.batik.transcoder.TranscoderOutput
 import org.apache.batik.transcoder.image.JPEGTranscoder
 import org.apache.batik.transcoder.image.PNGTranscoder
 import com.puntogris.telescope.models.ImageResult
+import com.puntogris.telescope.utils.replaceUnknownColors
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -19,7 +20,7 @@ object Convert {
 
     fun toClipCompatible(file: VirtualFile): ImageResult? {
         return when(file.extension) {
-            "png" -> {
+            "png", "webp" -> {
                 val bufferedImage = ImageIO.read(ByteArrayInputStream(file.readBytes()))
                 val buff = bufferedImageToByteBuffer(bufferedImage)
                 ImageResult(
@@ -30,9 +31,25 @@ object Convert {
                 )
             }
             "xml" -> {
+                val cache = DiskCache.getIfPresent(file.path)
+                if (cache != null) {
+                    val buff = bufferedImageToByteBuffer(cache)
+                    return ImageResult(
+                        name = file.name,
+                        byteBuffer = buff,
+                        width = cache.width,
+                        height = cache.height
+                    )
+                }
                 val xml = file.readText()
-                val svg = VectorDrawableConverter().transform(xml)
+                if (!xml.startsWith("<vector")) {
+                    return null
+                }
+
+                val svg = VectorDrawableConverter().transform(xml).replaceUnknownColors()
                 val bufferedImage = convertSvgToRaster(svg, "png")
+                DiskCache.put(bufferedImage, "png", file.path)
+
                 val buff = bufferedImageToByteBuffer(bufferedImage)
                 ImageResult(
                     name = file.name,
@@ -78,8 +95,10 @@ object Convert {
             else -> throw IllegalArgumentException("Unsupported format: $format")
         }
 
-        transcoder.addTranscodingHint(PNGTranscoder.KEY_WIDTH, width.toFloat())
-        transcoder.addTranscodingHint(PNGTranscoder.KEY_HEIGHT, height.toFloat())
+//        transcoder.addTranscodingHint(PNGTranscoder.KEY_WIDTH, width.toFloat())
+//        transcoder.addTranscodingHint(PNGTranscoder.KEY_HEIGHT, height.toFloat())
+        transcoder.addTranscodingHint(PNGTranscoder.KEY_WIDTH, 224)
+        transcoder.addTranscodingHint(PNGTranscoder.KEY_HEIGHT, 224)
         transcoder.transcode(transcoderInput, transcoderOutput)
 
         inputStream.close()

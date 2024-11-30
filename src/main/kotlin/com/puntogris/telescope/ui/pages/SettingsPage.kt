@@ -1,5 +1,6 @@
 package com.puntogris.telescope.ui.pages
 
+import com.intellij.notification.NotificationType
 import com.intellij.openapi.fileChooser.FileChooser
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.progress.ProgressIndicator
@@ -8,6 +9,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.ui.components.JBLabel
 import com.puntogris.telescope.ui.components.Hyperlink
 import com.puntogris.telescope.ui.components.PathComponent
+import com.puntogris.telescope.utils.sendNotification
 import java.awt.*
 import java.net.URI
 import java.net.URL
@@ -71,7 +73,7 @@ class SettingsPage(private val project: Project) : JPanel() {
     private fun startDownload() {
         val folder = chooseFolder(project)
         if (folder.isEmpty()) {
-            showMessageDialog("Folder invalid!")
+            sendNotification(project, "Invalid Telescope AI model destination", NotificationType.ERROR)
             return
         }
         val url =
@@ -115,21 +117,14 @@ class SettingsPage(private val project: Project) : JPanel() {
             outputStream.close()
 
             if (indicator.isCanceled) {
-                showMessageDialog("Download Canceled!")
+                sendNotification(project, "Telescope AI models download canceled", NotificationType.WARNING)
             } else {
-                showMessageDialog("Download Complete!")
+                sendNotification(project, "Telescope AI models download completed", NotificationType.INFORMATION)
                 pathComponent.updatePath(destinationPath.absolutePathString())
             }
-
         } catch (e: Exception) {
             e.printStackTrace()
-            showMessageDialog("Error downloading file!")
-        }
-    }
-
-    private fun showMessageDialog(message: String) {
-        SwingUtilities.invokeLater {
-            JOptionPane.showMessageDialog(this, message)
+            sendNotification(project, "Telescope AI models download failed", NotificationType.ERROR)
         }
     }
 }

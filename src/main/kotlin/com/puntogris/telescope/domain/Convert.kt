@@ -9,6 +9,7 @@ import org.apache.batik.transcoder.image.JPEGTranscoder
 import org.apache.batik.transcoder.image.PNGTranscoder
 import com.puntogris.telescope.models.ImageResult
 import com.puntogris.telescope.utils.replaceUnknownColors
+import java.awt.Color
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -95,10 +96,8 @@ object Convert {
             else -> throw IllegalArgumentException("Unsupported format: $format")
         }
 
-//        transcoder.addTranscodingHint(PNGTranscoder.KEY_WIDTH, width.toFloat())
-//        transcoder.addTranscodingHint(PNGTranscoder.KEY_HEIGHT, height.toFloat())
-        transcoder.addTranscodingHint(PNGTranscoder.KEY_WIDTH, 224)
-        transcoder.addTranscodingHint(PNGTranscoder.KEY_HEIGHT, 224)
+        transcoder.addTranscodingHint(PNGTranscoder.KEY_WIDTH, width.toFloat() * 10 )
+        transcoder.addTranscodingHint(PNGTranscoder.KEY_HEIGHT, height.toFloat() * 10)
         transcoder.transcode(transcoderInput, transcoderOutput)
 
         inputStream.close()
@@ -107,7 +106,26 @@ object Convert {
         val byteBuffer = outputStream.toByteArray()
         outputStream.close()
 
-        return ImageIO.read(ByteArrayInputStream(byteBuffer))
+        return addWhiteBackground(ImageIO.read(ByteArrayInputStream(byteBuffer)))
+    }
+
+    private fun addWhiteBackground(originalImage: BufferedImage): BufferedImage {
+        val resultImage = BufferedImage(
+            originalImage.width,
+            originalImage.height,
+            BufferedImage.TYPE_INT_RGB
+        )
+
+        // Paint white background
+        val graphics = resultImage.createGraphics()
+        graphics.color = Color.WHITE
+        graphics.fillRect(0, 0, resultImage.width, resultImage.height)
+
+        // Draw original image on top
+        graphics.drawImage(originalImage, 0, 0, null)
+        graphics.dispose()
+
+        return resultImage
     }
 
     private fun getSvgDimensions(svgContent: String): Pair<Int, Int> {
@@ -116,8 +134,8 @@ object Convert {
         val document = documentBuilder.parse(inputStream)
         val svgElement = document.documentElement
 
-        val width = svgElement.getAttribute("width").toIntOrNull() ?: 300  // Default width if undefined
-        val height = svgElement.getAttribute("height").toIntOrNull() ?: 300  // Default height if undefined
+        val width = svgElement.getAttribute("width").toIntOrNull() ?: 224  // Default width if undefined
+        val height = svgElement.getAttribute("height").toIntOrNull() ?: 244  // Default height if undefined
 
         inputStream.close()
         return Pair(width, height)

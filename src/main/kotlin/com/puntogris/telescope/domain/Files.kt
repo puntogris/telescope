@@ -1,8 +1,13 @@
 package com.puntogris.telescope.domain
 
+import com.intellij.notification.NotificationType
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.findDirectory
+import com.puntogris.telescope.utils.sendNotification
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 object Files {
 
@@ -37,16 +42,24 @@ object Files {
 //        return drawables
 //    }
 
-    //TODO we should
-    //fetch all new files
-    //clear svg cache
-    //check path model state valid/checked -> enable/disable embeddings
-    //create embeddings and store in db
+    private suspend fun indexFiles(project: Project) {
+        getResDirectories(project).forEach {
+            Clip.encodeFileImage(it).onSuccess { emb ->
+                ImagesDB.add(it.path, emb)
+            }
+        }
+    }
+
     fun refresh(project: Project) {
-        MemoryCache.svg.invalidateAll()
-        DiskCache.invalidateAll()
-        if (GlobalStorage.getEmbeddingsState()) {
-            // todo create new embeddings
+        CoroutineScope(Dispatchers.Default).launch {
+            try {
+                DiskCache.invalidateAll()
+                ImagesDB.removeAll()
+                indexFiles(project)
+                sendNotification(project, "Telescope sync completed", NotificationType.INFORMATION)
+            } catch (e: Exception) {
+                sendNotification(project, "Telescope sync completed failed", NotificationType.ERROR)
+            }
         }
     }
 }

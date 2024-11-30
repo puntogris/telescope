@@ -4,9 +4,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBList
 import com.intellij.ui.components.JBScrollPane
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import com.puntogris.telescope.models.SearchResult
 import java.awt.*
 import javax.swing.*
 import javax.swing.event.ListSelectionEvent
@@ -29,27 +27,23 @@ class ListPanel(
     init {
         listModel.addAll(files)
         setViewportView(list)
+    }
 
-        MainScope().launch {
-            delay(2100)
-            repaint()
-            revalidate()
-            invalidate()
-            list.repaint()
+    fun filter(result: List<SearchResult>) {
+        val newData = result.mapNotNull { r -> files.find { f -> f.path == r.uri } }
+        SwingUtilities.invokeLater {
+            listModel.clear()
+            listModel.addAll(newData)
         }
     }
 
-    fun setFiles(files: List<VirtualFile>) {
-        listModel.clear()
-        listModel.addAll(files)
+    fun reset() {
+        SwingUtilities.invokeLater {
+            listModel.clear()
+            listModel.addAll(files)
+        }
     }
 
-    fun filter(query: String) {
-        listModel.clear()
-        listModel.addAll(
-            files.filter { it.name.contains(query, ignoreCase = true) }
-        )
-    }
 
     override fun valueChanged(e: ListSelectionEvent?) {
         val selected = list.selectedValue ?: return

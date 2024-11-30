@@ -2,10 +2,13 @@ package com.puntogris.telescope.ui.pages
 
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
-import com.puntogris.telescope.domain.Files
+import com.puntogris.telescope.domain.*
+import com.puntogris.telescope.domain.usecase.SearchUseCase
 import com.puntogris.telescope.ui.components.CheckboxPanel
 import com.puntogris.telescope.ui.components.ListPanel
 import com.puntogris.telescope.ui.components.SearchPanel
+import kotlinx.coroutines.*
+import kotlinx.coroutines.swing.Swing
 import javax.swing.BoxLayout
 import javax.swing.JPanel
 
@@ -13,20 +16,16 @@ class HomePage(project: Project) : JPanel() {
 
     private val list = ListPanel(
         files = Files.getResDirectories(project),
-        onClick = {
-            FileEditorManager.getInstance(project).openFile(it, true)
-        }
+        onClick = { FileEditorManager.getInstance(project).openFile(it, true) }
     )
 
     private val checkbox = CheckboxPanel(
         project = project,
-        onRefreshClicked = {
-            Files.refresh(project)
-        }
+        onRefreshClicked = { Files.refresh(project) }
     )
 
     private val search = SearchPanel(
-        onChange = list::filter
+        onChange = ::onNewSearch
     )
 
     init {
@@ -35,5 +34,21 @@ class HomePage(project: Project) : JPanel() {
         add(checkbox)
         add(search)
         add(list)
+    }
+
+    private var searchJob: Job? = null
+    private val searchUseCase = SearchUseCase()
+
+    private fun onNewSearch(query: String) {
+        searchJob?.cancel()
+
+        if (query.isBlank()) {
+            list.reset()
+        } else {
+            searchJob = CoroutineScope(Dispatchers.Swing).launch {
+                val result = searchUseCase(query)
+                list.filter(result)
+            }
+        }
     }
 }

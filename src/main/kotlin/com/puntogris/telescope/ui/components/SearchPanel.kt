@@ -2,7 +2,7 @@ package com.puntogris.telescope.ui.components
 
 import com.intellij.ui.util.maximumHeight
 import com.puntogris.telescope.utils.documentText
-import java.util.*
+import java.util.Timer
 import javax.swing.JPanel
 import javax.swing.JTextField
 import javax.swing.event.DocumentEvent

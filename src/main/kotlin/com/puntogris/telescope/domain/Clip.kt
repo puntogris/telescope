@@ -1,7 +1,6 @@
 package com.puntogris.telescope.domain
 
 import android.clip.cpp.CLIPAndroid
-import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.vfs.VirtualFile
 
 object Clip {
@@ -13,13 +12,15 @@ object Clip {
     //TODO mb we should only load it once
     private val clip: CLIPAndroid
         get() = CLIPAndroid().apply {
-            load("/Users/joaquin/Documents/CLIP-ViT-B-32-laion2B-s34B-b79K_ggml-model-f16.gguf", CLIP_VERBOSITY)
+            load("/Users/joaquin/Downloads/CLIP-ViT-B-32-laion2B-s34B-b79K_ggml-model-f32.gguf", CLIP_VERBOSITY)
         }
 
-    fun encodeFileImage(file: VirtualFile): FloatArray {
-        val converted = Convert.toClipCompatible(file)
-        return if (converted != null) {
-            return clip.encodeImage(
+    fun encodeFileImage(file: VirtualFile): Result<FloatArray> {
+        return try {
+            val converted = requireNotNull(
+                Convert.toClipCompatible(file)
+            )
+            val emb = clip.encodeImage(
                 converted.byteBuffer,
                 converted.width,
                 converted.height,
@@ -27,16 +28,18 @@ object Clip {
                 VECTOR_DIMS,
                 true
             )
-        } else {
-            FloatArray(1)
+            Result.success(emb)
+        } catch (e: Throwable) {
+            return Result.failure(e)
         }
     }
 
-    fun encodeText(text: String): FloatArray {
+    fun encodeText(text: String): Result<FloatArray> {
         return try {
-            clip.encodeText(text, NUMB_THREADS, VECTOR_DIMS, true)
+            val emb = clip.encodeText(text, NUMB_THREADS, VECTOR_DIMS, true)
+            Result.success(emb)
         } catch (e: Throwable) {
-            floatArrayOf()
+            Result.failure(e)
         }
     }
 

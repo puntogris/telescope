@@ -1,6 +1,7 @@
 plugins {
     id("java")
     id("org.jetbrains.kotlin.jvm") version "1.9.20"
+    id("org.jetbrains.kotlin.kapt") version "1.9.20"
     id("org.jetbrains.intellij") version "1.16.0"
 }
 
@@ -17,9 +18,14 @@ dependencies {
         exclude("xml-apis")
     }
 
-    implementation("org.xerial:sqlite-jdbc:3.47.0.0")
     implementation(project(":clip"))
     implementation(files("libs/svgSalamander-1.1.4.jar"))
+
+    kapt("io.objectbox:objectbox-processor:4.0.3")
+    implementation("io.objectbox:objectbox-kotlin:4.0.3")
+    implementation("io.objectbox:objectbox-macos:4.0.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.9.0")
+
 }
 // Configure Gradle IntelliJ Plugin
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html

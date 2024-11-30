@@ -17,7 +17,9 @@ object DiskCache {
     private var cacheDir: String? = null
 
     fun init(projectName: String) {
-        cacheDir = getCacheDir(projectName)
+        if (cacheDir == null) {
+            cacheDir = getCacheDir(projectName)
+        }
     }
 
     fun put(image: Image, format: String, path: String) {
@@ -74,10 +76,6 @@ object DiskCache {
     }
 
     private fun getCacheDir(projectName: String): String? {
-        if (cacheDir != null) {
-            return cacheDir
-        }
-
         val pluginCacheDir = PluginManagerCore.getPlugin(PluginId.getId(PLUGIN_PACKAGE))
         val pluginPath = pluginCacheDir?.pluginPath
 

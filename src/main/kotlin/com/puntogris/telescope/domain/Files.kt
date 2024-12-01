@@ -12,44 +12,41 @@ import kotlinx.coroutines.launch
 
 object Files {
 
+    private val dpiDirs = listOf(
+        "mipmap-hdpi",
+        "mipmap-mdpi",
+        "mipmap-xhdpi",
+        "mipmap-xxhhdpi",
+        "mipmap-xxxhdpi"
+    )
+
     // TODO figure a way to launch AN from or how to check what ide are we using
     // Only to debug in IntelliJ
     fun getResDirectories(project: Project): List<DrawableDir> {
-        val drawables = project.baseDir.children
-            .filter { it.isDirectory }
+        val baseDirs = project.baseDir.children.filter { it.isDirectory }
+
+        val drawablesDirs = baseDirs
             .mapNotNull { it.findDirectory("src/main/res/drawable") }
             .flatMap { it.children.toList() }
             .map { DrawableDir.Simple.from(it) }
 
-        val dpi = listOf(
-            "mipmap-hdpi",
-            "mipmap-mdpi",
-            "mipmap-xhdpi",
-            "mipmap-xxhhdpi",
-            "mipmap-xxxhdpi"
-        )
         //  hashMapOf<file name, HashMap<dpi dir, VirtualFile>>()
-        val tempDpis = hashMapOf<String, HashMap<String, VirtualFile>>()
+        val tempDpiDirs = hashMapOf<String, HashMap<String, VirtualFile>>()
 
-        for (d in dpi) {
-            project.baseDir.children
-                .filter { it.isDirectory }
-                .mapNotNull { it.findDirectory("src/main/res/${d}") }
+        for (dir in dpiDirs) {
+            baseDirs.mapNotNull { it.findDirectory("src/main/res/${dir}") }
                 .flatMap { it.children.toList() }
-                .map {
-                    if (tempDpis.containsKey(it.name)) {
-                        tempDpis[it.name]!![d] = it
+                .forEach {
+                    if (tempDpiDirs.containsKey(it.name)) {
+                        tempDpiDirs[it.name]!![dir] = it
                     } else {
-                        tempDpis[it.name] = hashMapOf(d to it)
+                        tempDpiDirs[it.name] = hashMapOf(dir to it)
                     }
                 }
         }
+        val dpiDirs = tempDpiDirs.map { DrawableDir.WithVariants.from(it) }
 
-        val dpis = tempDpis.map {
-            DrawableDir.WithVariants.from(it)
-        }
-
-        return (drawables + dpis).sortedBy { it.name }
+        return (drawablesDirs + dpiDirs).sortedBy { it.name }
     }
 
     // For release, we should use this

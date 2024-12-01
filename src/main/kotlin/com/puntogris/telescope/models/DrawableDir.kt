@@ -50,7 +50,7 @@ sealed class DrawableDir {
                             module = "",
                             parentDirName = v.key
                         )
-                    }
+                    }.sortedBy { it.parentDirName }
                 )
             }
         }

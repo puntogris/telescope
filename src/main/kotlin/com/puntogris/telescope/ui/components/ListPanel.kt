@@ -23,6 +23,16 @@ class ListPanel(
     private val list = JBList<DrawableDir>().apply {
         cellRenderer = FileListCellRenderer()
         model = listModel
+
+        selectionModel = object : DefaultListSelectionModel() {
+            override fun setSelectionInterval(index0: Int, index1: Int) {
+                if (isSelectedIndex(index0)) {
+                    // Clear selection briefly to allow repeated selection
+                    clearSelection()
+                }
+                super.setSelectionInterval(index0, index1)
+            }
+        }
         addListSelectionListener(this@ListPanel)
     }
 
@@ -48,15 +58,37 @@ class ListPanel(
 
 
     override fun valueChanged(e: ListSelectionEvent?) {
+        if (e == null || e.valueIsAdjusting) {
+            // Ignore interim events
+            return
+        }
         val selected = list.selectedValue ?: return
-        val selectedPath = selected.path
+        var nextPath = ""
 
-        if (lastSelectedPath != selectedPath) {
-            lastSelectedPath = selectedPath
-            list.selectedValue?.let {
-                onClick(it.file)
+        when (selected) {
+            is DrawableDir.Simple -> {
+                if (lastSelectedPath != nextPath) {
+                    nextPath = selected.path
+                    onClick(selected.file)
+                }
+            }
+
+            is DrawableDir.WithVariants -> {
+                val paths = selected.variants.map { it.mainPath }
+                if (lastSelectedPath in paths) {
+                    val currentIndex = paths.indexOf(lastSelectedPath)
+                    val nextIndex = if (currentIndex + 1 < paths.size) currentIndex + 1 else 0
+                    val next = selected.variants[nextIndex]
+                    nextPath = next.mainPath
+                    onClick(next.file)
+                } else {
+                    val first = selected.variants.first()
+                    nextPath = first.mainPath
+                    onClick(first.file)
+                }
             }
         }
+        lastSelectedPath = nextPath
     }
 
     private class FileListCellRenderer : JPanel(), ListCellRenderer<DrawableDir> {

@@ -4,6 +4,7 @@ import com.intellij.notification.NotificationType
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.findDirectory
+import com.puntogris.telescope.models.DrawableDir
 import com.puntogris.telescope.utils.sendNotification
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -13,11 +14,42 @@ object Files {
 
     // TODO figure a way to launch AN from or how to check what ide are we using
     // Only to debug in IntelliJ
-    fun getResDirectories(project: Project): List<VirtualFile> {
-        return project.baseDir.children
+    fun getResDirectories(project: Project): List<DrawableDir> {
+        val drawables = project.baseDir.children
             .filter { it.isDirectory }
             .mapNotNull { it.findDirectory("src/main/res/drawable") }
             .flatMap { it.children.toList() }
+            .map { DrawableDir.Simple.from(it) }
+
+        val dpi = listOf(
+            "mipmap-hdpi",
+            "mipmap-mdpi",
+            "mipmap-xhdpi",
+            "mipmap-xxhhdpi",
+            "mipmap-xxxhdpi"
+        )
+        //  hashMapOf<file name, HashMap<dpi dir, VirtualFile>>()
+        val tempDpis = hashMapOf<String, HashMap<String, VirtualFile>>()
+
+        for (d in dpi) {
+            project.baseDir.children
+                .filter { it.isDirectory }
+                .mapNotNull { it.findDirectory("src/main/res/${d}") }
+                .flatMap { it.children.toList() }
+                .map {
+                    if (tempDpis.containsKey(it.name)) {
+                        tempDpis[it.name]!![d] = it
+                    } else {
+                        tempDpis[it.name] = hashMapOf(d to it)
+                    }
+                }
+        }
+
+        val dpis = tempDpis.map {
+            DrawableDir.WithVariants.from(it)
+        }
+
+        return (drawables + dpis).sortedBy { it.name }
     }
 
     // For release, we should use this
@@ -44,7 +76,7 @@ object Files {
 
     private suspend fun indexFiles(project: Project) {
         getResDirectories(project).forEach {
-            Clip.encodeFileImage(it).onSuccess { emb ->
+            Clip.encodeFileImage(it.file).onSuccess { emb ->
                 ImagesDB.add(it.path, emb)
             }
         }

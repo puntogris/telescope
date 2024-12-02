@@ -1,18 +1,18 @@
 package com.puntogris.telescope.domain
 
-import com.intellij.openapi.application.PathManager
 import com.puntogris.telescope.models.ImageEntity
 import com.puntogris.telescope.models.ImageEntity_
 import com.puntogris.telescope.models.MyObjectBox
 import com.puntogris.telescope.models.SearchResult
-import com.puntogris.telescope.utils.PLUGIN_NAME
+import com.puntogris.telescope.utils.configPath
 import io.objectbox.Box
 import io.objectbox.BoxStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.nio.file.Paths
 
 object ImagesDB {
+
+    private const val DB_DIR = "db"
 
     private lateinit var store: BoxStore
 
@@ -20,11 +20,11 @@ object ImagesDB {
         if (this::store.isInitialized) {
             return
         }
-        val configPath = Paths.get(PathManager.getConfigPath(), PLUGIN_NAME, projectName)
+        val configPath = configPath.resolve(projectName)
 
         store = MyObjectBox.builder()
             .baseDirectory(configPath.toFile())
-            .name("db")
+            .name(DB_DIR)
             .build()
     }
 

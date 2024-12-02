@@ -5,3 +5,5 @@ const val WEBP = "webp"
 const val PNG = "png"
 const val JPEG = "jpeg"
 const val JPG = "jpg"
+
+const val PLUGIN_NAME = "telescope"

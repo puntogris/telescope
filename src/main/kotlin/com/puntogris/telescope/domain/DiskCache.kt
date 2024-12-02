@@ -1,18 +1,18 @@
 package com.puntogris.telescope.domain
 
-import com.intellij.ide.plugins.PluginManagerCore
-import com.intellij.openapi.extensions.PluginId
+import com.intellij.openapi.application.PathManager
+import com.puntogris.telescope.utils.PLUGIN_NAME
 import com.puntogris.telescope.utils.toBufferedImage
 import java.awt.Image
 import java.awt.image.BufferedImage
 import java.io.File
+import java.nio.file.Files
+import java.nio.file.Paths
 import javax.imageio.ImageIO
 import javax.swing.SwingWorker
 import kotlin.io.path.absolutePathString
 
 object DiskCache {
-
-    private const val PLUGIN_PACKAGE = "com.puntogris.telescope"
 
     private var cacheDir: String? = null
 
@@ -76,16 +76,10 @@ object DiskCache {
     }
 
     private fun getCacheDir(projectName: String): String? {
-        val pluginCacheDir = PluginManagerCore.getPlugin(PluginId.getId(PLUGIN_PACKAGE))
-        val pluginPath = pluginCacheDir?.pluginPath
+        val configPath = Paths.get(PathManager.getConfigPath(), PLUGIN_NAME, projectName, "cache")
+        Files.createDirectories(configPath)
 
-        if (pluginPath != null) {
-            val newCacheDir = File(pluginPath.absolutePathString(), "cache/$projectName")
-            if (!newCacheDir.exists()) {
-                newCacheDir.mkdirs()
-            }
-            cacheDir = newCacheDir.absolutePath
-        }
+        cacheDir = configPath.absolutePathString()
         return cacheDir
     }
 }

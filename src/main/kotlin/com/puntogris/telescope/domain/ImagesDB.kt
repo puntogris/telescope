@@ -1,15 +1,15 @@
 package com.puntogris.telescope.domain
 
-import com.intellij.openapi.application.PluginPathManager
+import com.intellij.openapi.application.PathManager
 import com.puntogris.telescope.models.ImageEntity
 import com.puntogris.telescope.models.ImageEntity_
 import com.puntogris.telescope.models.MyObjectBox
 import com.puntogris.telescope.models.SearchResult
+import com.puntogris.telescope.utils.PLUGIN_NAME
 import io.objectbox.Box
 import io.objectbox.BoxStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.io.File
 import java.nio.file.Paths
 
 object ImagesDB {
@@ -20,11 +20,11 @@ object ImagesDB {
         if (this::store.isInitialized) {
             return
         }
-        val pluginPath = Paths.get(PluginPathManager.getPluginHomePath("telescope"))
-        val dbPath = pluginPath.resolve(projectName)
+        val configPath = Paths.get(PathManager.getConfigPath(), PLUGIN_NAME, projectName)
+
         store = MyObjectBox.builder()
-            .baseDirectory(File("build/idea-sandbox/plugins/telescope/db4"))
-            .name("test")
+            .baseDirectory(configPath.toFile())
+            .name("db")
             .build()
     }
 

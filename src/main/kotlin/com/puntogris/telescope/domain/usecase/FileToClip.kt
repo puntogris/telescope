@@ -1,15 +1,16 @@
-package com.puntogris.telescope.domain
+package com.puntogris.telescope.domain.usecase
 
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.readBytes
 import com.intellij.openapi.vfs.readText
+import com.intellij.ui.JBColor
+import com.puntogris.telescope.domain.DiskCache
+import com.puntogris.telescope.models.ImageResult
+import com.puntogris.telescope.utils.*
 import org.apache.batik.transcoder.TranscoderInput
 import org.apache.batik.transcoder.TranscoderOutput
 import org.apache.batik.transcoder.image.JPEGTranscoder
 import org.apache.batik.transcoder.image.PNGTranscoder
-import com.puntogris.telescope.models.ImageResult
-import com.puntogris.telescope.utils.replaceUnknownColors
-import java.awt.Color
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -17,11 +18,13 @@ import java.nio.ByteBuffer
 import javax.imageio.ImageIO
 import javax.xml.parsers.DocumentBuilderFactory
 
-object Convert {
+class FileToClip {
 
-    fun toClipCompatible(file: VirtualFile): ImageResult? {
-        return when(file.extension) {
-            "png", "webp" -> {
+    private val vectorToSvg = VectorToSvg()
+
+    operator fun invoke(file: VirtualFile): ImageResult? {
+        return when (file.extension) {
+            PNG, WEBP -> {
                 val bufferedImage = ImageIO.read(ByteArrayInputStream(file.readBytes()))
                 val buff = bufferedImageToByteBuffer(bufferedImage)
                 ImageResult(
@@ -31,7 +34,8 @@ object Convert {
                     height = bufferedImage.height
                 )
             }
-            "xml" -> {
+
+            XML -> {
                 val cache = DiskCache.getIfPresent(file.path)
                 if (cache != null) {
                     val buff = bufferedImageToByteBuffer(cache)
@@ -47,9 +51,9 @@ object Convert {
                     return null
                 }
 
-                val svg = VectorDrawableConverter().transform(xml).replaceUnknownColors()
-                val bufferedImage = convertSvgToRaster(svg, "png")
-                DiskCache.put(bufferedImage, "png", file.path)
+                val svg = vectorToSvg(xml).replaceUnknownColors()
+                val bufferedImage = convertSvgToRaster(svg, PNG)
+                DiskCache.put(bufferedImage, PNG, file.path)
 
                 val buff = bufferedImageToByteBuffer(bufferedImage)
                 ImageResult(
@@ -59,6 +63,7 @@ object Convert {
                     height = bufferedImage.height
                 )
             }
+
             else -> null
         }
     }
@@ -88,8 +93,8 @@ object Convert {
         val transcoderOutput = TranscoderOutput(outputStream)
 
         val transcoder = when (format.lowercase()) {
-            "png" -> PNGTranscoder()
-            "jpeg", "jpg" -> JPEGTranscoder().apply {
+            PNG -> PNGTranscoder()
+            JPEG, JPG -> JPEGTranscoder().apply {
                 addTranscodingHint(JPEGTranscoder.KEY_QUALITY, 0.8f)  // Set JPEG quality
             }
 
@@ -118,7 +123,7 @@ object Convert {
 
         // Paint white background
         val graphics = resultImage.createGraphics()
-        graphics.color = Color.WHITE
+        graphics.color = JBColor.WHITE
         graphics.fillRect(0, 0, resultImage.width, resultImage.height)
 
         // Draw original image on top

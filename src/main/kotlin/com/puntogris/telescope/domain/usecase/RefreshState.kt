@@ -1,16 +1,19 @@
-package com.puntogris.telescope.domain
+package com.puntogris.telescope.domain.usecase
 
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.project.Project
-import com.puntogris.telescope.domain.usecase.GetResourcesUseCase
+import com.puntogris.telescope.domain.Clip
+import com.puntogris.telescope.domain.DiskCache
+import com.puntogris.telescope.domain.ImagesDB
 import com.puntogris.telescope.utils.sendNotification
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-object PluginData {
+class RefreshState {
+    private val getResources = GetResources()
 
-    fun refresh(project: Project) {
+    operator fun invoke(project: Project) {
         CoroutineScope(Dispatchers.Default).launch {
             try {
                 DiskCache.invalidateAll()
@@ -24,7 +27,7 @@ object PluginData {
     }
 
     private suspend fun indexFiles(project: Project) {
-        GetResourcesUseCase().invoke(project).drawablesRes.forEach {
+        getResources(project).drawablesRes.forEach {
             Clip.encodeFileImage(it.file).onSuccess { emb ->
                 ImagesDB.add(it.path, emb)
             }

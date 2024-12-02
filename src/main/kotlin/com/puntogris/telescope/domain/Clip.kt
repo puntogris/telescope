@@ -2,6 +2,7 @@ package com.puntogris.telescope.domain
 
 import android.clip.cpp.CLIPAndroid
 import com.intellij.openapi.vfs.VirtualFile
+import com.puntogris.telescope.domain.usecase.FileToClip
 
 object Clip {
 
@@ -15,10 +16,12 @@ object Clip {
             load("/Users/joaquin/Downloads/CLIP-ViT-B-32-laion2B-s34B-b79K_ggml-model-f32.gguf", CLIP_VERBOSITY)
         }
 
+    private val fileToClip = FileToClip()
+
     fun encodeFileImage(file: VirtualFile): Result<FloatArray> {
         return try {
             val converted = requireNotNull(
-                Convert.toClipCompatible(file)
+                fileToClip(file)
             )
             val emb = clip.encodeImage(
                 converted.byteBuffer,

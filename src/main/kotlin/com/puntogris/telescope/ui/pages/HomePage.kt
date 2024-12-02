@@ -2,9 +2,9 @@ package com.puntogris.telescope.ui.pages
 
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
-import com.puntogris.telescope.domain.*
-import com.puntogris.telescope.domain.usecase.GetResourcesUseCase
-import com.puntogris.telescope.domain.usecase.SearchUseCase
+import com.puntogris.telescope.domain.usecase.GetResources
+import com.puntogris.telescope.domain.usecase.RefreshState
+import com.puntogris.telescope.domain.usecase.SearchQuery
 import com.puntogris.telescope.ui.components.CheckboxPanel
 import com.puntogris.telescope.ui.components.ListPanel
 import com.puntogris.telescope.ui.components.SearchPanel
@@ -16,13 +16,13 @@ import javax.swing.JPanel
 class HomePage(project: Project) : JPanel() {
 
     private val list = ListPanel(
-        files = GetResourcesUseCase().invoke(project).drawablesRes,
+        files = GetResources().invoke(project).drawablesRes,
         onClick = { FileEditorManager.getInstance(project).openFile(it, true) }
     )
 
     private val checkbox = CheckboxPanel(
         project = project,
-        onRefreshClicked = { PluginData.refresh(project) }
+        onRefreshClicked = { RefreshState().invoke(project) }
     )
 
     private val search = SearchPanel(
@@ -38,7 +38,7 @@ class HomePage(project: Project) : JPanel() {
     }
 
     private var searchJob: Job? = null
-    private val searchUseCase = SearchUseCase()
+    private val searchUseCase = SearchQuery()
 
     private fun onNewSearch(query: String) {
         searchJob?.cancel()

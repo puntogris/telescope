@@ -3,14 +3,10 @@ package com.puntogris.telescope.domain.usecase
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.findDirectory
-import com.intellij.openapi.vfs.findFile
-import com.puntogris.telescope.domain.iterable
 import com.puntogris.telescope.models.DrawableRes
 import com.puntogris.telescope.models.Resources
-import org.w3c.dom.Element
-import javax.xml.parsers.DocumentBuilderFactory
 
-class GetResourcesUseCase {
+class GetResources {
 
     private val dpiVariants = listOf(
         "mipmap-hdpi",
@@ -27,7 +23,7 @@ class GetResourcesUseCase {
 
         return Resources(
             drawablesRes = getDrawableResources(baseDirs),
-            colorsRes = getColorResources(baseDirs)
+            colorsRes = GetColorResources().invoke(baseDirs)
         )
     }
 
@@ -49,40 +45,9 @@ class GetResourcesUseCase {
 
         return (drawablesRes + dpiRes).sortedBy { it.name }
     }
+}
 
-    private fun getColorResources(baseDirs: List<VirtualFile>): Map<String, Map<String, String>> {
-        // mutableMapOf<module name, Map<color name, hex value>>()
-        val colorRes = mutableMapOf<String, Map<String, String>>()
-
-        for (dir in baseDirs) {
-            val colorsFile = dir.findFile("src/main/res/values/colors.xml")
-            if (colorsFile != null) {
-                colorRes[dir.name] = extractColorFromFile(colorsFile)
-            }
-        }
-        return colorRes
-    }
-
-    private fun extractColorFromFile(file: VirtualFile): Map<String, String> {
-        val document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(file.inputStream)
-        document.documentElement.normalize()
-
-        val colorNodes = document.getElementsByTagName("color").iterable.filterIsInstance<Element>()
-
-        return buildMap {
-            colorNodes.forEach {
-                val name = it.getAttribute("name")
-                val value = it.textContent.trim()
-
-                // TODO For now we ignore colors that point to a style res, like ?primaryColor
-                if (name.isNotEmpty() && value.isNotEmpty() && !name.startsWith("?")) {
-                    put(name, value)
-                }
-            }
-        }
-    }
-
-    // For release, we should use this
+//    Alternative: For release, we should could use this, difficult to test as we need to install it manually in AS
 //    fun getResDirectoriesV2(project: Project): List<FileEmb> {
 //        val moduleManager = ModuleManager.getInstance(project)
 //        val modules = moduleManager.modules.filter { it.name.endsWith(".main") }
@@ -96,4 +61,3 @@ class GetResourcesUseCase {
 //
 //        return drawables
 //    }
-}

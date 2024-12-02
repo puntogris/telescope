@@ -7,7 +7,8 @@ import com.puntogris.telescope.models.SearchResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class SearchUseCase {
+class SearchQuery {
+
     suspend operator fun invoke(query: String): List<SearchResult> = withContext(Dispatchers.Default) {
         buildList {
             if (GlobalStorage.getFuzzyState()) {

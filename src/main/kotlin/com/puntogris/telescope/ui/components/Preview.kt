@@ -4,7 +4,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.readText
 import com.puntogris.telescope.domain.DiskCache
 import com.puntogris.telescope.domain.MemoryCache
-import com.puntogris.telescope.domain.VectorDrawableConverter
+import com.puntogris.telescope.domain.usecase.VectorToSvg
 import com.puntogris.telescope.icons.MyIcons
 import com.puntogris.telescope.utils.*
 import java.awt.Dimension
@@ -61,7 +61,7 @@ class XmlVector(private val fileContent: String, val path: String) : Preview() {
             if (cached != null) {
                 SVGPanel(cached)
             } else {
-                val svg = VectorDrawableConverter().transform(fileContent).replaceUnknownColors()
+                val svg = VectorToSvg().invoke(fileContent).replaceUnknownColors()
                 MemoryCache.svg.put(path, svg)
                 SVGPanel(svg)
             }

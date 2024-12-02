@@ -1,15 +1,15 @@
-package com.puntogris.telescope.domain
+package com.puntogris.telescope.domain.usecase
 
 import org.w3c.dom.Document
 import org.w3c.dom.Element
 import org.w3c.dom.Node
+import java.io.StringWriter
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.transform.TransformerFactory
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
-import java.io.StringWriter
 
-class VectorDrawableConverter {
+class VectorToSvg {
 
     private val attributesMap = mapOf(
         "android:pathData" to "d",
@@ -50,39 +50,8 @@ class VectorDrawableConverter {
         "android:offset" to "offset"
     )
 
-    data class TransformAttribute(val transform: String)
-
-    //TODO we should find the res values in each module
-    fun parseAndroidResource(value: String?): Map<String, String>? {
-        if (value == null) return null
-
-        val factory = DocumentBuilderFactory.newInstance()
-        val builder = factory.newDocumentBuilder()
-        val doc = builder.parse(value.byteInputStream())
-
-        val resourcesNode = doc.getElementsByTagName("resources").item(0) ?: return null
-        val map = mutableMapOf<String, String>()
-
-        for (i in 0 until resourcesNode.childNodes.length) {
-            val node = resourcesNode.childNodes.item(i)
-            if (node.nodeType != Node.ELEMENT_NODE) continue
-            if (node.firstChild.nodeType != Node.TEXT_NODE) continue
-
-            val key = "@${node.nodeName}/${(node as Element).getAttribute("name")}"
-            val nodeValue = node.textContent
-            map[key] = nodeValue
-        }
-
-        // resolve references
-        map.forEach { (key, value) ->
-            if (value.matches(Regex("@\\w+/\\w+"))) {
-                map[value]?.let { resolvedValue ->
-                    map[key] = resolvedValue
-                }
-            }
-        }
-
-        return map
+    operator fun invoke(content: String): String {
+        return transform(content)
     }
 
     private fun parsePath(root: Document, pathNode: Element): Element {
@@ -313,7 +282,7 @@ class VectorDrawableConverter {
         }
     }
 
-    fun transform(content: String, options: Map<String, Any> = emptyMap()): String {
+    private fun transform(content: String, options: Map<String, Any> = emptyMap()): String {
         val factory = DocumentBuilderFactory.newInstance()
         val builder = factory.newDocumentBuilder()
         val doc = builder.parse(content.byteInputStream())
@@ -406,4 +375,6 @@ class VectorDrawableConverter {
 
         return svgString
     }
+
+    data class TransformAttribute(val transform: String)
 }

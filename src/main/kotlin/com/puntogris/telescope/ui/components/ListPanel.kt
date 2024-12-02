@@ -5,7 +5,7 @@ import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBList
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.util.ui.JBUI
-import com.puntogris.telescope.models.DrawableDir
+import com.puntogris.telescope.models.DrawableRes
 import com.puntogris.telescope.models.SearchResult
 import java.awt.*
 import javax.swing.*
@@ -13,14 +13,14 @@ import javax.swing.event.ListSelectionEvent
 import javax.swing.event.ListSelectionListener
 
 class ListPanel(
-    private val files: List<DrawableDir>,
+    private val files: List<DrawableRes>,
     private val onClick: (VirtualFile) -> Unit
 ) : JBScrollPane(), ListSelectionListener {
 
-    private val listModel = DefaultListModel<DrawableDir>()
+    private val listModel = DefaultListModel<DrawableRes>()
     private var lastSelectedPath: String? = null
 
-    private val list = JBList<DrawableDir>().apply {
+    private val list = JBList<DrawableRes>().apply {
         cellRenderer = FileListCellRenderer()
         model = listModel
 
@@ -66,14 +66,14 @@ class ListPanel(
         var nextPath = ""
 
         when (selected) {
-            is DrawableDir.Simple -> {
+            is DrawableRes.Simple -> {
                 if (lastSelectedPath != nextPath) {
                     nextPath = selected.path
                     onClick(selected.file)
                 }
             }
 
-            is DrawableDir.WithVariants -> {
+            is DrawableRes.WithVariants -> {
                 val paths = selected.variants.map { it.mainPath }
                 if (lastSelectedPath in paths) {
                     val currentIndex = paths.indexOf(lastSelectedPath)
@@ -91,7 +91,7 @@ class ListPanel(
         lastSelectedPath = nextPath
     }
 
-    private class FileListCellRenderer : JPanel(), ListCellRenderer<DrawableDir> {
+    private class FileListCellRenderer : JPanel(), ListCellRenderer<DrawableRes> {
 
         private val nameLabel = JBLabel().apply {
             alignmentX = LEFT_ALIGNMENT
@@ -117,8 +117,8 @@ class ListPanel(
         }
 
         override fun getListCellRendererComponent(
-            list: JList<out DrawableDir>,
-            value: DrawableDir,
+            list: JList<out DrawableRes>,
+            value: DrawableRes,
             index: Int,
             isSelected: Boolean,
             cellHasFocus: Boolean
@@ -127,11 +127,11 @@ class ListPanel(
             previewPanel.bind(value.file)
 
             when (value) {
-                is DrawableDir.Simple -> {
+                is DrawableRes.Simple -> {
                     variantsLabel.isVisible = false
                 }
 
-                is DrawableDir.WithVariants -> {
+                is DrawableRes.WithVariants -> {
                     val variants = value.variants.joinToString(" - ") { it.parentDirName }
                     variantsLabel.text = "<html><a href=''>$variants</a></html>"
                     variantsLabel.isVisible = true

@@ -3,6 +3,7 @@ package com.puntogris.telescope.ui.pages
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.puntogris.telescope.domain.*
+import com.puntogris.telescope.domain.usecase.GetResourcesUseCase
 import com.puntogris.telescope.domain.usecase.SearchUseCase
 import com.puntogris.telescope.ui.components.CheckboxPanel
 import com.puntogris.telescope.ui.components.ListPanel
@@ -15,13 +16,13 @@ import javax.swing.JPanel
 class HomePage(project: Project) : JPanel() {
 
     private val list = ListPanel(
-        files = Files.getResDirectories(project),
+        files = GetResourcesUseCase().invoke(project).drawablesRes,
         onClick = { FileEditorManager.getInstance(project).openFile(it, true) }
     )
 
     private val checkbox = CheckboxPanel(
         project = project,
-        onRefreshClicked = { Files.refresh(project) }
+        onRefreshClicked = { PluginData.refresh(project) }
     )
 
     private val search = SearchPanel(

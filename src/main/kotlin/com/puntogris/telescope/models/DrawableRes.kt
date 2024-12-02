@@ -2,7 +2,7 @@ package com.puntogris.telescope.models
 
 import com.intellij.openapi.vfs.VirtualFile
 
-sealed class DrawableDir {
+sealed class DrawableRes {
 
     abstract val name: String
     abstract val path: String
@@ -13,7 +13,7 @@ sealed class DrawableDir {
         override val name: String,
         override val path: String,
         override val file: VirtualFile
-    ) : DrawableDir() {
+    ) : DrawableRes() {
 
         companion object {
             fun from(file: VirtualFile) = Simple(
@@ -31,10 +31,10 @@ sealed class DrawableDir {
         override val name: String,
         override val path: String,
         override val file: VirtualFile
-    ) : DrawableDir() {
+    ) : DrawableRes() {
 
         companion object {
-            fun from(entry: Map.Entry<String, HashMap<String, VirtualFile>>): WithVariants {
+            fun from(entry: Map.Entry<String, Map<String, VirtualFile>>): WithVariants {
                 val first = entry.value.entries.first().value
 
                 return WithVariants(

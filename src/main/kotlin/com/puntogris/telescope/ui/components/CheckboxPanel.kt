@@ -28,7 +28,7 @@ class CheckboxPanel(
 
     private val embeddingCheckbox = JBCheckBox("Embeddings").apply {
         toolTipText = "To enable this enable on the settings page."
-        isEnabled = Clip.isValidModel()
+        isEnabled = Clip.canEnableClip()
         isSelected = GlobalStorage.getEmbeddingsState()
         addActionListener {
             GlobalStorage.setEmbeddingsState(isSelected)

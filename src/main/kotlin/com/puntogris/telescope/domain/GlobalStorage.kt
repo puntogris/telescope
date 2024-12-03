@@ -2,18 +2,27 @@ package com.puntogris.telescope.domain
 
 import com.intellij.ide.util.PropertiesComponent
 
-private const val AI_MODEL_PATH_KEY = "AI_MODEL_PATH_KEY"
+private const val TEXT_MODEL_PATH_KEY = "TEXT_MODEL_PATH_KEY"
+private const val VISION_MODEL_PATH_KEY = "VISION_MODEL_PATH_KEY"
 private const val FUZZY_CHECKBOX_STATE_KEY = "FUZZY_CHECKBOX_STATE_KEY"
 private const val EMBEDDING_CHECKBOX_STATE_KEY = "EMBEDDING_CHECKBOX_STATE_KEY"
 
 object GlobalStorage {
 
-    fun setModelPath(path: String) {
-        PropertiesComponent.getInstance().setValue(AI_MODEL_PATH_KEY, path)
+    fun setTextModelPath(path: String) {
+        PropertiesComponent.getInstance().setValue(TEXT_MODEL_PATH_KEY, path)
     }
 
-    fun getModelPath(): String {
-        return PropertiesComponent.getInstance().getValue(AI_MODEL_PATH_KEY, "")
+    fun getTextModelPath(): String {
+        return PropertiesComponent.getInstance().getValue(TEXT_MODEL_PATH_KEY, "")
+    }
+
+    fun setVisionModelPath(path: String) {
+        PropertiesComponent.getInstance().setValue(VISION_MODEL_PATH_KEY, path)
+    }
+
+    fun getVisionModelPath(): String {
+        return PropertiesComponent.getInstance().getValue(VISION_MODEL_PATH_KEY, "")
     }
 
     fun setFuzzyState(state: Boolean) {

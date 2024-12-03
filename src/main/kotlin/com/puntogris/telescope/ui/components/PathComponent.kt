@@ -7,9 +7,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBTextField
 import com.puntogris.telescope.domain.Clip
-import com.puntogris.telescope.domain.GlobalStorage
 import com.puntogris.telescope.domain.SETTINGS_TOPIC
-import com.puntogris.telescope.utils.documentText
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.Toolkit
@@ -25,7 +23,8 @@ private const val GGUF_EXTENSION = "gguf"
 class PathComponent(private val project: Project) : JPanel(), DocumentListener {
 
     private val pathInput = JBTextField().apply {
-        text = GlobalStorage.getModelPath()
+        // TODO add custom text and vision paths
+        //text = GlobalStorage.getModelPath()
         document.addDocumentListener(this@PathComponent)
     }
 
@@ -85,8 +84,9 @@ class PathComponent(private val project: Project) : JPanel(), DocumentListener {
     }
 
     private fun setEvent(e: DocumentEvent?) {
-        GlobalStorage.setModelPath(e?.documentText.orEmpty())
-        val isValid = Clip.isValidModel()
+        // TODO set both paths
+        // GlobalStorage.setModelPath(e?.documentText.orEmpty())
+        val isValid = Clip.canEnableClip()
         project.messageBus.syncPublisher(SETTINGS_TOPIC).onModelPathUpdated(isValid)
     }
 

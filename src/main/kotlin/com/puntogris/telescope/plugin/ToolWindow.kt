@@ -12,7 +12,7 @@ class ToolWindow : ToolWindowFactory {
         val contentManager = window.contentManager
 
         val home = contentManager.factory.createContent(HomePage(project), "Home", false)
-        val settings = contentManager.factory.createContent(SettingsPage(project), "Settings", false)
+        val settings = contentManager.factory.createContent(SettingsPage(project).createContent(), "Settings", false)
 
         window.contentManager.addContent(home)
         window.contentManager.addContent(settings)

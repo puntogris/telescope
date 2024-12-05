@@ -4,91 +4,136 @@ import com.intellij.notification.NotificationType
 import com.intellij.openapi.fileChooser.FileChooser
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.progress.ProgressIndicator
-import com.intellij.openapi.progress.Task
+import com.intellij.openapi.progress.runBackgroundableTask
 import com.intellij.openapi.project.Project
-import com.intellij.ui.components.JBLabel
-import com.puntogris.telescope.ui.components.Hyperlink
-import com.puntogris.telescope.ui.components.PathComponent
+import com.intellij.ui.components.JBRadioButton
+import com.intellij.ui.dsl.builder.*
+import com.puntogris.telescope.domain.GlobalStorage
+import com.puntogris.telescope.models.DslComponent
+import com.puntogris.telescope.utils.configPath
 import com.puntogris.telescope.utils.sendNotification
-import java.awt.*
+import java.io.IOException
 import java.net.URI
 import java.net.URL
 import java.nio.file.Files
-import java.nio.file.Paths
 import java.nio.file.Path
 import javax.swing.*
 import kotlin.io.path.absolutePathString
 
-class SettingsPage(private val project: Project) : JPanel() {
+private const val MODEL_URL =
+    "https://huggingface.co/mys/ggml_CLIP-ViT-B-32-laion2B-s34B-b79K/resolve/main/CLIP-ViT-B-32-laion2B-s34B-b79K_ggml-model-f16.gguf"
 
-    private val pathComponent = PathComponent(project)
+class SettingsPage(private val project: Project) : DslComponent {
 
-    init {
-        layout = BoxLayout(this, BoxLayout.Y_AXIS)
-        border = BorderFactory.createEmptyBorder(10, 10, 10, 10)
+    private lateinit var defaultButton: Cell<JBRadioButton>
+    private lateinit var advancedButton: Cell<JBRadioButton>
+    private var value = true
 
-        add(title())
-        add(subtitle())
-        add(Box.createRigidArea(Dimension(0, 10)))
-        add(pathComponent)
-        add(Box.createRigidArea(Dimension(0, 10)))
+    override fun createContent(): JComponent {
+        return panel {
 
-        val downloadLabel = JLabel("If you don't want to use a custom one i recommend you this one at only 85MB")
-        val downloadButton = JButton("Download default and apply")
-
-        downloadButton.addActionListener {
-            startDownload()
-        }
-        add(downloadLabel)
-        add(downloadButton)
-
-        add(Box.createRigidArea(Dimension(0, 10)))
-
-        val info = JLabel("This uses CLIP compatible models, you can check more about them here:")
-        add(info)
-        add(Hyperlink("https://huggingface.co/models?other=clip-cpp-gguf"))
+            row {
+                text("Settings")
+            }
+            group("AI models configuration") {
+                row {
+                    comment("Choose the configuration you would like to use, the default one should be preferred.")
+                }
+                buttonsGroup {
+                    row {
+                        defaultButton = radioButton("Default models (recommended)", true)
+                    }
+                    row {
+                        advancedButton = radioButton("Advanced models", false)
+                    }
+                }.bind({ value }, { value = it })
+                separator()
+                defaultPanel().visibleIf(defaultButton.selected)
+                advancedPanel().visibleIf(advancedButton.selected)
+            }
+        }.withBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10))
     }
 
-    private fun title(): JLabel {
-        return JBLabel("Settings").apply {
-            font = font.deriveFont(18f)
-            alignmentX = LEFT_ALIGNMENT
+    private fun Panel.defaultPanel() : Panel = panel {
+        row {
+            text("This model was trained and optimized specifically for this plugin's tasks.")
+        }
+        row {
+            button("Download models") {
+                downloadModels()
+            }.comment(
+                "Models are about 100MB each and we will store at:\n${
+                    configPath.resolve("models").absolutePathString()
+                }"
+            )
         }
     }
 
-    private fun subtitle(): JLabel {
-        return JBLabel("Set the path to your AI model for generating image embeddings.").apply {
-            alignmentX = LEFT_ALIGNMENT
+    private fun downloadModels() {
+        runBackgroundableTask("Downloading model", project, cancellable = true) {
+            val fileUrl = URI(MODEL_URL).toURL()
+            val destinationPath = configPath.resolve("models")
+
+            downloadFileWithProgress(fileUrl, destinationPath, it)
         }
     }
 
-    private fun chooseFolder(project: Project): String {
-        val fileDescription = FileChooserDescriptor(false, true, false, false, false, false)
-        fileDescription.withFileFilter {
+    private fun Panel.advancedPanel() = panel {
+        var textModelComment: Cell<JEditorPane>? = null
+        var visionModelComment: Cell<JEditorPane>? = null
+        val textModelInit = GlobalStorage.getTextModelPath().ifEmpty { "None selected" }
+        val visionModelInit = GlobalStorage.getVisionModelPath().ifEmpty { "None selected" }
+
+        row {
+            text("To experiment and if you know what you are doing")
+        }
+        row {
+            button("Select text model") {
+                chooseCustomModel(project).onSuccess {
+                    GlobalStorage.setTextModelPath(it)
+                    textModelComment?.text(it)
+                }
+            }
+            textModelComment = comment(textModelInit)
+        }
+        row {
+            button("Select vision model") {
+                chooseCustomModel(project).onSuccess {
+                    GlobalStorage.setVisionModelPath(it)
+                    visionModelComment?.text(it)
+                }
+            }
+            visionModelComment = comment(visionModelInit)
+        }
+        row {
+            text("About models").bold()
+        }
+        row {
+            text("This plugin uses OpenCLIP compatible models and converted to gguf format. Keep in mind that this models will need to be load into memory so bigger models will be more demanding.")
+        }
+        row {
+            browserLink("Here are a few models available in HuggingFaces", "")
+        }
+    }
+
+    private fun chooseCustomModel(project: Project): Result<String> {
+        val fileDescription = FileChooserDescriptor(
+            true,
+            false,
+            false,
+            false,
+            false,
+            false
+        ).withFileFilter {
             it.extension == "gguf"
         }
-        return FileChooser.chooseFile(fileDescription, project, null)?.path ?: ""
-    }
+        val file = FileChooser.chooseFile(fileDescription, project, null)
 
-    private fun startDownload() {
-        val folder = chooseFolder(project)
-        if (folder.isEmpty()) {
-            sendNotification(project, "Invalid Telescope AI model destination", NotificationType.ERROR)
-            return
+        return if (file != null) {
+            Result.success(file.path)
+        } else {
+            Result.failure(IOException("File selection failed: No file selected"))
         }
-        val url =
-            "https://huggingface.co/mys/ggml_CLIP-ViT-B-32-laion2B-s34B-b79K/resolve/main/CLIP-ViT-B-32-laion2B-s34B-b79K_ggml-model-f16.gguf"
-        val name = "CLIP-ViT-B-32-laion2B-s34B-b79K_ggml-model-f16.gguf"
-        val path = "${folder}/${name}"
-
-        object : Task.Backgroundable(project, "Downloading model", true) {
-            override fun run(indicator: ProgressIndicator) {
-                val fileUrl = URI(url).toURL()
-                val destinationPath = Paths.get(path)
-
-                downloadFileWithProgress(fileUrl, destinationPath, indicator)
-            }
-        }.queue()
     }
 
     private fun downloadFileWithProgress(url: URL, destinationPath: Path, indicator: ProgressIndicator) {
@@ -120,7 +165,6 @@ class SettingsPage(private val project: Project) : JPanel() {
                 sendNotification(project, "Telescope AI models download canceled", NotificationType.WARNING)
             } else {
                 sendNotification(project, "Telescope AI models download completed", NotificationType.INFORMATION)
-                pathComponent.updatePath(destinationPath.absolutePathString())
             }
         } catch (e: Exception) {
             e.printStackTrace()

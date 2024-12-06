@@ -8,19 +8,24 @@ import com.intellij.openapi.progress.runBackgroundableTask
 import com.intellij.openapi.project.Project
 import com.intellij.ui.components.JBRadioButton
 import com.intellij.ui.dsl.builder.*
+import com.intellij.util.io.*
 import com.puntogris.telescope.domain.GlobalStorage
 import com.puntogris.telescope.models.DslComponent
 import com.puntogris.telescope.utils.configPath
 import com.puntogris.telescope.utils.sendNotification
 import java.io.IOException
 import java.net.URI
-import java.net.URL
 import java.nio.file.Files
 import java.nio.file.Path
 import javax.swing.*
-import kotlin.io.path.absolutePathString
+import kotlin.io.path.*
+import kotlin.io.path.createDirectories
+import kotlin.io.path.exists
 
-private const val MODEL_URL =
+private const val DEFAULT_VISION_MODEL_URL =
+    "https://huggingface.co/mys/ggml_CLIP-ViT-B-32-laion2B-s34B-b79K/resolve/main/CLIP-ViT-B-32-laion2B-s34B-b79K_ggml-model-f32.gguf"
+
+private const val DEFAULT_TEXT_MODEL_URL =
     "https://huggingface.co/mys/ggml_CLIP-ViT-B-32-laion2B-s34B-b79K/resolve/main/CLIP-ViT-B-32-laion2B-s34B-b79K_ggml-model-f16.gguf"
 
 class SettingsPage(private val project: Project) : DslComponent {
@@ -54,7 +59,7 @@ class SettingsPage(private val project: Project) : DslComponent {
         }.withBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10))
     }
 
-    private fun Panel.defaultPanel() : Panel = panel {
+    private fun Panel.defaultPanel(): Panel = panel {
         row {
             text("This model was trained and optimized specifically for this plugin's tasks.")
         }
@@ -66,15 +71,6 @@ class SettingsPage(private val project: Project) : DslComponent {
                     configPath.resolve("models").absolutePathString()
                 }"
             )
-        }
-    }
-
-    private fun downloadModels() {
-        runBackgroundableTask("Downloading model", project, cancellable = true) {
-            val fileUrl = URI(MODEL_URL).toURL()
-            val destinationPath = configPath.resolve("models")
-
-            downloadFileWithProgress(fileUrl, destinationPath, it)
         }
     }
 
@@ -136,15 +132,57 @@ class SettingsPage(private val project: Project) : DslComponent {
         }
     }
 
-    private fun downloadFileWithProgress(url: URL, destinationPath: Path, indicator: ProgressIndicator) {
-        try {
-            val inputStream = url.openStream()
-            val outputStream = Files.newOutputStream(destinationPath)
+    private fun downloadModels() {
+        runBackgroundableTask("Downloading text model", project, cancellable = true) {
+            downloadFileWithProgress(DEFAULT_TEXT_MODEL_URL, configPath.resolve("models"), it)
 
-            val buffer = ByteArray(4096)
+            if (it.isCanceled) {
+                sendNotification(project, "Telescope text model download canceled", NotificationType.WARNING)
+            } else {
+                sendNotification(project, "Telescope text model download completed", NotificationType.INFORMATION)
+            }
+        }
+
+        runBackgroundableTask("Downloading vision model", project, cancellable = true) {
+            downloadFileWithProgress(DEFAULT_VISION_MODEL_URL, configPath.resolve("models"), it)
+
+            if (it.isCanceled) {
+                sendNotification(project, "Telescope vision model download canceled", NotificationType.WARNING)
+            } else {
+                sendNotification(project, "Telescope vision model download completed", NotificationType.INFORMATION)
+            }
+        }
+    }
+
+    private fun downloadFileWithProgress(url: String, destinationDir: Path, indicator: ProgressIndicator) {
+        try {
+            val downloadUrl = URI(url).toURL()
+
+            if (destinationDir.notExists()) {
+                destinationDir.createDirectories()
+            }
+
+            val fileName = downloadUrl.path.substringAfterLast("/")
+            val destinationFile = destinationDir.resolve(fileName)
+
+            var localFileSize = 0L
+
+            if (destinationFile.exists() && destinationFile.isFile()) {
+                localFileSize = destinationFile.size()
+            }
+
+            val inputStream = downloadUrl.openStream()
+            val contentLength = downloadUrl.openConnection().contentLengthLong
+
+            if (localFileSize == contentLength) {
+                inputStream.close()
+                return
+            }
+
             var bytesRead: Int
             var totalBytesRead = 0
-            val contentLength = url.openConnection().contentLengthLong
+            val buffer = ByteArray(4096)
+            val outputStream = Files.newOutputStream(destinationFile)
 
             while (inputStream.read(buffer).also { bytesRead = it } != -1) {
                 if (indicator.isCanceled) {
@@ -160,12 +198,6 @@ class SettingsPage(private val project: Project) : DslComponent {
 
             inputStream.close()
             outputStream.close()
-
-            if (indicator.isCanceled) {
-                sendNotification(project, "Telescope AI models download canceled", NotificationType.WARNING)
-            } else {
-                sendNotification(project, "Telescope AI models download completed", NotificationType.INFORMATION)
-            }
         } catch (e: Exception) {
             e.printStackTrace()
             sendNotification(project, "Telescope AI models download failed", NotificationType.ERROR)

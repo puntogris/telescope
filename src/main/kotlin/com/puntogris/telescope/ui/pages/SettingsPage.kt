@@ -133,28 +133,38 @@ class SettingsPage(private val project: Project) : DslComponent {
     }
 
     private fun downloadModels() {
-        runBackgroundableTask("Downloading text model", project, cancellable = true) {
-            downloadFileWithProgress(DEFAULT_TEXT_MODEL_URL, configPath.resolve("models"), it)
+        runBackgroundableTask("Downloading text and vision models", project, cancellable = true) {
+            val modelsDir = configPath.resolve("models")
+
+            downloadFileWithProgress(DEFAULT_TEXT_MODEL_URL, modelsDir, it)
+                .onSuccess {
+
+                }
+                .onFailure {
+                    sendNotification(project, "Telescope text model download failed", NotificationType.ERROR)
+                }
+
+            downloadFileWithProgress(DEFAULT_VISION_MODEL_URL, modelsDir, it)
+                .onSuccess {
+
+                }
+                .onFailure {
+                    sendNotification(project, "Telescope vision model download failed", NotificationType.ERROR)
+                }
 
             if (it.isCanceled) {
-                sendNotification(project, "Telescope text model download canceled", NotificationType.WARNING)
+                sendNotification(project, "Telescope AI models download canceled", NotificationType.WARNING)
             } else {
-                sendNotification(project, "Telescope text model download completed", NotificationType.INFORMATION)
-            }
-        }
-
-        runBackgroundableTask("Downloading vision model", project, cancellable = true) {
-            downloadFileWithProgress(DEFAULT_VISION_MODEL_URL, configPath.resolve("models"), it)
-
-            if (it.isCanceled) {
-                sendNotification(project, "Telescope vision model download canceled", NotificationType.WARNING)
-            } else {
-                sendNotification(project, "Telescope vision model download completed", NotificationType.INFORMATION)
+                sendNotification(project, "Telescope AI models download completed", NotificationType.INFORMATION)
             }
         }
     }
 
-    private fun downloadFileWithProgress(url: String, destinationDir: Path, indicator: ProgressIndicator) {
+    private fun downloadFileWithProgress(
+        url: String,
+        destinationDir: Path,
+        indicator: ProgressIndicator
+    ): Result<String> {
         try {
             val downloadUrl = URI(url).toURL()
 
@@ -176,7 +186,7 @@ class SettingsPage(private val project: Project) : DslComponent {
 
             if (localFileSize == contentLength) {
                 inputStream.close()
-                return
+                return Result.success(destinationDir.absolutePathString())
             }
 
             var bytesRead: Int
@@ -198,9 +208,10 @@ class SettingsPage(private val project: Project) : DslComponent {
 
             inputStream.close()
             outputStream.close()
+            return Result.success(destinationDir.absolutePathString())
         } catch (e: Exception) {
             e.printStackTrace()
-            sendNotification(project, "Telescope AI models download failed", NotificationType.ERROR)
+            return Result.failure(e)
         }
     }
 }

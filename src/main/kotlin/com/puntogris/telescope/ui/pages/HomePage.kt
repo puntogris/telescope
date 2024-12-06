@@ -8,7 +8,10 @@ import com.puntogris.telescope.domain.usecase.SearchQuery
 import com.puntogris.telescope.ui.components.CheckboxPanel
 import com.puntogris.telescope.ui.components.ListPanel
 import com.puntogris.telescope.ui.components.SearchPanel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.swing.Swing
 import javax.swing.BoxLayout
 import javax.swing.JPanel

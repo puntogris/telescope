@@ -6,7 +6,12 @@ import com.puntogris.telescope.domain.DiskCache
 import com.puntogris.telescope.domain.MemoryCache
 import com.puntogris.telescope.domain.usecase.VectorToSvg
 import com.puntogris.telescope.icons.MyIcons
-import com.puntogris.telescope.utils.*
+import com.puntogris.telescope.utils.JPEG
+import com.puntogris.telescope.utils.JPG
+import com.puntogris.telescope.utils.PNG
+import com.puntogris.telescope.utils.WEBP
+import com.puntogris.telescope.utils.XML
+import com.puntogris.telescope.utils.replaceUnknownColors
 import java.awt.Dimension
 import java.awt.Graphics
 import java.awt.Image

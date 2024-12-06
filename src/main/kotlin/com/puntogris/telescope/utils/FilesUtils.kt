@@ -15,7 +15,7 @@ import kotlin.io.path.createDirectories
 import kotlin.io.path.exists
 import kotlin.io.path.notExists
 
-fun openFileChooser(project: Project, vararg extension: String): Result<String> {
+fun openFileChooser(project: Project, vararg extensions: String): Result<String> {
     val fileDescription = FileChooserDescriptor(
         true,
         false,
@@ -24,8 +24,8 @@ fun openFileChooser(project: Project, vararg extension: String): Result<String> 
         false,
         false
     ).apply {
-        if (extension.isNotEmpty()) {
-            withFileFilter { it.extension in extension }
+        if (extensions.isNotEmpty()) {
+            withFileFilter { it.extension in extensions }
         }
     }
 

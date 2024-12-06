@@ -7,8 +7,16 @@ import com.intellij.ui.components.JBScrollPane
 import com.intellij.util.ui.JBUI
 import com.puntogris.telescope.models.DrawableRes
 import com.puntogris.telescope.models.SearchResult
-import java.awt.*
-import javax.swing.*
+import java.awt.BorderLayout
+import java.awt.Component
+import java.awt.FlowLayout
+import javax.swing.BorderFactory
+import javax.swing.DefaultListModel
+import javax.swing.DefaultListSelectionModel
+import javax.swing.JList
+import javax.swing.JPanel
+import javax.swing.ListCellRenderer
+import javax.swing.SwingUtilities
 import javax.swing.event.ListSelectionEvent
 import javax.swing.event.ListSelectionListener
 

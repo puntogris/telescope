@@ -6,7 +6,12 @@ import com.intellij.openapi.vfs.readText
 import com.intellij.ui.JBColor
 import com.puntogris.telescope.domain.DiskCache
 import com.puntogris.telescope.models.ImageResult
-import com.puntogris.telescope.utils.*
+import com.puntogris.telescope.utils.JPEG
+import com.puntogris.telescope.utils.JPG
+import com.puntogris.telescope.utils.PNG
+import com.puntogris.telescope.utils.WEBP
+import com.puntogris.telescope.utils.XML
+import com.puntogris.telescope.utils.replaceUnknownColors
 import org.apache.batik.transcoder.TranscoderInput
 import org.apache.batik.transcoder.TranscoderOutput
 import org.apache.batik.transcoder.image.JPEGTranscoder

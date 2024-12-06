@@ -32,24 +32,27 @@ class SettingsPage(private val project: Project) : DslComponent {
 
     private lateinit var defaultButton: Cell<JBRadioButton>
     private lateinit var advancedButton: Cell<JBRadioButton>
-    private var value = true
+    private var value = GlobalStorage.getUseDefaultModels()
 
     override fun createContent(): JComponent {
         return panel {
-
             row {
                 text("Settings")
             }
-            group("AI models configuration") {
+            group("AI models configuration.") {
                 row {
                     comment("Choose the configuration you would like to use, the default one should be preferred.")
                 }
                 buttonsGroup {
                     row {
-                        defaultButton = radioButton("Default models (recommended)", true)
+                        defaultButton = radioButton("Default models (recommended)", true).actionListener { _, _ ->
+                            GlobalStorage.setUseDefaultModels(true)
+                        }
                     }
                     row {
-                        advancedButton = radioButton("Advanced models", false)
+                        advancedButton = radioButton("Advanced models", false).actionListener { _, _ ->
+                            GlobalStorage.setUseDefaultModels(false)
+                        }
                     }
                 }.bind({ value }, { value = it })
                 separator()

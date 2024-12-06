@@ -80,8 +80,8 @@ class SettingsPage(private val project: Project) : DslComponent {
     private fun Panel.advancedPanel() = panel {
         var textModelComment: Cell<JEditorPane>? = null
         var visionModelComment: Cell<JEditorPane>? = null
-        val textModelInit = GlobalStorage.getTextModelPath().ifEmpty { "None selected" }
-        val visionModelInit = GlobalStorage.getVisionModelPath().ifEmpty { "None selected" }
+        val textModelInit = GlobalStorage.getCustomTextModelPath().ifEmpty { "None selected" }
+        val visionModelInit = GlobalStorage.getCustomVisionModelPath().ifEmpty { "None selected" }
 
         row {
             text("To experiment and if you know what you are doing")
@@ -89,7 +89,7 @@ class SettingsPage(private val project: Project) : DslComponent {
         row {
             button("Select text model") {
                 chooseCustomModel(project).onSuccess {
-                    GlobalStorage.setTextModelPath(it)
+                    GlobalStorage.setCustomTextModelPath(it)
                     textModelComment?.text(it)
                 }
             }
@@ -98,7 +98,7 @@ class SettingsPage(private val project: Project) : DslComponent {
         row {
             button("Select vision model") {
                 chooseCustomModel(project).onSuccess {
-                    GlobalStorage.setVisionModelPath(it)
+                    GlobalStorage.setCustomVisionModelPath(it)
                     visionModelComment?.text(it)
                 }
             }
@@ -136,26 +136,26 @@ class SettingsPage(private val project: Project) : DslComponent {
     }
 
     private fun downloadModels() {
-        runBackgroundableTask("Downloading text and vision models", project, cancellable = true) {
+        runBackgroundableTask("Downloading text and vision models", project, true) { indicator ->
             val modelsDir = configPath.resolve("models")
 
-            downloadFileWithProgress(DEFAULT_TEXT_MODEL_URL, modelsDir, it)
+            downloadFileWithProgress(DEFAULT_TEXT_MODEL_URL, modelsDir, indicator)
                 .onSuccess {
-
+                    GlobalStorage.setDefaultTextModelPath(it)
                 }
                 .onFailure {
                     sendNotification(project, "Telescope text model download failed", NotificationType.ERROR)
                 }
 
-            downloadFileWithProgress(DEFAULT_VISION_MODEL_URL, modelsDir, it)
+            downloadFileWithProgress(DEFAULT_VISION_MODEL_URL, modelsDir, indicator)
                 .onSuccess {
-
+                    GlobalStorage.setDefaultVisionModelPath(it)
                 }
                 .onFailure {
                     sendNotification(project, "Telescope vision model download failed", NotificationType.ERROR)
                 }
 
-            if (it.isCanceled) {
+            if (indicator.isCanceled) {
                 sendNotification(project, "Telescope AI models download canceled", NotificationType.WARNING)
             } else {
                 sendNotification(project, "Telescope AI models download completed", NotificationType.INFORMATION)

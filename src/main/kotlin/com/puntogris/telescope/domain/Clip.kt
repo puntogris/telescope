@@ -3,8 +3,8 @@ package com.puntogris.telescope.domain
 import android.clip.cpp.CLIPAndroid
 import com.intellij.openapi.vfs.VirtualFile
 import com.puntogris.telescope.domain.usecase.FileToClip
-import com.puntogris.telescope.utils.PLUGIN_NAME
-import com.puntogris.telescope.utils.configPath
+import com.puntogris.telescope.domain.usecase.GetModelsPath
+import kotlin.io.path.Path
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.exists
 
@@ -18,6 +18,7 @@ object Clip {
     private var visionClip: CLIPAndroid? = null
 
     private val fileToClip = FileToClip()
+    private val modelsPath = GetModelsPath()
 
     private fun textClip(): CLIPAndroid? {
         if (textClip == null) {
@@ -38,11 +39,7 @@ object Clip {
     }
 
     private fun getTextModelPath(): String? {
-        val customModel = GlobalStorage.getTextModelPath()
-        if (customModel.isNotEmpty()) {
-            return customModel
-        }
-        val path = configPath.resolve(PLUGIN_NAME).resolve("CLIP-ViT-B-32-laion2B-s34B-b79K_ggml-model-f32.gguf")
+        val path = Path(modelsPath().textModel)
         if (path.exists()) {
             return path.absolutePathString()
         }
@@ -50,11 +47,7 @@ object Clip {
     }
 
     private fun getVisionModelPath(): String? {
-        val customModel = GlobalStorage.getVisionModelPath()
-        if (customModel.isNotEmpty()) {
-            return customModel
-        }
-        val path = configPath.resolve(PLUGIN_NAME).resolve("CLIP-ViT-B-32-laion2B-s34B-b79K_ggml-model-f32.gguf")
+        val path = Path(modelsPath().visionModel)
         if (path.exists()) {
             return path.absolutePathString()
         }

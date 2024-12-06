@@ -2,28 +2,48 @@ package com.puntogris.telescope.domain
 
 import com.intellij.ide.util.PropertiesComponent
 
-private const val TEXT_MODEL_PATH_KEY = "TELESCOPE_TEXT_MODEL_PATH"
-private const val VISION_MODEL_PATH_KEY = "TELESCOPE_VISION_MODEL_PATH"
+private const val DEFAULT_TEXT_MODEL_PATH_KEY = "TELESCOPE_DEFAULT_TEXT_MODEL_PATH"
+private const val DEFAULT_VISION_MODEL_PATH_KEY = "TELESCOPE_DEFAULT_VISION_MODEL_PATH"
+private const val CUSTOM_TEXT_MODEL_PATH_KEY = "TELESCOPE_CUSTOM_TEXT_MODEL_PATH"
+private const val CUSTOM_VISION_MODEL_PATH_KEY = "TELESCOPE_CUSTOM_VISION_MODEL_PATH"
 private const val FUZZY_CHECKBOX_STATE_KEY = "TELESCOPE_FUZZY_CHECKBOX_STATE"
 private const val EMBEDDING_CHECKBOX_STATE_KEY = "TELESCOPE_EMBEDDING_CHECKBOX_STATE"
 private const val USE_DEFAULT_MODELS_KEY = "TELESCOPE_USE_DEFAULT_MODELS"
 
+private const val EMPTY_STRING = ""
+
 object GlobalStorage {
 
-    fun setTextModelPath(value: String) {
-        PropertiesComponent.getInstance().setValue(TEXT_MODEL_PATH_KEY, value)
+    fun setDefaultTextModelPath(value: String) {
+        PropertiesComponent.getInstance().setValue(DEFAULT_TEXT_MODEL_PATH_KEY, value)
     }
 
-    fun getTextModelPath(): String {
-        return PropertiesComponent.getInstance().getValue(TEXT_MODEL_PATH_KEY, "")
+    fun getDefaultTextModelPath(): String {
+        return PropertiesComponent.getInstance().getValue(DEFAULT_TEXT_MODEL_PATH_KEY, EMPTY_STRING)
     }
 
-    fun setVisionModelPath(value: String) {
-        PropertiesComponent.getInstance().setValue(VISION_MODEL_PATH_KEY, value)
+    fun setDefaultVisionModelPath(value: String) {
+        PropertiesComponent.getInstance().setValue(DEFAULT_VISION_MODEL_PATH_KEY, value)
     }
 
-    fun getVisionModelPath(): String {
-        return PropertiesComponent.getInstance().getValue(VISION_MODEL_PATH_KEY, "")
+    fun getDefaultVisionModelPath(): String {
+        return PropertiesComponent.getInstance().getValue(DEFAULT_VISION_MODEL_PATH_KEY, EMPTY_STRING)
+    }
+
+    fun setCustomTextModelPath(value: String) {
+        PropertiesComponent.getInstance().setValue(CUSTOM_TEXT_MODEL_PATH_KEY, value)
+    }
+
+    fun getCustomTextModelPath(): String {
+        return PropertiesComponent.getInstance().getValue(CUSTOM_TEXT_MODEL_PATH_KEY, EMPTY_STRING)
+    }
+
+    fun setCustomVisionModelPath(value: String) {
+        PropertiesComponent.getInstance().setValue(CUSTOM_VISION_MODEL_PATH_KEY, value)
+    }
+
+    fun getCustomVisionModelPath(): String {
+        return PropertiesComponent.getInstance().getValue(CUSTOM_VISION_MODEL_PATH_KEY, EMPTY_STRING)
     }
 
     fun setFuzzyState(value: Boolean) {

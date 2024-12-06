@@ -6,4 +6,6 @@ const val PNG = "png"
 const val JPEG = "jpeg"
 const val JPG = "jpg"
 
+const val GGUF = "gguf"
+
 const val PLUGIN_NAME = "telescope"

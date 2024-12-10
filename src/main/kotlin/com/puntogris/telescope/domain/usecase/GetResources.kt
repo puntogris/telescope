@@ -31,7 +31,7 @@ class GetResources {
     }
 
     private fun getDrawableResources(project: Project): List<DrawableRes> {
-        val modules =  ModuleManager.getInstance(project).modules.filter { it.name.endsWith(".main") }
+        val modules = ModuleManager.getInstance(project).modules.filter { it.name.endsWith(".main") }
 
         val singlesRes = modules.flatMap(::extractSinglesFromModule)
         val variantsRes = modules.flatMap(::extractVariantsFromModule)
@@ -41,13 +41,16 @@ class GetResources {
 
     private fun extractVariantsFromModule(module: Module): List<DrawableRes.WithVariants> {
         val tempDpiRes = mutableMapOf<String, MutableMap<String, VirtualFile>>()
+        val manager = ModuleRootManager.getInstance(module)
+        val root = manager.contentRoots.find { it.name == "main" }
 
+        if (root == null) {
+            return emptyList()
+        }
         for (variant in dpiVariants) {
-            ModuleRootManager.getInstance(module).contentRoots
-                .find { it.name == "main" }
-                ?.findDirectory("res/${variant}")
-                ?.children.orEmpty()
-                .forEach { tempDpiRes.computeIfAbsent(it.name) { mutableMapOf() }[variant] = it }
+            root.findDirectory("res/${variant}")
+                ?.children
+                ?.forEach { tempDpiRes.computeIfAbsent(it.name) { mutableMapOf() }[variant] = it }
         }
         return tempDpiRes.map { DrawableRes.WithVariants.from(it, module.displayName) }
     }

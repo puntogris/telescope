@@ -33,11 +33,12 @@ dependencies {
     intellijPlatform {
         bundledPlugin("org.jetbrains.android")
         instrumentationTools()
-        //TODO use a gradle properties for this check
-        //androidStudio("2024.3.1.2")
-        local("/Applications/Android Studio.app/Contents")
+        if (hasProperty("ide.localPath")) {
+            local(properties["ide.localPath"].toString())
+        } else if (hasProperty("ide.version")) {
+            androidStudio(properties["ide.version"].toString())
+        }
     }
-
 }
 
 tasks {

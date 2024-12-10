@@ -1,12 +1,11 @@
 package com.puntogris.telescope.ui.components
 
-import com.intellij.openapi.vfs.VirtualFile
 import javax.swing.JPanel
 
 class PreviewPanel: JPanel() {
 
-    fun bind(file: VirtualFile) {
+    fun bind(preview: Preview) {
         removeAll()
-        add(Preview.from(file).render())
+        add(preview.render())
     }
 }

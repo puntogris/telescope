@@ -56,7 +56,7 @@ class FileToClip {
                     return null
                 }
 
-                val svg = vectorToSvg(xml).replaceUnknownColors()
+                val svg = vectorToSvg(xml, mapOf()).replaceUnknownColors()
                 val bufferedImage = convertSvgToRaster(svg, PNG)
                 DiskCache.put(bufferedImage, PNG, file.path)
 

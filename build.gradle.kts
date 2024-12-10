@@ -1,8 +1,8 @@
 plugins {
     id("java")
-    id("org.jetbrains.kotlin.jvm") version "1.9.20"
-    id("org.jetbrains.kotlin.kapt") version "1.9.20"
-    id("org.jetbrains.intellij") version "1.16.0"
+    id("org.jetbrains.kotlin.jvm") version "2.0.21"
+    id("org.jetbrains.kotlin.kapt") version "2.0.21"
+    id("org.jetbrains.intellij.platform") version "2.1.0"
 }
 
 group = "com.puntogris.telescope"
@@ -11,6 +11,9 @@ version = "1.0-SNAPSHOT"
 repositories {
     mavenCentral()
     google()
+    intellijPlatform {
+        defaultRepositories()
+    }
 }
 
 dependencies {
@@ -26,12 +29,15 @@ dependencies {
     implementation("io.objectbox:objectbox-macos:4.0.3")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.9.0")
 
-}
-// Configure Gradle IntelliJ Plugin
-// Read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
-intellij {
-    version.set("2023.1.5")
-    type.set("IC")
+    // https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin.html
+    intellijPlatform {
+        bundledPlugin("org.jetbrains.android")
+        instrumentationTools()
+        //TODO use a gradle properties for this check
+        //androidStudio("2024.3.1.2")
+        local("/Applications/Android Studio.app/Contents")
+    }
+
 }
 
 tasks {

@@ -9,7 +9,8 @@ class PluginInitializer : ProjectActivity {
     override suspend fun execute(project: Project) {
 
         //TODO are we sure this always run before the window?
-        ImagesDB.init(project.name)
+        // this crashes now
+        //ImagesDB.init(project.name)
         DiskCache.init(project.name)
     }
 }

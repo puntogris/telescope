@@ -39,13 +39,13 @@ abstract class Preview {
 
         const val IMAGE_SIZE = 50
 
-        fun from(file: VirtualFile): Preview {
+        fun from(file: VirtualFile, colors: Map<String, Map<String, String>>): Preview {
             val content = file.readText()
 
             return when (file.extension) {
                 XML -> {
                     if (content.startsWith("<vector")) {
-                        XmlVector(content, file.path)
+                        XmlVector(content, file.path, colors)
                     } else {
                         NotSupported
                     }
@@ -58,7 +58,11 @@ abstract class Preview {
     }
 }
 
-class XmlVector(private val fileContent: String, val path: String) : Preview() {
+class XmlVector(
+    private val fileContent: String,
+    private val path: String,
+    private val colors: Map<String, Map<String, String>>
+) : Preview() {
     override fun render(): JPanel {
         return try {
             val cached = MemoryCache.svg.getIfPresent(path)
@@ -66,7 +70,7 @@ class XmlVector(private val fileContent: String, val path: String) : Preview() {
             if (cached != null) {
                 SVGPanel(cached)
             } else {
-                val svg = VectorToSvg().invoke(fileContent).replaceUnknownColors()
+                val svg = VectorToSvg().invoke(fileContent, colors).replaceUnknownColors()
                 MemoryCache.svg.put(path, svg)
                 SVGPanel(svg)
             }

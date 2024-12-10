@@ -4,8 +4,6 @@ import com.intellij.openapi.fileChooser.FileChooser
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
-import com.intellij.util.io.isFile
-import com.intellij.util.io.size
 import java.io.IOException
 import java.net.URI
 import java.nio.file.Files
@@ -13,6 +11,8 @@ import java.nio.file.Path
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.createDirectories
 import kotlin.io.path.exists
+import kotlin.io.path.fileSize
+import kotlin.io.path.isRegularFile
 import kotlin.io.path.notExists
 
 fun openFileChooser(project: Project, vararg extensions: String): Result<String> {
@@ -55,8 +55,8 @@ fun downloadFileWithProgress(
 
         var localFileSize = 0L
 
-        if (destinationFile.exists() && destinationFile.isFile()) {
-            localFileSize = destinationFile.size()
+        if (destinationFile.exists() && destinationFile.isRegularFile()) {
+            localFileSize = destinationFile.fileSize()
         }
 
         val inputStream = downloadUrl.openStream()

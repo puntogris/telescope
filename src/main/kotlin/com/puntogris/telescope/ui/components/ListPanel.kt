@@ -132,7 +132,7 @@ class ListPanel(
             cellHasFocus: Boolean
         ): Component {
             nameLabel.text = value.name
-            previewPanel.bind(value.file)
+            previewPanel.bind(value.preview)
 
             when (value) {
                 is DrawableRes.Simple -> {

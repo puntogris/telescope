@@ -76,7 +76,6 @@ fun downloadFileWithProgress(
             if (indicator.isCanceled) {
                 break
             }
-
             outputStream.write(buffer, 0, bytesRead)
             totalBytesRead += bytesRead
 

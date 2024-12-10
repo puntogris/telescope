@@ -41,7 +41,7 @@ class HomePage(project: Project) : JPanel() {
     }
 
     private var searchJob: Job? = null
-    private val searchUseCase = SearchQuery()
+    private val searchQuery = SearchQuery()
 
     private fun onNewSearch(query: String) {
         searchJob?.cancel()
@@ -50,7 +50,7 @@ class HomePage(project: Project) : JPanel() {
             list.reset()
         } else {
             searchJob = CoroutineScope(Dispatchers.Swing).launch {
-                val result = searchUseCase(query)
+                val result = searchQuery(query)
                 list.filter(result)
             }
         }

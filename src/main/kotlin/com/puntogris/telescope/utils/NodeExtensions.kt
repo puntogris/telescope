@@ -9,7 +9,6 @@ import org.w3c.dom.NodeList
  * https://github.com/neworld/vd2svg/blob/master/src/main/kotlin/lt/neworld/vd2svg/resources/AndroidResourceParser.kt
  * not working in most cases
  */
-
 private class NodeListIterator(private val nodeList: NodeList) : Iterator<Node> {
     private var position = 0
 

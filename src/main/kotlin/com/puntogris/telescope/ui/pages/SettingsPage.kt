@@ -25,22 +25,23 @@ import kotlin.io.path.absolutePathString
 
 private const val DEFAULT_VISION_MODEL_URL =
     "https://huggingface.co/mys/ggml_CLIP-ViT-B-32-laion2B-s34B-b79K/resolve/main/CLIP-ViT-B-32-laion2B-s34B-b79K_ggml-model-f32.gguf"
-
 private const val DEFAULT_TEXT_MODEL_URL =
     "https://huggingface.co/mys/ggml_CLIP-ViT-B-32-laion2B-s34B-b79K/resolve/main/CLIP-ViT-B-32-laion2B-s34B-b79K_ggml-model-f16.gguf"
+private const val GITHUB_URL = "https://github.com/puntogris/telescope"
+private const val PUNTOGRIS_URL = "https://www.puntogris.com"
 
 class SettingsPage(private val project: Project) : DslComponent {
 
     private lateinit var defaultButton: Cell<JBRadioButton>
     private lateinit var advancedButton: Cell<JBRadioButton>
-    private var value = GlobalStorage.getUseDefaultModels()
+    private var useDefaultModels = GlobalStorage.getUseDefaultModels()
 
     override fun createContent(): JComponent {
         return panel {
             row {
                 text("Settings")
             }
-            group("AI models configuration.") {
+            group("AI models configuration.", indent = false) {
                 row {
                     comment("Choose the configuration you would like to use, the default one should be preferred.")
                 }
@@ -55,10 +56,19 @@ class SettingsPage(private val project: Project) : DslComponent {
                             GlobalStorage.setUseDefaultModels(false)
                         }
                     }
-                }.bind({ value }, { value = it })
+                }.bind({ useDefaultModels }, { useDefaultModels = it })
                 separator()
                 defaultPanel().visibleIf(defaultButton.selected)
                 advancedPanel().visibleIf(advancedButton.selected)
+            }
+            row {
+                text("About telescope").bold()
+            }
+            row {
+                browserLink("This plugin is open source, check the code at Github", GITHUB_URL)
+            }
+            row {
+                browserLink("Made by puntogris", PUNTOGRIS_URL)
             }
         }.withBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10))
     }
@@ -70,7 +80,8 @@ class SettingsPage(private val project: Project) : DslComponent {
         row {
             button("Download models") {
                 downloadDefaultModels()
-            }.comment(
+            }
+            rowComment(
                 "Models are about 100MB each and we will store at:\n${
                     configPath.resolve("models").absolutePathString()
                 }"

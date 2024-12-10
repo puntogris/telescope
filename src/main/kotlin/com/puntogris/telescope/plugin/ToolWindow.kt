@@ -8,13 +8,13 @@ import com.puntogris.telescope.ui.pages.SettingsPage
 
 class ToolWindow : ToolWindowFactory {
 
-    override fun createToolWindowContent(project: Project, window: ToolWindow) {
-        val contentManager = window.contentManager
+    override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
+        val contentManager = toolWindow.contentManager
 
         val home = contentManager.factory.createContent(HomePage(project), "Home", false)
         val settings = contentManager.factory.createContent(SettingsPage(project).createContent(), "Settings", false)
 
-        window.contentManager.addContent(home)
-        window.contentManager.addContent(settings)
+        toolWindow.contentManager.addContent(home)
+        toolWindow.contentManager.addContent(settings)
     }
 }

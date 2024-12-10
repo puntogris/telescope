@@ -17,6 +17,8 @@ out/
 !**/src/test/**/out/
 .intellijPlatform
 .kotlin
+.idea
+.run
 
 ### Eclipse ###
 .apt_generated

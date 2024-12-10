@@ -25,30 +25,34 @@ class GetResources {
         val baseDirs = project.baseDir.children.filter { it.isDirectory }
 
         return Resources(
-            drawablesRes = getDrawableResources(project, baseDirs),
+            drawablesRes = getDrawableResources(project),
             colorsRes = GetColorResources().invoke(baseDirs)
         )
     }
 
-    private fun getDrawableResources(project: Project, baseDirs: List<VirtualFile>): List<DrawableRes> {
-        val drawablesRes = ModuleManager.getInstance(project).modules
-            .filter { it.name.endsWith(".main") }
-            .flatMap { extractDrawablesFromModule(it) }
+    private fun getDrawableResources(project: Project): List<DrawableRes> {
+        val modules =  ModuleManager.getInstance(project).modules.filter { it.name.endsWith(".main") }
 
-        //  mutableMapOf<file name, MutableMap<dpi dir, VirtualFile>>()
+        val singlesRes = modules.flatMap(::extractSinglesFromModule)
+        val variantsRes = modules.flatMap(::extractVariantsFromModule)
+
+        return (singlesRes + variantsRes).sortedBy { it.name }
+    }
+
+    private fun extractVariantsFromModule(module: Module): List<DrawableRes.WithVariants> {
         val tempDpiRes = mutableMapOf<String, MutableMap<String, VirtualFile>>()
 
         for (variant in dpiVariants) {
-            baseDirs.mapNotNull { it.findDirectory("src/main/res/${variant}") }
-                .flatMap { it.children.toList() }
+            ModuleRootManager.getInstance(module).contentRoots
+                .find { it.name == "main" }
+                ?.findDirectory("res/${variant}")
+                ?.children.orEmpty()
                 .forEach { tempDpiRes.computeIfAbsent(it.name) { mutableMapOf() }[variant] = it }
         }
-        val dpiRes = tempDpiRes.map { DrawableRes.WithVariants.from(it) }
-
-        return (drawablesRes + dpiRes).sortedBy { it.name }
+        return tempDpiRes.map { DrawableRes.WithVariants.from(it, module.displayName) }
     }
 
-    private fun extractDrawablesFromModule(module: Module): List<DrawableRes.Simple> {
+    private fun extractSinglesFromModule(module: Module): List<DrawableRes.Simple> {
         val dependencies = module.getAllDependencies(false)
             .map { it.displayName }
             .filter { it == module.displayName }

@@ -42,20 +42,20 @@ sealed class DrawableRes {
         override val preview: Preview = Preview.from(file, mapOf())
 
         companion object {
-            fun from(entry: Map.Entry<String, Map<String, VirtualFile>>): WithVariants {
+            fun from(entry: Map.Entry<String, Map<String, VirtualFile>>, module: String): WithVariants {
                 val first = entry.value.entries.first().value
 
                 return WithVariants(
                     file = first,
                     name = first.name,
                     path = first.path,
-                    module = "",
+                    module = module,
                     variants = entry.value.entries.map { v ->
                         DrawableVariant(
                             file = v.value,
                             name = v.value.name,
                             mainPath = v.value.path,
-                            module = "",
+                            module = module,
                             parentDirName = v.key
                         )
                     }.sortedBy { it.parentDirName }

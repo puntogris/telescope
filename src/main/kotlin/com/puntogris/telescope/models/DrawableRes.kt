@@ -1,45 +1,42 @@
 package com.puntogris.telescope.models
 
 import com.intellij.openapi.vfs.VirtualFile
-import com.puntogris.telescope.ui.components.Preview
+import com.puntogris.telescope.ui.components.ResourcePreview
 
 sealed class DrawableRes {
 
     abstract val name: String
     abstract val path: String
+    abstract val module: String
     abstract val file: VirtualFile
-    abstract val preview: Preview
+
+    val resourcePreview: ResourcePreview
+        get() = ResourcePreview.from(this)
 
     data class Simple(
-        val module: String,
-        val dependencies: List<String>,
+        override val module: String,
         override val name: String,
         override val path: String,
         override val file: VirtualFile,
     ) : DrawableRes() {
 
-        override val preview: Preview = Preview.from(file, mapOf())
-
         companion object {
-            fun from(file: VirtualFile, module: String, dependencies: List<String>) = Simple(
+            fun from(file: VirtualFile, module: String) = Simple(
                 file = file,
                 name = file.name,
                 path = file.path,
-                module = module,
-                dependencies = dependencies
+                module = module
             )
         }
     }
 
     data class WithVariants(
-        val module: String,
-        val variants: List<DrawableVariant>,
+        override val module: String,
         override val name: String,
         override val path: String,
-        override val file: VirtualFile
+        override val file: VirtualFile,
+        val variants: List<DrawableVariant>
     ) : DrawableRes() {
-
-        override val preview: Preview = Preview.from(file, mapOf())
 
         companion object {
             fun from(entry: Map.Entry<String, Map<String, VirtualFile>>, module: String): WithVariants {

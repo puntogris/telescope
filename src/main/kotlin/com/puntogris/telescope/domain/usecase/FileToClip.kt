@@ -11,7 +11,6 @@ import com.puntogris.telescope.utils.JPG
 import com.puntogris.telescope.utils.PNG
 import com.puntogris.telescope.utils.WEBP
 import com.puntogris.telescope.utils.XML
-import com.puntogris.telescope.utils.replaceUnknownColors
 import org.apache.batik.transcoder.TranscoderInput
 import org.apache.batik.transcoder.TranscoderOutput
 import org.apache.batik.transcoder.image.JPEGTranscoder
@@ -27,7 +26,7 @@ class FileToClip {
 
     private val vectorToSvg = VectorToSvg()
 
-    operator fun invoke(file: VirtualFile): ImageResult? {
+    operator fun invoke(file: VirtualFile, module: String): ImageResult? {
         return when (file.extension) {
             PNG, WEBP -> {
                 val bufferedImage = ImageIO.read(ByteArrayInputStream(file.readBytes()))
@@ -56,7 +55,7 @@ class FileToClip {
                     return null
                 }
 
-                val svg = vectorToSvg(xml, mapOf()).replaceUnknownColors()
+                val svg = vectorToSvg(xml, module)
                 val bufferedImage = convertSvgToRaster(svg, PNG)
                 DiskCache.put(bufferedImage, PNG, file.path)
 
@@ -106,7 +105,7 @@ class FileToClip {
             else -> throw IllegalArgumentException("Unsupported format: $format")
         }
 
-        transcoder.addTranscodingHint(PNGTranscoder.KEY_WIDTH, width.toFloat() * 10 )
+        transcoder.addTranscodingHint(PNGTranscoder.KEY_WIDTH, width.toFloat() * 10)
         transcoder.addTranscodingHint(PNGTranscoder.KEY_HEIGHT, height.toFloat() * 10)
         transcoder.transcode(transcoderInput, transcoderOutput)
 

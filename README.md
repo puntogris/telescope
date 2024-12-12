@@ -32,3 +32,6 @@ encoders are used on demand, ensuring smooth operation without compromising capa
 https://github.com/mlfoundations/open_clip
 
 https://github.com/monatis/clip.cpp
+
+### TODO
+ - Refactor how we get resources and generate previews, unsure if we should set global states for colors and modules to match when converting to svg

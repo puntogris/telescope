@@ -9,6 +9,7 @@ import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.findDirectory
 import com.intellij.openapi.vfs.findFile
+import com.puntogris.telescope.domain.Globals
 import com.puntogris.telescope.models.DrawableRes
 import com.puntogris.telescope.models.Resources
 import com.puntogris.telescope.utils.iterable
@@ -36,10 +37,28 @@ class GetResources {
         val manager = ModuleManager.getInstance(project)
         val modules = manager.modules.filter { it.name.endsWith(ROOT_MAIN_MODULE_SUFFIX) }
 
+        val dependencies = getModuleDependencies(modules)
+        val colors = getColorsResources(modules)
+
+        Globals.setModuleColors(colors)
+        Globals.setModuleDependencies(dependencies)
+
         return Resources(
-            drawablesRes = getDrawableResources(modules),
-            colorsRes = getColorsResources(modules)
+            drawables = getDrawableResources(modules),
+            colors = getColorsResources(modules),
+            dependencies = getModuleDependencies(modules)
         )
+    }
+
+    private fun getModuleDependencies(modules: List<Module>): Map<String, List<String>> {
+        return buildMap {
+            for (module in modules) {
+                val dependencies = module.getAllDependencies(false)
+                    .map { it.displayName }
+                    .filter { it == module.displayName }
+                put(module.displayName, dependencies)
+            }
+        }
     }
 
     private fun getDrawableResources(modules: List<Module>): List<DrawableRes> {
@@ -66,16 +85,12 @@ class GetResources {
     }
 
     private fun extractSinglesFromModule(module: Module): List<DrawableRes.Simple> {
-        val dependencies = module.getAllDependencies(false)
-            .map { it.displayName }
-            .filter { it == module.displayName }
-
         val drawables = ModuleRootManager.getInstance(module).contentRoots
             .find { it.name == MAIN_MODULE }
             ?.findDirectory(DRAWABLES_DIR_PATH)
             ?.children.orEmpty()
 
-        return drawables.map { DrawableRes.Simple.from(it, module.displayName, dependencies) }
+        return drawables.map { DrawableRes.Simple.from(it, module.displayName) }
     }
 
     private fun getColorsResources(modules: List<Module>): Map<String, Map<String, String>> {

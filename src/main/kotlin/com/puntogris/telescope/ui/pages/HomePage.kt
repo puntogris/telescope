@@ -19,13 +19,16 @@ import javax.swing.JPanel
 class HomePage(project: Project) : JPanel() {
 
     private val list = ListPanel(
-        files = GetResources().invoke(project).drawablesRes,
+        files = GetResources().invoke(project).drawables,
         onClick = { FileEditorManager.getInstance(project).openFile(it, true) }
     )
 
     private val checkbox = CheckboxPanel(
         project = project,
-        onRefreshClicked = { RefreshState().invoke(project) }
+        onRefreshClicked = {
+            RefreshState().invoke(project)
+            list.update(GetResources().invoke(project).drawables)
+        }
     )
 
     private val search = SearchPanel(

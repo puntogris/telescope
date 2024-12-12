@@ -1,9 +1,9 @@
 package com.puntogris.telescope.domain
 
 import android.clip.cpp.CLIPAndroid
-import com.intellij.openapi.vfs.VirtualFile
 import com.puntogris.telescope.domain.usecase.FileToClip
 import com.puntogris.telescope.domain.usecase.GetModelsPath
+import com.puntogris.telescope.models.DrawableRes
 import kotlin.io.path.Path
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.exists
@@ -54,10 +54,10 @@ object Clip {
         return null
     }
 
-    fun encodeFileImage(file: VirtualFile): Result<FloatArray> {
+    fun encodeFileImage(res: DrawableRes): Result<FloatArray> {
         return try {
             val converted = requireNotNull(
-                fileToClip(file)
+                fileToClip(res.file, res.module)
             )
             val emb = requireNotNull(visionClip()).encodeImage(
                 converted.byteBuffer,

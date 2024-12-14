@@ -41,7 +41,7 @@ class SettingsPage(private val project: Project) : DslComponent {
             row {
                 text("Settings")
             }
-            group("AI models configuration.", indent = false) {
+            group("AI models configuration. (experimental)", indent = false) {
                 row {
                     comment("Choose the configuration you would like to use, the default one should be preferred.")
                 }

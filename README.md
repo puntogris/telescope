@@ -27,6 +27,11 @@ Telescope leverages OpenCLIP-compatible models in GGUF format to balance perform
 separate models for text and vision encoders, the plugin avoids loading unnecessarily large models into memory. These
 encoders are used on demand, ensuring smooth operation without compromising capabilities.
 
+### About the models
+
+The models use the `ViT-B/32` architecture with pretrained `laion2B-s34B-b79K` weights. For optimal results, images
+should be resized to a resolution of 224x224 pixels. In the plugin we do this internally.
+
 ### Useful links
 
 https://github.com/mlfoundations/open_clip
@@ -34,4 +39,7 @@ https://github.com/mlfoundations/open_clip
 https://github.com/monatis/clip.cpp
 
 ### TODO
- - Refactor how we get resources and generate previews, unsure if we should set global states for colors and modules to match when converting to svg
+
+- Refactor how we get resources and generate previews, unsure if we should set global states for colors and modules to
+  match when converting to svg
+- Fix crash in clip.cpp when encoding text multiple times in a short amount of time

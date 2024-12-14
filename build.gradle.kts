@@ -1,8 +1,8 @@
 plugins {
-    id("java")
     id("org.jetbrains.kotlin.jvm") version "2.0.21"
     id("org.jetbrains.kotlin.kapt") version "2.0.21"
     id("org.jetbrains.intellij.platform") version "2.1.0"
+    id("io.objectbox") version "4.0.3"
 }
 
 group = "com.puntogris.telescope"
@@ -21,18 +21,25 @@ dependencies {
         exclude("xml-apis")
     }
 
+    implementation("xml-apis:xml-apis-ext:1.3.04")
+
     implementation(project(":clip"))
+
     implementation(files("libs/svgSalamander-1.1.4.jar"))
 
     kapt("io.objectbox:objectbox-processor:4.0.3")
-    implementation("io.objectbox:objectbox-kotlin:4.0.3")
-    implementation("io.objectbox:objectbox-macos:4.0.3")
+
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.9.0")
 
     // https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin.html
     intellijPlatform {
+        // https://plugins.jetbrains.com/docs/intellij/android-studio.html#open-source-plugins-for-android-studio
+        // https://plugins.jetbrains.com/docs/intellij/android-studio-releases-list.html
+        // https://plugins.jetbrains.com/plugin/22989-android/versions/stable
         bundledPlugin("org.jetbrains.android")
         instrumentationTools()
+
+        // TODO maybe is a workspace error but having trouble using ide.localPath on AS, plugin path seems broken
         if (hasProperty("ide.localPath")) {
             local(properties["ide.localPath"].toString())
         } else if (hasProperty("ide.version")) {
@@ -53,7 +60,7 @@ tasks {
 
     patchPluginXml {
         sinceBuild.set("231")
-        untilBuild.set("241.*")
+        untilBuild.set("243.*")
     }
 
     signPlugin {

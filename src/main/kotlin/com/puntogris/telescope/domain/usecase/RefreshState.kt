@@ -21,8 +21,8 @@ class RefreshState {
             try {
                 MemoryCache.svg.invalidateAll()
                 DiskCache.invalidateAll()
-              //  ImagesDB.removeAll()
-               // indexFiles(project)
+                ImagesDB.removeAll()
+                indexFiles(project)
                 sendNotification(project, "Telescope sync completed", NotificationType.INFORMATION)
             } catch (e: Exception) {
                 thisLogger().error(e)
@@ -33,6 +33,8 @@ class RefreshState {
 
     private suspend fun indexFiles(project: Project) {
         getResources(project).drawables.forEach {
+            // TODO if we dont have the models paths we need to avoid this and just save the paths
+            // we could get the path and check if are valid
             Clip.encodeFileImage(it).onSuccess { emb ->
                 ImagesDB.add(it.path, emb)
             }

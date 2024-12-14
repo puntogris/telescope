@@ -16,16 +16,17 @@ import kotlin.io.path.isRegularFile
 import kotlin.io.path.notExists
 
 fun openFileChooser(project: Project, vararg extensions: String): Result<String> {
-    val fileDescription = FileChooserDescriptor(
+    var fileDescription = FileChooserDescriptor(
         true,
         false,
         false,
         false,
         false,
         false
-    ).apply {
-        if (extensions.isNotEmpty()) {
-            withFileFilter { it.extension in extensions }
+    )
+    if (extensions.isNotEmpty()) {
+        fileDescription = fileDescription.withFileFilter {
+            it.extension in extensions
         }
     }
 

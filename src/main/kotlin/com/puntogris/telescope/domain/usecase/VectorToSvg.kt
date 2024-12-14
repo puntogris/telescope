@@ -280,11 +280,12 @@ class VectorToSvg {
             }
 
             else -> {
+                // TODO svg doesnt support RGBA in hex apparently, we should use fill-opacity,..?
                 val alpha = digits.substring(0, 2)
                 val red = digits.substring(2, 4)
                 val green = digits.substring(4, 6)
                 val blue = digits.substring(6, 8)
-                "#$red$green$blue$alpha"
+                "#$red$green$blue"
             }
         }
     }
@@ -296,7 +297,9 @@ class VectorToSvg {
         } else {
             Globals.searchInModuleColors(color.substringAfter("/"), module)
         }
-        return hex ?: "#000000"
+        val c =  hex ?: "#000000"
+
+        return convertColorResToHex(c)
     }
 
     private fun transform(content: String, options: Map<String, Any> = emptyMap()): String {

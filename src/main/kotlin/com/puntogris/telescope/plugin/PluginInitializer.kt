@@ -1,6 +1,5 @@
 package com.puntogris.telescope.plugin
 
-import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.ProjectActivity
 import com.puntogris.telescope.domain.DiskCache

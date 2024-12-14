@@ -1,5 +1,6 @@
 package com.puntogris.telescope.ui.components
 
+import com.android.tools.idea.ui.resourcemanager.plugin.DrawableAssetRenderer
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.vfs.VirtualFile
 import com.puntogris.telescope.domain.DiskCache
@@ -10,10 +11,8 @@ import com.puntogris.telescope.utils.JPG
 import com.puntogris.telescope.utils.PNG
 import com.puntogris.telescope.utils.WEBP
 import com.puntogris.telescope.utils.XML
-import com.puntogris.telescope.utils.createRenderer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.future.await
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -30,6 +29,7 @@ abstract class ResourcePreview {
     companion object {
         const val IMAGE_SIZE = 50
 
+        // TODO, migrate to DrawableAssetRenderer().isFileSupported
         fun from(res: DrawableRes): ResourcePreview {
             return when (res.file.extension) {
                 XML -> {
@@ -54,9 +54,8 @@ class VectorPreview(
             var image: Image? = DiskCache.getIfPresent(path)
 
             if (image == null) {
-                val imageFuture = createRenderer(module, file).thenCompose {
-                    it.renderDrawable(String(file.contentsToByteArray()), Dimension(50, 50))
-                }
+                // TODO we should avoid creating the same class multiple times
+                val imageFuture = DrawableAssetRenderer().getImage(file, module, Dimension(50, 50))
                 CoroutineScope(Dispatchers.Default).launch {
                     image = imageFuture.await()
                     withContext(Dispatchers.IO) {

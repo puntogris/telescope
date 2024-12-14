@@ -18,15 +18,15 @@ class RefreshState {
     private val getResources = GetResources()
     private val getModelsPath = GetModelsPath()
 
-    operator fun invoke(project: Project, onComplete: () -> Unit) {
+    operator fun invoke(project: Project, onComplete: ( List<DrawableRes>) -> Unit) {
         CoroutineScope(Dispatchers.Default).launch {
             try {
                 MemoryCache.svg.invalidateAll()
                 DiskCache.invalidateAll()
                 ImagesDB.removeAll()
-                indexFiles(project)
+                val files = indexFiles(project)
+                onComplete(files)
                 sendNotification(project, "Telescope sync completed", NotificationType.INFORMATION)
-                onComplete()
             } catch (e: Exception) {
                 thisLogger().error(e)
                 sendNotification(project, "Telescope sync completed failed", NotificationType.ERROR)
@@ -34,7 +34,7 @@ class RefreshState {
         }
     }
 
-    private suspend fun indexFiles(project: Project) {
+    private suspend fun indexFiles(project: Project): List<DrawableRes> {
         val drawables = getResources(project).drawables
 
         if (getModelsPath().areValid) {
@@ -42,6 +42,7 @@ class RefreshState {
         } else {
             processInvalidModels(drawables)
         }
+        return drawables
     }
 
     private suspend fun processValidModels(drawables: List<DrawableRes>) {

@@ -27,9 +27,8 @@ class HomePage(project: Project) : JPanel() {
         onRefreshClicked = {
             RefreshState().invoke(
                 project = project,
-                onComplete = list::reset
+                onComplete = list::update
             )
-            list.update(GetResources().invoke(project).drawables)
         }
     )
 

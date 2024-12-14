@@ -7,6 +7,8 @@ import com.puntogris.telescope.domain.Clip
 import com.puntogris.telescope.domain.DiskCache
 import com.puntogris.telescope.domain.ImagesDB
 import com.puntogris.telescope.domain.MemoryCache
+import com.puntogris.telescope.models.DrawableRes
+import com.puntogris.telescope.models.ImageEntity
 import com.puntogris.telescope.utils.sendNotification
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -14,9 +16,9 @@ import kotlinx.coroutines.launch
 
 class RefreshState {
     private val getResources = GetResources()
+    private val getModelsPath = GetModelsPath()
 
     operator fun invoke(project: Project) {
-
         CoroutineScope(Dispatchers.Default).launch {
             try {
                 MemoryCache.svg.invalidateAll()
@@ -32,12 +34,29 @@ class RefreshState {
     }
 
     private suspend fun indexFiles(project: Project) {
-        getResources(project).drawables.forEach {
-            // TODO if we dont have the models paths we need to avoid this and just save the paths
-            // we could get the path and check if are valid
-            Clip.encodeFileImage(it).onSuccess { emb ->
-                ImagesDB.add(it.path, emb)
-            }
+        val drawables = getResources(project).drawables
+
+        if (getModelsPath().areValid) {
+            processValidModels(drawables)
+        } else {
+            processInvalidModels(drawables)
         }
+    }
+
+    private suspend fun processValidModels(drawables: List<DrawableRes>) {
+        drawables.chunked(100).forEach { chunk ->
+            val encodedEntities = chunk.map { drawable ->
+                ImageEntity(
+                    uri = drawable.path,
+                    embedding = Clip.encodeFileImage(drawable).getOrDefault(floatArrayOf())
+                )
+            }
+            ImagesDB.addBatched(encodedEntities, 20)
+        }
+    }
+
+    private suspend fun processInvalidModels(drawables: List<DrawableRes>) {
+        val entities = drawables.map { drawable -> ImageEntity(uri = drawable.path) }
+        ImagesDB.addBatched(entities, 100)
     }
 }

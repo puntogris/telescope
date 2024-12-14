@@ -36,6 +36,10 @@ object ImagesDB {
         imagesBox.put(ImageEntity(uri = uri, embedding = embedding))
     }
 
+    suspend fun addBatched(entities: List<ImageEntity>, batchSize: Int = 50) = withContext(Dispatchers.IO) {
+        imagesBox.putBatched(entities, batchSize)
+    }
+
     suspend fun getSimilarUri(uri: String): List<SearchResult> = withContext(Dispatchers.IO) {
         val query = imagesBox.query(ImageEntity_.uri.contains(uri)).build()
 

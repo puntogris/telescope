@@ -11,6 +11,7 @@ import com.puntogris.telescope.utils.PNG
 import com.puntogris.telescope.utils.WEBP
 import com.puntogris.telescope.utils.XML
 import com.puntogris.telescope.utils.createRenderer
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.future.await
@@ -56,7 +57,7 @@ class VectorPreview(
                 val imageFuture = createRenderer(module, file).thenCompose {
                     it.renderDrawable(String(file.contentsToByteArray()), Dimension(50, 50))
                 }
-                MainScope().launch(Dispatchers.Default) {
+                CoroutineScope(Dispatchers.Default).launch {
                     image = imageFuture.await()
                     withContext(Dispatchers.IO) {
                         DiskCache.put(requireNotNull(image), PNG, path)

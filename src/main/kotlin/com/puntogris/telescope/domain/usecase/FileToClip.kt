@@ -2,9 +2,7 @@ package com.puntogris.telescope.domain.usecase
 
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.readBytes
-import com.intellij.openapi.vfs.readText
 import com.intellij.ui.JBColor
-import com.puntogris.telescope.domain.DiskCache
 import com.puntogris.telescope.models.ImageResult
 import com.puntogris.telescope.utils.JPEG
 import com.puntogris.telescope.utils.JPG
@@ -24,8 +22,6 @@ import javax.xml.parsers.DocumentBuilderFactory
 
 class FileToClip {
 
-    private val vectorToSvg = VectorToSvg()
-
     operator fun invoke(file: VirtualFile, module: String): ImageResult? {
         return when (file.extension) {
             PNG, WEBP -> {
@@ -40,32 +36,34 @@ class FileToClip {
             }
 
             XML -> {
-                val cache = DiskCache.getIfPresent(file.path)
-                if (cache != null) {
-                    val buff = bufferedImageToByteBuffer(cache)
-                    return ImageResult(
-                        name = file.name,
-                        byteBuffer = buff,
-                        width = cache.width,
-                        height = cache.height
-                    )
-                }
-                val xml = file.readText()
-                if (!xml.startsWith("<vector")) {
-                    return null
-                }
-
-                val svg = vectorToSvg(xml, module)
-                val bufferedImage = convertSvgToRaster(svg, PNG)
-                DiskCache.put(bufferedImage, PNG, file.path)
-
-                val buff = bufferedImageToByteBuffer(bufferedImage)
-                ImageResult(
-                    name = file.name,
-                    byteBuffer = buff,
-                    width = bufferedImage.width,
-                    height = bufferedImage.height
-                )
+                null
+                // TODO we should get the cached image and add a white bg, resize
+//                val cache = DiskCache.getIfPresent(file.path)
+//                if (cache != null) {
+//                    val buff = bufferedImageToByteBuffer(cache)
+//                    return ImageResult(
+//                        name = file.name,
+//                        byteBuffer = buff,
+//                        width = cache.width,
+//                        height = cache.height
+//                    )
+//                }
+//                val xml = file.readText()
+//                if (!xml.startsWith("<vector")) {
+//                    return null
+//                }
+//
+//                val svg = vectorToSvg(xml, module)
+//                val bufferedImage = convertSvgToRaster(svg, PNG)
+//                DiskCache.put(bufferedImage, PNG, file.path)
+//
+//                val buff = bufferedImageToByteBuffer(bufferedImage)
+//                ImageResult(
+//                    name = file.name,
+//                    byteBuffer = buff,
+//                    width = bufferedImage.width,
+//                    height = bufferedImage.height
+//                )
             }
 
             else -> null

@@ -24,7 +24,6 @@ class HomePage(project: Project) : JPanel() {
     )
 
     private val checkbox = CheckboxPanel(
-        project = project,
         onRefreshClicked = {
             RefreshState().invoke(project)
             list.update(GetResources().invoke(project).drawables)

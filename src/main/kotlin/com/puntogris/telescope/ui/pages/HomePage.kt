@@ -25,7 +25,10 @@ class HomePage(project: Project) : JPanel() {
 
     private val checkbox = CheckboxPanel(
         onRefreshClicked = {
-            RefreshState().invoke(project)
+            RefreshState().invoke(
+                project = project,
+                onComplete = list::reset
+            )
             list.update(GetResources().invoke(project).drawables)
         }
     )

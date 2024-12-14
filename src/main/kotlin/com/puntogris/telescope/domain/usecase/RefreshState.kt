@@ -18,7 +18,7 @@ class RefreshState {
     private val getResources = GetResources()
     private val getModelsPath = GetModelsPath()
 
-    operator fun invoke(project: Project) {
+    operator fun invoke(project: Project, onComplete: () -> Unit) {
         CoroutineScope(Dispatchers.Default).launch {
             try {
                 MemoryCache.svg.invalidateAll()
@@ -26,6 +26,7 @@ class RefreshState {
                 ImagesDB.removeAll()
                 indexFiles(project)
                 sendNotification(project, "Telescope sync completed", NotificationType.INFORMATION)
+                onComplete()
             } catch (e: Exception) {
                 thisLogger().error(e)
                 sendNotification(project, "Telescope sync completed failed", NotificationType.ERROR)

@@ -30,9 +30,7 @@
     </extensions>
     <extensions defaultExtensionNs="com.intellij">
         <postStartupActivity implementation="com.puntogris.telescope.plugin.PluginInitializer"/>
-        <notificationGroup id="Telescope"
-                           displayType="BALLOON"
-                           key="notification.group.name"/>
+        <notificationGroup id="Telescope" displayType="BALLOON"/>
     </extensions>
 
     <extensions defaultExtensionNs="com.intellij">

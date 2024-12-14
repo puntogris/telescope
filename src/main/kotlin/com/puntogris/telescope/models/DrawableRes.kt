@@ -1,5 +1,6 @@
 package com.puntogris.telescope.models
 
+import com.intellij.openapi.module.Module
 import com.intellij.openapi.vfs.VirtualFile
 import com.puntogris.telescope.ui.components.ResourcePreview
 
@@ -7,21 +8,21 @@ sealed class DrawableRes {
 
     abstract val name: String
     abstract val path: String
-    abstract val module: String
+    abstract val module: Module
     abstract val file: VirtualFile
 
     val resourcePreview: ResourcePreview
         get() = ResourcePreview.from(this)
 
     data class Simple(
-        override val module: String,
+        override val module: Module,
         override val name: String,
         override val path: String,
         override val file: VirtualFile,
     ) : DrawableRes() {
 
         companion object {
-            fun from(file: VirtualFile, module: String) = Simple(
+            fun from(file: VirtualFile, module: Module) = Simple(
                 file = file,
                 name = file.name,
                 path = file.path,
@@ -31,15 +32,15 @@ sealed class DrawableRes {
     }
 
     data class WithVariants(
-        override val module: String,
+        override val module: Module,
         override val name: String,
         override val path: String,
         override val file: VirtualFile,
-        val variants: List<DrawableVariant>
+        val variants: List<DrawableVariant>,
     ) : DrawableRes() {
 
         companion object {
-            fun from(entry: Map.Entry<String, Map<String, VirtualFile>>, module: String): WithVariants {
+            fun from(entry: Map.Entry<String, Map<String, VirtualFile>>, module: Module): WithVariants {
                 val first = entry.value.entries.first().value
 
                 return WithVariants(
@@ -66,6 +67,6 @@ data class DrawableVariant(
     val file: VirtualFile,
     val name: String,
     val mainPath: String,
-    val module: String,
+    val module: Module,
     val parentDirName: String
 )

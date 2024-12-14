@@ -81,7 +81,7 @@ class GetResources {
                 ?.children
                 ?.forEach { tempDpiRes.computeIfAbsent(it.name) { mutableMapOf() }[variant] = it }
         }
-        return tempDpiRes.map { DrawableRes.WithVariants.from(it, module.displayName) }
+        return tempDpiRes.map { DrawableRes.WithVariants.from(it, module) }
     }
 
     private fun extractSinglesFromModule(module: Module): List<DrawableRes.Simple> {
@@ -90,7 +90,7 @@ class GetResources {
             ?.findDirectory(DRAWABLES_DIR_PATH)
             ?.children.orEmpty()
 
-        return drawables.map { DrawableRes.Simple.from(it, module.displayName) }
+        return drawables.map { DrawableRes.Simple.from(it, module) }
     }
 
     private fun getColorsResources(modules: List<Module>): Map<String, Map<String, String>> {

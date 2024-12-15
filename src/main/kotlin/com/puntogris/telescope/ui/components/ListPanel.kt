@@ -48,10 +48,10 @@ class ListPanel(
         setViewportView(list)
     }
 
-    fun update(data: List<DrawableRes>) {
+    fun update(newFiles: List<DrawableRes>) {
         SwingUtilities.invokeLater {
+            files = newFiles
             listModel.clear()
-            files = data
             listModel.addAll(files)
         }
     }

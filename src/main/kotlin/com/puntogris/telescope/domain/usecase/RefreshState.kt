@@ -5,6 +5,7 @@ import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.puntogris.telescope.domain.Clip
 import com.puntogris.telescope.domain.DiskCache
+import com.puntogris.telescope.domain.DrawableCache
 import com.puntogris.telescope.domain.ImagesDB
 import com.puntogris.telescope.domain.MemoryCache
 import com.puntogris.telescope.models.DrawableRes
@@ -24,6 +25,7 @@ class RefreshState {
                 MemoryCache.svg.invalidateAll()
                 DiskCache.invalidateAll()
                 ImagesDB.removeAll()
+                DrawableCache.createImageCache({}).clear()
                 val files = indexFiles(project)
                 onComplete(files)
                 sendNotification(project, "Telescope sync completed", NotificationType.INFORMATION)

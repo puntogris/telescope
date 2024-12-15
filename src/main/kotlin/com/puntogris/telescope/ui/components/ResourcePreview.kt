@@ -1,92 +1,63 @@
 package com.puntogris.telescope.ui.components
 
-import com.android.tools.idea.ui.resourcemanager.plugin.DesignAssetRenderer
 import com.android.tools.idea.ui.resourcemanager.plugin.DesignAssetRendererManager
-import com.intellij.openapi.module.Module
-import com.intellij.openapi.vfs.VirtualFile
-import com.puntogris.telescope.domain.DiskCache
+import com.intellij.openapi.components.Service
+import com.intellij.openapi.components.service
+import com.intellij.util.concurrency.AppExecutorUtil
+import com.intellij.util.ui.JBImageIcon
+import com.puntogris.telescope.domain.DrawableCache
 import com.puntogris.telescope.icons.MyIcons
 import com.puntogris.telescope.models.DrawableRes
-import com.puntogris.telescope.utils.PNG
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.future.await
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import com.puntogris.telescope.utils.toImage
+import java.awt.Component
 import java.awt.Dimension
-import java.awt.Graphics
-import java.awt.Image
-import javax.swing.JPanel
+import java.awt.image.BufferedImage
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ExecutorService
+import javax.swing.Icon
 
-abstract class ResourcePreview {
+class IconProvider {
+    private val imageIcon = JBImageIcon(MyIcons.NotSupportedIcon.toImage())
+    private val fetchImageExecutor = service<FetchImageExecutor>()
+    private val drawableCache = DrawableCache.createImageCache({})
+    private val drawableRenderer = DrawableRenderer()
 
-    abstract fun render(): JPanel
-
-    companion object {
-        const val IMAGE_SIZE = 50
-
-        fun from(res: DrawableRes): ResourcePreview {
-            val renderer = DesignAssetRendererManager.getInstance().getViewer(res.file)
-
-            return if (renderer.isFileSupported(res.file)) {
-                ValidPreview(renderer, res.file, res.module)
+    fun getIcon(
+        drawable: DrawableRes,
+        component: Component,
+        refreshCallback: () -> Unit,
+        shouldBeRendered: () -> Boolean
+    ): Icon {
+        val image = drawableCache.computeAndGet(drawable.file, BufferedImage(300, 300, 1), false, refreshCallback) {
+            if (shouldBeRendered()) {
+                CompletableFuture.supplyAsync(
+                    { if (shouldBeRendered()) drawableRenderer.render(drawable) else null },
+                    fetchImageExecutor
+                )
             } else {
-                NotSupportedPreview
+                CompletableFuture.completedFuture(null)
             }
         }
+        imageIcon.image = image
+        return imageIcon
     }
 
-    class ValidPreview(
-        private val renderer: DesignAssetRenderer,
-        private val file: VirtualFile,
-        private val module: Module
-    ) : ResourcePreview() {
+    @Service
+    private class FetchImageExecutor : ExecutorService by AppExecutorUtil.createBoundedApplicationPoolExecutor(
+        FetchImageExecutor::class.java.simpleName,
+        1
+    )
+}
 
-        override fun render(): JPanel {
-            return try {
-                var image: Image? = DiskCache.getIfPresent(file.path)
+class DrawableRenderer {
+    private val rendererManager = DesignAssetRendererManager.getInstance()
 
-                if (image == null) {
-                    val imageFuture = renderer.getImage(file, module, Dimension(50, 50))
-
-                    CoroutineScope(Dispatchers.Default).launch {
-                        image = imageFuture.await()
-                        withContext(Dispatchers.IO) {
-                            DiskCache.put(requireNotNull(image), PNG, file.path)
-                        }
-                    }
-                }
-
-                return object : JPanel() {
-                    init {
-                        preferredSize = Dimension(IMAGE_SIZE, IMAGE_SIZE)
-                    }
-
-                    override fun paintComponent(g: Graphics) {
-                        super.paintComponent(g)
-                        image?.let {
-                            g.drawImage(image, 0, 0, this)
-                        }
-                    }
-                }
-            } catch (ignored: Throwable) {
-                NotSupportedPreview.render()
-            }
-        }
-    }
-
-    data object NotSupportedPreview : ResourcePreview() {
-        override fun render(): JPanel {
-            return object : JPanel() {
-                init {
-                    preferredSize = Dimension(IMAGE_SIZE, IMAGE_SIZE)
-                }
-
-                override fun paintComponent(g: Graphics) {
-                    super.paintComponent(g)
-                    MyIcons.NotSupportedIcon.paintIcon(this, g, 0, 0)
-                }
-            }
+    fun render(drawable: DrawableRes): BufferedImage? {
+        try {
+            val rendered = rendererManager.getViewer(drawable.file)
+            return rendered.getImage(drawable.file, drawable.module, Dimension(50, 50)).get()
+        } catch (e: Throwable) {
+            return null
         }
     }
 }

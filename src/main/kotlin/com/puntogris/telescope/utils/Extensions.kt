@@ -2,6 +2,7 @@ package com.puntogris.telescope.utils
 
 import java.awt.Image
 import java.awt.image.BufferedImage
+import javax.swing.Icon
 import javax.swing.event.DocumentEvent
 
 val DocumentEvent.documentText: String
@@ -22,4 +23,12 @@ fun Image.toBufferedImage(): BufferedImage {
     bGr.dispose()
 
     return bimage
+}
+
+fun Icon.toImage(): Image {
+    val image = BufferedImage(iconWidth, iconHeight, BufferedImage.TYPE_INT_ARGB)
+    val g = image.createGraphics()
+    this.paintIcon(null, g, 0, 0)
+    g.dispose()
+    return image
 }

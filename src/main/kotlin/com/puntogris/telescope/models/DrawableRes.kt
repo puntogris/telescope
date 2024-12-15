@@ -2,7 +2,6 @@ package com.puntogris.telescope.models
 
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.vfs.VirtualFile
-import com.puntogris.telescope.ui.components.ResourcePreview
 
 sealed class DrawableRes {
 
@@ -10,9 +9,6 @@ sealed class DrawableRes {
     abstract val path: String
     abstract val module: Module
     abstract val file: VirtualFile
-
-    val resourcePreview: ResourcePreview
-        get() = ResourcePreview.from(this)
 
     data class Simple(
         override val module: Module,

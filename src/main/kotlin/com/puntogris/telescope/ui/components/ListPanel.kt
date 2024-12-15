@@ -1,17 +1,18 @@
 package com.puntogris.telescope.ui.components
 
+import com.android.tools.idea.gradle.variant.conflict.displayName
+import com.android.tools.idea.ui.resourcemanager.widget.AssetView
+import com.android.tools.idea.ui.resourcemanager.widget.RowAssetView
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.components.JBList
 import com.intellij.ui.components.JBScrollPane
 import com.puntogris.telescope.models.DrawableRes
 import com.puntogris.telescope.models.SearchResult
 import java.awt.Component
-import java.awt.FlowLayout
-import javax.swing.BorderFactory
 import javax.swing.DefaultListModel
 import javax.swing.DefaultListSelectionModel
+import javax.swing.JLabel
 import javax.swing.JList
-import javax.swing.JPanel
 import javax.swing.ListCellRenderer
 import javax.swing.SwingUtilities
 import javax.swing.event.ListSelectionEvent
@@ -25,7 +26,8 @@ class ListPanel(
     private val listModel = DefaultListModel<DrawableRes>()
     private var lastSelectedPath: String? = null
 
-    private val list = JBList<DrawableRes>().apply {
+    private val list = AssetList().apply {
+        layoutOrientation = JList.VERTICAL
         cellRenderer = FileListCellRenderer()
         model = listModel
 
@@ -101,35 +103,41 @@ class ListPanel(
         }
         lastSelectedPath = nextPath
     }
+}
 
-    private class FileListCellRenderer : JPanel(), ListCellRenderer<DrawableRes> {
-        private val previewPanel = ResPreviewPanel()
-        private val descriptionPanel = ResDescriptionPanel()
+class AssetList : JBList<DrawableRes>() {
+    val assetView: AssetView = RowAssetView()
 
-        init {
-            layout = FlowLayout(FlowLayout.LEFT, 5, 5)
-            add(previewPanel)
-            add(descriptionPanel)
-        }
+    init {
+        layoutOrientation = JList.VERTICAL
+    }
+}
 
-        override fun getListCellRendererComponent(
-            list: JList<out DrawableRes>,
-            value: DrawableRes,
-            index: Int,
-            isSelected: Boolean,
-            cellHasFocus: Boolean
-        ): Component {
-            previewPanel.bind(value.resourcePreview)
-            descriptionPanel.bind(value)
+class FileListCellRenderer : ListCellRenderer<DrawableRes> {
+    private val label = JLabel().apply { horizontalAlignment = JLabel.CENTER }
 
-            border = if (isSelected) {
-                BorderFactory.createLineBorder(list.selectionBackground)
-            } else {
-                BorderFactory.createEmptyBorder(1, 1, 1, 1)
-            }
-            isOpaque = true
+    private val iconProvider = IconProvider()
 
-            return this
-        }
+    override fun getListCellRendererComponent(
+        list: JList<out DrawableRes>,
+        value: DrawableRes,
+        index: Int,
+        isSelected: Boolean,
+        cellHasFocus: Boolean
+    ): Component {
+        val view = (list as AssetList).assetView
+        label.icon = iconProvider.getIcon(
+            drawable = value,
+            component = view,
+            refreshCallback = { list.getCellBounds(index, index)?.let(list::repaint) },
+            shouldBeRendered = { index in list.firstVisibleIndex..list.lastVisibleIndex }
+        )
+        view.selected = isSelected
+        view.focused = cellHasFocus
+        view.thumbnail = label
+        view.title = value.name
+        view.subtitle = value.module.displayName
+
+        return view
     }
 }

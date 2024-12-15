@@ -26,9 +26,6 @@
     <!-- Extension points defined by the plugin.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
     <extensions defaultExtensionNs="com.intellij">
-
-    </extensions>
-    <extensions defaultExtensionNs="com.intellij">
         <postStartupActivity implementation="com.puntogris.telescope.plugin.PluginInitializer"/>
         <notificationGroup id="Telescope" displayType="BALLOON"/>
     </extensions>

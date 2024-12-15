@@ -4,7 +4,6 @@ import com.intellij.notification.NotificationType
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.puntogris.telescope.domain.Clip
-import com.puntogris.telescope.domain.DiskCache
 import com.puntogris.telescope.domain.DrawableCache
 import com.puntogris.telescope.domain.ImagesDB
 import com.puntogris.telescope.models.DrawableRes
@@ -21,7 +20,6 @@ class RefreshState {
     operator fun invoke(project: Project, onComplete: ( List<DrawableRes>) -> Unit) {
         CoroutineScope(Dispatchers.Default).launch {
             try {
-                DiskCache.invalidateAll()
                 ImagesDB.removeAll()
                 DrawableCache.createImageCache({}).clear()
                 val files = indexFiles(project)

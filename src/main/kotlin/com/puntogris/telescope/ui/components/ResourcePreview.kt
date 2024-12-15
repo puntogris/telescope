@@ -16,6 +16,8 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutorService
 import javax.swing.Icon
 
+private const val DEFAULT_SIZE = 50
+
 class IconProvider {
     private val imageIcon = JBImageIcon(MyIcons.NotSupportedIcon.toImage())
     private val fetchImageExecutor = service<FetchImageExecutor>()
@@ -52,10 +54,10 @@ class IconProvider {
 class DrawableRenderer {
     private val rendererManager = DesignAssetRendererManager.getInstance()
 
-    fun render(drawable: DrawableRes): BufferedImage? {
+    fun render(drawable: DrawableRes, size: Int = DEFAULT_SIZE): BufferedImage? {
         try {
             val rendered = rendererManager.getViewer(drawable.file)
-            return rendered.getImage(drawable.file, drawable.module, Dimension(50, 50)).get()
+            return rendered.getImage(drawable.file, drawable.module, Dimension(size, size)).get()
         } catch (e: Throwable) {
             return null
         }

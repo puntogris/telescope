@@ -1,73 +1,33 @@
 package com.puntogris.telescope.domain.usecase
 
-import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.openapi.vfs.readBytes
-import com.intellij.ui.JBColor
+import com.intellij.util.ui.UIUtil
+import com.puntogris.telescope.models.DrawableRes
 import com.puntogris.telescope.models.ImageResult
-import com.puntogris.telescope.utils.JPEG
-import com.puntogris.telescope.utils.JPG
-import com.puntogris.telescope.utils.PNG
-import com.puntogris.telescope.utils.WEBP
-import com.puntogris.telescope.utils.XML
-import org.apache.batik.transcoder.TranscoderInput
-import org.apache.batik.transcoder.TranscoderOutput
-import org.apache.batik.transcoder.image.JPEGTranscoder
-import org.apache.batik.transcoder.image.PNGTranscoder
+import com.puntogris.telescope.ui.components.DrawableRenderer
+import java.awt.Color
 import java.awt.image.BufferedImage
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
-import javax.imageio.ImageIO
-import javax.xml.parsers.DocumentBuilderFactory
 
+private const val IMAGE_SIZE = 224
+
+// TODO we loss white images when we only use white as bg
+// we could convert it to gray scale but we lose the ability to search by color
+// we could check image colors and then apply a appropriate bg color
 class FileToClip {
 
-    operator fun invoke(file: VirtualFile, module: String): ImageResult? {
-        return when (file.extension) {
-            PNG, WEBP -> {
-                val bufferedImage = ImageIO.read(ByteArrayInputStream(file.readBytes()))
-                val buff = bufferedImageToByteBuffer(bufferedImage)
-                ImageResult(
-                    name = file.name,
-                    byteBuffer = buff,
-                    width = bufferedImage.width,
-                    height = bufferedImage.height
-                )
-            }
+    private val drawableRenderer = DrawableRenderer()
 
-            XML -> {
-                null
-                // TODO we should get the cached image and add a white bg, resize
-//                val cache = DiskCache.getIfPresent(file.path)
-//                if (cache != null) {
-//                    val buff = bufferedImageToByteBuffer(cache)
-//                    return ImageResult(
-//                        name = file.name,
-//                        byteBuffer = buff,
-//                        width = cache.width,
-//                        height = cache.height
-//                    )
-//                }
-//                val xml = file.readText()
-//                if (!xml.startsWith("<vector")) {
-//                    return null
-//                }
-//
-//                val svg = vectorToSvg(xml, module)
-//                val bufferedImage = convertSvgToRaster(svg, PNG)
-//                DiskCache.put(bufferedImage, PNG, file.path)
-//
-//                val buff = bufferedImageToByteBuffer(bufferedImage)
-//                ImageResult(
-//                    name = file.name,
-//                    byteBuffer = buff,
-//                    width = bufferedImage.width,
-//                    height = bufferedImage.height
-//                )
-            }
+    operator fun invoke(drawable: DrawableRes): ImageResult? {
+        val image = drawableRenderer.render(drawable, IMAGE_SIZE) ?: return null
+        val imageWhiteBg = addWhiteBackground(image)
+        val byteBuffer = bufferedImageToByteBuffer(imageWhiteBg)
 
-            else -> null
-        }
+        return ImageResult(
+            name = drawable.name,
+            byteBuffer = byteBuffer,
+            width = image.width,
+            height = image.height
+        )
     }
 
     private fun bufferedImageToByteBuffer(image: BufferedImage): ByteBuffer {
@@ -86,38 +46,9 @@ class FileToClip {
         return imageBuffer
     }
 
-    private fun convertSvgToRaster(svgContent: String, format: String): BufferedImage {
-        val (width, height) = getSvgDimensions(svgContent)
-
-        val inputStream = ByteArrayInputStream(svgContent.toByteArray())
-        val transcoderInput = TranscoderInput(inputStream)
-        val outputStream = ByteArrayOutputStream()
-        val transcoderOutput = TranscoderOutput(outputStream)
-
-        val transcoder = when (format.lowercase()) {
-            PNG -> PNGTranscoder()
-            JPEG, JPG -> JPEGTranscoder().apply {
-                addTranscodingHint(JPEGTranscoder.KEY_QUALITY, 0.8f)  // Set JPEG quality
-            }
-
-            else -> throw IllegalArgumentException("Unsupported format: $format")
-        }
-
-        transcoder.addTranscodingHint(PNGTranscoder.KEY_WIDTH, width.toFloat() * 10)
-        transcoder.addTranscodingHint(PNGTranscoder.KEY_HEIGHT, height.toFloat() * 10)
-        transcoder.transcode(transcoderInput, transcoderOutput)
-
-        inputStream.close()
-        outputStream.flush()
-
-        val byteBuffer = outputStream.toByteArray()
-        outputStream.close()
-
-        return addWhiteBackground(ImageIO.read(ByteArrayInputStream(byteBuffer)))
-    }
-
     private fun addWhiteBackground(originalImage: BufferedImage): BufferedImage {
-        val resultImage = BufferedImage(
+        val resultImage = UIUtil.createImage(
+            null,
             originalImage.width,
             originalImage.height,
             BufferedImage.TYPE_INT_RGB
@@ -125,7 +56,7 @@ class FileToClip {
 
         // Paint white background
         val graphics = resultImage.createGraphics()
-        graphics.color = JBColor.WHITE
+        graphics.color = Color.white
         graphics.fillRect(0, 0, resultImage.width, resultImage.height)
 
         // Draw original image on top
@@ -133,18 +64,5 @@ class FileToClip {
         graphics.dispose()
 
         return resultImage
-    }
-
-    private fun getSvgDimensions(svgContent: String): Pair<Int, Int> {
-        val documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
-        val inputStream = ByteArrayInputStream(svgContent.toByteArray())
-        val document = documentBuilder.parse(inputStream)
-        val svgElement = document.documentElement
-
-        val width = svgElement.getAttribute("width").toIntOrNull() ?: 224  // Default width if undefined
-        val height = svgElement.getAttribute("height").toIntOrNull() ?: 244  // Default height if undefined
-
-        inputStream.close()
-        return Pair(width, height)
     }
 }

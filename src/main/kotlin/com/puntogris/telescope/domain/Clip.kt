@@ -1,7 +1,6 @@
 package com.puntogris.telescope.domain
 
 import android.clip.cpp.CLIPAndroid
-import com.android.tools.idea.gradle.variant.conflict.displayName
 import com.puntogris.telescope.domain.usecase.FileToClip
 import com.puntogris.telescope.domain.usecase.GetModelsPath
 import com.puntogris.telescope.models.DrawableRes
@@ -58,7 +57,7 @@ object Clip {
     fun encodeFileImage(res: DrawableRes): Result<FloatArray> {
         return try {
             val converted = requireNotNull(
-                fileToClip(res.file, res.module.displayName)
+                fileToClip(res)
             )
             val emb = requireNotNull(visionClip()).encodeImage(
                 converted.byteBuffer,

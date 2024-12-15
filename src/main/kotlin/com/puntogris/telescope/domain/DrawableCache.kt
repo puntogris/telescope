@@ -63,23 +63,19 @@ class DrawableCache private constructor(
          * [MergingUpdateQueue] when the [mergingUpdateQueue] parameter is null.
          */
         fun createImageCache(
-            parentDisposable: Disposable,
-            mergingUpdateQueue: MergingUpdateQueue? = null
+            parentDisposable: Disposable, mergingUpdateQueue: MergingUpdateQueue? = null
         ) = DrawableCache(mergingUpdateQueue, objectToImageCache).apply { Disposer.register(parentDisposable, this) }
     }
 
     private val pendingFutures = HashMap<VirtualFile, CompletableFuture<*>?>()
 
     private val updateQueue = mergingUpdateQueue ?: MergingUpdateQueue(
-        "queue", 3000, true, MergingUpdateQueue.ANY_COMPONENT, this, null,
-        false
+        "queue", 3000, true, MergingUpdateQueue.ANY_COMPONENT, this, null, false
     )
 
     @Async.Schedule
     private fun runOrQueue(
-        asset: VirtualFile,
-        executeImmediately: Boolean = false,
-        runnable: () -> Unit
+        asset: VirtualFile, executeImmediately: Boolean = false, runnable: () -> Unit
     ) {
         // We map to null to mark that the computation for asset has started and avoid any new computation.
         // It will then be replaced by the computation future once it is created.
@@ -124,12 +120,9 @@ class DrawableCache private constructor(
         onImageCached: () -> Unit = {},
         executor: Executor = EdtExecutorService.getInstance(),
         computationFutureProvider: (() -> CompletableFuture<out BufferedImage?>)
-    )
-            : BufferedImage {
+    ): BufferedImage {
         val cachedImage = objectToImage.getIfPresent(asset.path)
-        if ((cachedImage == null || forceComputation)
-            && !pendingFutures.containsKey(asset)
-        ) {
+        if ((cachedImage == null || forceComputation) && !pendingFutures.containsKey(asset)) {
             val executeImmediately = cachedImage == null // If we don't have any image, no need to wait.
             runOrQueue(asset, executeImmediately) {
                 startComputation(computationFutureProvider, asset, onImageCached, executor)
@@ -144,18 +137,17 @@ class DrawableCache private constructor(
         onImageCached: () -> Unit,
         executor: Executor
     ) {
-        val future = computationFutureProvider()
-            .thenAccept { image: BufferedImage? ->
-                synchronized(pendingFutures) {
-                    pendingFutures.remove(asset)
-                }
-                if (image != null) {
-                    objectToImage.put(asset.path, CachedImage(image, 0))
-                    executor.execute(onImageCached)
-                } else {
-                    objectToImage.invalidate(asset.path)
-                }
+        val future = computationFutureProvider().thenAccept { image: BufferedImage? ->
+            synchronized(pendingFutures) {
+                pendingFutures.remove(asset)
             }
+            if (image != null) {
+                objectToImage.put(asset.path, CachedImage(image, 0))
+                executor.execute(onImageCached)
+            } else {
+                objectToImage.invalidate(asset.path)
+            }
+        }
         synchronized(pendingFutures) {
             if (!future.isDone) {
                 pendingFutures[asset] = future

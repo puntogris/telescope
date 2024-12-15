@@ -26,23 +26,7 @@ object DiskCache {
         val worker = object : SwingWorker<Unit, Unit>() {
             override fun doInBackground() {
                 try {
-                    val dir = File(cacheDir, path.hashCode().toString())
-                    if (!dir.exists()) {
-                        dir.mkdirs()
-                    }
-                    ImageIO.write(image.toBufferedImage(), format.uppercase(), dir)
-                } catch (ignored: Throwable) {
-                }
-            }
-        }
-        worker.execute()
-    }
-
-    fun put(image: BufferedImage, format: String, path: String) {
-        val worker = object : SwingWorker<Unit, Unit>() {
-            override fun doInBackground() {
-                try {
-                    val dir = File(cacheDir, path.hashCode().toString())
+                    val dir = File(cacheDir, path.hashCode().toString() + ".$format")
                     if (!dir.exists()) {
                         dir.mkdirs()
                     }

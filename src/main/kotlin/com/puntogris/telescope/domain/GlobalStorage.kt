@@ -70,7 +70,7 @@ object GlobalStorage {
         return PropertiesComponent.getInstance().getSecureBoolean(USE_DEFAULT_MODELS_KEY, true)
     }
 
-    // There seems to be a bug where booleans are not saved correctly
+    // TODO There seems to be a bug where booleans are not saved correctly
     // workaround for this, should investigate more, seems to fail when we use a default value
     private fun PropertiesComponent.getSecureBoolean(name: String, default: Boolean): Boolean {
         return getValue(name).orEmpty().toBooleanStrictOrNull() ?: default

@@ -1,7 +1,6 @@
 package com.puntogris.telescope.ui.components
 
 import com.android.tools.idea.gradle.variant.conflict.displayName
-import com.android.tools.idea.ui.resourcemanager.widget.AssetView
 import com.android.tools.idea.ui.resourcemanager.widget.RowAssetView
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.components.JBList
@@ -106,7 +105,7 @@ class ListPanel(
 }
 
 class AssetList : JBList<DrawableRes>() {
-    val assetView: AssetView = RowAssetView()
+    val assetView = RowAssetView()
 
     init {
         layoutOrientation = JList.VERTICAL
@@ -132,12 +131,19 @@ class FileListCellRenderer : ListCellRenderer<DrawableRes> {
             refreshCallback = { list.getCellBounds(index, index)?.let(list::repaint) },
             shouldBeRendered = { index in list.firstVisibleIndex..list.lastVisibleIndex }
         )
-        view.selected = isSelected
-        view.focused = cellHasFocus
-        view.thumbnail = label
-        view.title = value.name
-        view.subtitle = value.module.displayName
-
+        view.apply {
+            selected = isSelected
+            focused = cellHasFocus
+            thumbnail = label
+            title = value.name
+            subtitle = value.module.displayName
+            metadata = when (value) {
+                is DrawableRes.Simple -> "1 version"
+                is DrawableRes.WithVariants -> {
+                    value.variants.joinToString(" - ") { it.parentDirName.replace("mipmap-", "") }
+                }
+            }
+        }
         return view
     }
 }

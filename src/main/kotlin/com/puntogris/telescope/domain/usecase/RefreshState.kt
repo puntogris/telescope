@@ -7,7 +7,6 @@ import com.puntogris.telescope.domain.Clip
 import com.puntogris.telescope.domain.DiskCache
 import com.puntogris.telescope.domain.DrawableCache
 import com.puntogris.telescope.domain.ImagesDB
-import com.puntogris.telescope.domain.MemoryCache
 import com.puntogris.telescope.models.DrawableRes
 import com.puntogris.telescope.models.ImageEntity
 import com.puntogris.telescope.utils.sendNotification
@@ -22,7 +21,6 @@ class RefreshState {
     operator fun invoke(project: Project, onComplete: ( List<DrawableRes>) -> Unit) {
         CoroutineScope(Dispatchers.Default).launch {
             try {
-                MemoryCache.svg.invalidateAll()
                 DiskCache.invalidateAll()
                 ImagesDB.removeAll()
                 DrawableCache.createImageCache({}).clear()

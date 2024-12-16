@@ -7,6 +7,7 @@ import com.puntogris.telescope.models.SearchResult
 import com.puntogris.telescope.utils.configPath
 import io.objectbox.Box
 import io.objectbox.BoxStore
+import io.objectbox.query.QueryBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -41,7 +42,7 @@ object ImagesDB {
     }
 
     suspend fun getSimilarUri(uri: String): List<SearchResult> = withContext(Dispatchers.IO) {
-        val query = imagesBox.query(ImageEntity_.uri.contains(uri)).build()
+        val query = imagesBox.query(ImageEntity_.uri.contains(uri, QueryBuilder.StringOrder.CASE_INSENSITIVE)).build()
 
         val results = query.find()
 

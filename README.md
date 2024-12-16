@@ -46,8 +46,8 @@ https://github.com/monatis/clip.cpp
 
 ### TODO
 
-- Refactor how we get resources and generate previews, unsure if we should set global states for colors and modules to
-  match when converting to svg
+- Check if it's worth migrating to the way ResourceManager fetches resources
 - Fix crash in clip.cpp when encoding text multiple times in a short amount of time
+- Implement fuzzy search
 
 

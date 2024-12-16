@@ -1,6 +1,7 @@
 package com.puntogris.telescope.ui.components
 
 import com.android.tools.idea.gradle.variant.conflict.displayName
+import com.android.tools.idea.ui.resourcemanager.widget.RowAssetView
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.components.JBList
 import com.intellij.ui.components.JBScrollPane
@@ -142,8 +143,6 @@ class FileListCellRenderer : ListCellRenderer<DrawableRes> {
                     value.variants.joinToString(" - ") { it.parentDirName.replace("mipmap-", "") }
                 }
             }
-            // TODO we should only show this for ai results
-            view.rowIcon = RowIcon.AI
             withChessboard = true
 
             // image size plus some padding

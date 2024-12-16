@@ -123,7 +123,7 @@ class SettingsPage(private val project: Project) : DslComponent {
             text("This plugin uses OpenCLIP compatible models and converted to gguf format. Keep in mind that this models will need to be load into memory so bigger models will be more demanding.")
         }
         row {
-            browserLink("Here are a few models available in HuggingFaces", "")
+            browserLink("Get more info here", GITHUB_URL)
         }
     }
 

@@ -4,6 +4,7 @@ import com.intellij.icons.AllIcons
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.util.maximumHeight
+import com.intellij.util.ui.JBUI
 import com.puntogris.telescope.domain.Clip
 import com.puntogris.telescope.domain.GlobalStorage
 import java.awt.BorderLayout
@@ -37,13 +38,14 @@ class CheckboxPanel(
         add(embeddingCheckbox)
     }
 
-    private val rightPanel = JPanel(FlowLayout(FlowLayout.RIGHT, 5, 5)).apply {
+    private val rightPanel = JPanel(FlowLayout(FlowLayout.RIGHT, 0, 0)).apply {
         val button = JButton(AllIcons.Actions.Refresh)
         button.addActionListener { onRefreshClicked() }
         add(button)
     }
 
     init {
+        border = JBUI.Borders.empty(0, 6)
         layout = BorderLayout()
         maximumHeight = 30
 

@@ -1,6 +1,5 @@
 package com.puntogris.telescope.domain.usecase
 
-import com.intellij.util.ui.UIUtil
 import com.puntogris.telescope.models.DrawableRes
 import com.puntogris.telescope.models.ImageResult
 import com.puntogris.telescope.ui.components.DrawableRenderer
@@ -46,9 +45,12 @@ class FileToClip {
         return imageBuffer
     }
 
+    /**
+     * Using BufferedImage directly instead of UIUtil or ImageUtil to avoid interference with embedding creation.
+     * Also, using Color instead of JBColor, as the latter doesn't provide true white in this context.
+     */
     private fun addWhiteBackground(originalImage: BufferedImage): BufferedImage {
-        val resultImage = UIUtil.createImage(
-            null,
+        val resultImage = BufferedImage(
             originalImage.width,
             originalImage.height,
             BufferedImage.TYPE_INT_RGB

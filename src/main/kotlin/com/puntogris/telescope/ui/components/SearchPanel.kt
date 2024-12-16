@@ -1,41 +1,35 @@
 package com.puntogris.telescope.ui.components
 
+import com.intellij.ui.DocumentAdapter
+import com.intellij.ui.SearchTextField
 import com.intellij.ui.util.maximumHeight
+import com.intellij.util.ui.JBUI
 import com.puntogris.telescope.utils.documentText
-import java.util.*
-import javax.swing.JPanel
-import javax.swing.JTextField
+import org.jdesktop.swingx.AbstractPatternPanel.SEARCH_FIELD_LABEL
+import java.util.Timer
 import javax.swing.event.DocumentEvent
-import javax.swing.event.DocumentListener
 import kotlin.concurrent.schedule
 
 private const val DEBOUNCE_MS = 200L
+private val GAP_SIZE = JBUI.scale(10)
 
 class SearchPanel(
     private val onChange: (String) -> Unit
-) : JPanel(), DocumentListener {
-
-    private val searchField = JTextField(30).apply {
-        document.addDocumentListener(this@SearchPanel)
-    }
+) : SearchTextField(true) {
 
     private var debounceTimer: Timer? = null
 
     init {
         maximumHeight = 40
-        add(searchField)
-    }
-
-    override fun insertUpdate(e: DocumentEvent?) {
-        onEvent(e)
-    }
-
-    override fun removeUpdate(e: DocumentEvent?) {
-        onEvent(e)
-    }
-
-    override fun changedUpdate(e: DocumentEvent?) {
-        onEvent(e)
+        isFocusable = true
+        border = JBUI.Borders.empty(0, 6)
+        toolTipText = SEARCH_FIELD_LABEL
+        textEditor.columns = GAP_SIZE
+        textEditor.document.addDocumentListener(object : DocumentAdapter() {
+            override fun textChanged(e: DocumentEvent) {
+                onEvent(e)
+            }
+        })
     }
 
     private fun onEvent(e: DocumentEvent?) {

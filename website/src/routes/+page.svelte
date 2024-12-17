@@ -1,28 +1,16 @@
 <script lang="ts">
-	import CommitIcon from '$lib/commitIcon.svelte';
-	import DotsIcon from '$lib/dotsIcon.svelte';
-	import DotsVertical from '$lib/dotsVertical.svelte';
-	import FolderIcon from '$lib/folderIcon.svelte';
-	import LineIcon from '$lib/lineIcon.svelte';
-	import PullRequestIcon from '$lib/pullRequestIcon.svelte';
-	import ShapesIcon from '$lib/shapesIcon.svelte';
-	import SyncIcon from '$lib/syncIcon.svelte';
-	import TelescopeIcon from '$lib/telescopeIcon.svelte';
+	import { data } from '$lib/data';
+	import CommitIcon from '$lib/icons/commitIcon.svelte';
+	import DotsIcon from '$lib/icons/dotsIcon.svelte';
+	import DotsVertical from '$lib/icons/dotsVertical.svelte';
+	import FolderIcon from '$lib/icons/folderIcon.svelte';
+	import LineIcon from '$lib/icons/lineIcon.svelte';
+	import PullRequestIcon from '$lib/icons/pullRequestIcon.svelte';
+	import ShapesIcon from '$lib/icons/shapesIcon.svelte';
+	import SyncIcon from '$lib/icons/syncIcon.svelte';
+	import TelescopeIcon from '$lib/icons/telescopeIcon.svelte';
 
-	let items = [
-		{
-			name: 'icon 1'
-		},
-		{
-			name: 'icon 2'
-		},
-		{
-			name: 'icon 3'
-		},
-		{
-			name: 'icon 4'
-		}
-	];
+	let items = data;
 
 	let filteredItems = items;
 
@@ -45,6 +33,15 @@
 
 		return dotProduct;
 	}
+
+	async function getEmbedding(query: string) {
+		const response = await fetch(`/api?query=${query}`);
+
+		if (response.ok) {
+			const data = await response.json();
+		} else {
+		}
+	}
 </script>
 
 <div class="flex h-screen w-1/2 overflow-hidden bg-ide-bg">
@@ -58,7 +55,7 @@
 	</div>
 	<div class="flex w-full flex-col">
 		<div
-			class="flex h-14 items-center justify-center gap-6 border-b border-ide-border px-4 text-ide-text"
+			class="flex h-14 shrink-0 items-center justify-center gap-6 border-b border-ide-border px-4 text-ide-text"
 		>
 			<div class="text-lg font-semibold">Telescope</div>
 			<div class="text relative flex h-full px-4">
@@ -89,8 +86,10 @@
 		<div class="flex flex-col gap-2 overflow-y-auto p-4">
 			{#each filteredItems as item}
 				<div class="flex gap-6">
-					<div class="chess size-24 shrink-0 border border-ide-border">
-						<ShapesIcon />
+					<div
+						class="chess flex size-24 shrink-0 items-center justify-center border border-ide-border"
+					>
+						<svelte:component this={item.icon} />
 					</div>
 
 					<div class="flex w-full flex-col justify-between border-b border-ide-border py-2">

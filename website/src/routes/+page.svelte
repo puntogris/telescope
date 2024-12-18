@@ -69,6 +69,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>telescope.puntogris</title>
+</svelte:head>
+
 <div class="grid min-h-screen grid-cols-2">
 	<div class="flex overflow-hidden bg-ide-bg">
 		<div class="flex flex-col gap-6 border-r border-ide-border-dark p-3 text-ide-text">

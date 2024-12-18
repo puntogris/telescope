@@ -12,18 +12,43 @@
 	import TelescopeIcon from '$lib/icons/telescopeIcon.svelte';
 	import { samples } from '$lib/samples';
 
-	let items = samples;
-	let filteredItems = items;
+	let filtered = samples;
 
-	let fuzzyEnabled = false;
+	let fuzzyEnabled = true;
 	let embeddingsEnabled = false;
 
-	function filterItems(query: string) {
-		if (query) {
-			filteredItems = items.filter((item) => item.name.toLowerCase().includes(query.toLowerCase()));
+	async function filterSamples(query: string) {
+		if (!query) {
+			filtered = samples;
+		} else if (fuzzyEnabled) {
+			filtered = applyFuzzyFilter(query);
 		} else {
-			filteredItems = items;
+			filtered = await applyEmbeddingsFilter(query);
 		}
+	}
+
+	function applyFuzzyFilter(query: string) {
+		return samples.filter((i) => i.name.toLowerCase().includes(query.toLowerCase()));
+	}
+
+	async function applyEmbeddingsFilter(query: string) {
+		const response = await fetch(`/api?query=${query}`);
+		if (!response.ok) {
+			return [];
+		}
+
+		const result = await response.json();
+		const textEmbeddings = result.embeddings as [];
+		const scores = [];
+
+		for (const sample of samples) {
+			scores.push({
+				sample: sample,
+				score: dotProduct(textEmbeddings, sample.embedding)
+			});
+		}
+
+		return scores.sort((a, b) => b.score - a.score).map((i) => i.sample);
 	}
 
 	function dotProduct(vectorA: number[], vectorB: number[]) {
@@ -39,34 +64,10 @@
 		return dotProduct;
 	}
 
-	async function getEmbedding(query: string) {
-		const response = await fetch(`/api?query=${query}`);
-
-		if (response.ok) {
-			const data = await response.json();
-			return data.embeddings;
-		} else {
-			return '';
-		}
-	}
-
-	async function search(query: string) {
-		if (!query) {
-			filteredItems = items;
-			return;
-		}
-		let results: any[] = [];
-
-		if (fuzzyEnabled) {
-			results = items.filter((item) => item.name.toLowerCase().includes(query.toLowerCase()));
-		}
-
-		if (embeddingsEnabled) {
-			const embedding = getEmbedding(query);
-			//search across all files
-		}
-
-		filteredItems = results;
+	function updateCheckboxs(mode: string) {
+		const isFuzzy = mode === 'fuzzy';
+		fuzzyEnabled = isFuzzy;
+		embeddingsEnabled = !isFuzzy;
 	}
 </script>
 
@@ -104,8 +105,10 @@
 						class="rounded p-1 checked:bg-blue-500"
 						type="checkbox"
 						id="exampleCheckbox"
-						name="example"
-						value="option1"
+						bind:checked={fuzzyEnabled}
+						onchange={(e) => {
+							if (e.currentTarget.checked) updateCheckboxs('fuzzy');
+						}}
 					/>
 					Fuzzy
 				</label>
@@ -113,9 +116,10 @@
 					<input
 						class="rounded p-1 checked:bg-blue-500"
 						type="checkbox"
-						id="exampleCheckbox"
-						name="example"
-						value="option1"
+						bind:checked={embeddingsEnabled}
+						onchange={(e) => {
+							if (e.currentTarget.checked) updateCheckboxs('embeddings');
+						}}
 					/>
 					Embeddings
 				</label>
@@ -124,19 +128,19 @@
 			<input
 				class="mx-4 rounded-md border border-ide-border-dark bg-transparent px-4 py-2 text-ide-text outline-none focus:ring-2 focus:ring-blue-500"
 				type="text"
-				oninput={(e) => filterItems(e.currentTarget.value)}
+				oninput={(e) => filterSamples(e.currentTarget.value)}
 			/>
 			<div class="mt-1 flex flex-col gap-3 overflow-y-auto p-4">
-				{#each filteredItems as item}
+				{#each filtered as sample}
 					<div class="flex gap-6">
 						<div
 							class="chess flex size-24 shrink-0 items-center justify-center border border-ide-border-dark"
 						>
-							<img class="size-12" src={item.path} alt="icon" />
+							<img class="size-12" src={sample.path} alt="icon" />
 						</div>
 
 						<div class="flex w-full flex-col justify-between border-b border-ide-border-dark py-2">
-							<div class="text-ide-text">{item.name}</div>
+							<div class="text-ide-text">{sample.name}</div>
 							<div class="text-zinc-500">:app | 1 version</div>
 						</div>
 					</div>

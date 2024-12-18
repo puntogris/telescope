@@ -73,7 +73,7 @@
 	<title>telescope.puntogris</title>
 </svelte:head>
 
-<div class="grid min-h-screen grid-cols-2">
+<div class="grid h-screen grid-cols-2">
 	<div class="flex overflow-hidden bg-ide-bg">
 		<div class="flex flex-col gap-6 border-r border-ide-border-dark p-3 text-ide-text">
 			<FolderIcon class="size-10 rounded-md p-2 hover:bg-zinc-700" />
@@ -98,12 +98,24 @@
 			</div>
 			<div class="flex gap-4 p-4 text-ide-text">
 				<div>Filters:</div>
-				<label>
-					<input type="checkbox" id="exampleCheckbox" name="example" value="option1" />
+				<label class="flex items-center gap-1.5">
+					<input
+						class="rounded p-1 checked:bg-blue-500"
+						type="checkbox"
+						id="exampleCheckbox"
+						name="example"
+						value="option1"
+					/>
 					Fuzzy
 				</label>
-				<label>
-					<input type="checkbox" id="exampleCheckbox" name="example" value="option1" />
+				<label class="flex items-center gap-1.5">
+					<input
+						class="rounded p-1 checked:bg-blue-500"
+						type="checkbox"
+						id="exampleCheckbox"
+						name="example"
+						value="option1"
+					/>
 					Embeddings
 				</label>
 				<SyncIcon class="ml-auto size-5" />
@@ -113,7 +125,7 @@
 				type="text"
 				on:input={(e) => filterItems(e.currentTarget.value)}
 			/>
-			<div class="flex flex-col gap-2 overflow-y-auto p-4">
+			<div class="mt-1 flex flex-col gap-2 overflow-y-auto p-4">
 				{#each filteredItems as item}
 					<div class="flex gap-6">
 						<div

@@ -3,5 +3,5 @@
 @import 'tailwindcss/utilities';
 
 :root {
-	@apply bg-zinc-800;
+	@apply bg-ide-bg;
 }

@@ -21,10 +21,10 @@ class handler(BaseHTTPRequestHandler):
             return
         
         tokens = clip.tokenize(query)        
-        embedding = clip.encode_text(tokens)
+        embeddings = clip.encode_text(tokens)
 
         response = {
-            "embedding": embedding
+            "embeddings": embeddings
         }
 
         self.send_response(200)

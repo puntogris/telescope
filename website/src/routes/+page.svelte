@@ -23,20 +23,13 @@
 	let terminalLogs: string[] = $state(['running at telescope.puntogris.com...']);
 
 	async function filterSamples(query: string) {
-		registerLog(`Resolving query: ${query}`);
 		if (!query) {
 			filtered = samples;
 			registerLog(`No query, returning all samples`, true);
 		} else if (fuzzyEnabled) {
-			filtered = applyFuzzyFilter(query);
-			if (filtered.length === 0) {
-				registerLog(`No fuzzy matches for query ${query}`, true);
-			} else {
-				const matches = filtered.map((i) => i.name).join('\n -');
-				registerLog(`Fuzzy match for query ${query}: \n -${matches}`, true);
-			}
+			applyFuzzyFilter(query);
 		} else {
-			filtered = await applyEmbeddingsFilter(query);
+			applyEmbeddingsFilter(query);
 		}
 	}
 
@@ -56,7 +49,16 @@
 	}
 
 	function applyFuzzyFilter(query: string) {
-		return samples.filter((i) => i.name.toLowerCase().includes(query.toLowerCase()));
+		registerLog(`Resolving query with fuzzy: ${query}`);
+
+		filtered = samples.filter((i) => i.name.toLowerCase().includes(query.toLowerCase()));
+
+		if (filtered.length === 0) {
+			registerLog(`No fuzzy matches for query ${query}`, true);
+		} else {
+			const matches = filtered.map((i) => i.name).join('\n -');
+			registerLog(`Fuzzy match for query ${query}: \n -${matches}`, true);
+		}
 	}
 
 	function summarizeList(list: number[]) {
@@ -77,6 +79,7 @@
 			headers: { 'Content-Type': 'application/json' }
 		});
 		if (!response.ok) {
+			registerLog(`Fetching for ${query} failed: ${response.status}`, true);
 			return [];
 		}
 
@@ -84,15 +87,18 @@
 		const textEmbeddings = result.embeddings as [];
 		registerLog(`Embeddings for ${query}: ${summarizeList(textEmbeddings)}`);
 
-		const scores = [];
+		let scores = [];
 		for (const sample of samples) {
 			scores.push({
 				sample: sample,
 				score: dotProduct(textEmbeddings, sample.embeddings)
 			});
 		}
+		scores = scores.sort((a, b) => b.score - a.score);
+		filtered = scores.map((i) => i.sample);
 
-		return scores.sort((a, b) => b.score - a.score).map((i) => i.sample);
+		const matches = scores.map((i) => `${i.sample.name} (${i.score.toFixed(2)})`).join('\n -');
+		registerLog(`Embeddings match for query ${query}: \n -${matches}`, true);
 	}
 
 	function dotProduct(vectorA: number[], vectorB: number[]) {

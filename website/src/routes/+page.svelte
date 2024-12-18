@@ -13,6 +13,7 @@
 	import TerminalIcon from '$lib/icons/terminalIcon.svelte';
 	import XIcon from '$lib/icons/xIcon.svelte';
 	import { samples } from '$lib/samples';
+	import { dotProduct, summarizeList } from '$lib/utils';
 	import { tick } from 'svelte';
 	import { twMerge } from 'tailwind-merge';
 
@@ -21,19 +22,71 @@
 	let embeddingsEnabled = $state(false);
 	let showTerminal = $state(false);
 	let terminalLogs: string[] = $state(['running at telescope.puntogris.com...']);
+	let timeout: number;
 
-	async function filterSamples(query: string) {
+	async function handleSearch(query: string) {
 		if (!query) {
-			filtered = samples;
-			registerLog(`No query, returning all samples`, true);
+			handleNoQuery();
 		} else if (fuzzyEnabled) {
-			applyFuzzyFilter(query);
+			performFuzzySearch(query);
 		} else {
-			applyEmbeddingsFilter(query);
+			debounceEmbeddingsSearch(query);
 		}
 	}
 
-	function registerLog(log: string, withSparator = false) {
+	function handleNoQuery() {
+		filtered = samples;
+		logTerminalMessage(`No query, returning all samples`, true);
+	}
+
+	function performFuzzySearch(query: string) {
+		logTerminalMessage(`Resolving query with fuzzy: ${query}`);
+
+		filtered = samples.filter((i) => i.name.toLowerCase().includes(query.toLowerCase()));
+
+		if (filtered.length === 0) {
+			logTerminalMessage(`No fuzzy matches for query ${query}`, true);
+		} else {
+			const matches = filtered.map((i) => i.name).join('\n -');
+			logTerminalMessage(`Fuzzy match for query ${query}: \n -${matches}`, true);
+		}
+	}
+
+	function debounceEmbeddingsSearch(query: string) {
+		clearTimeout(timeout);
+		timeout = setTimeout(() => performEmbeddingsSearch(query), 500);
+	}
+
+	async function performEmbeddingsSearch(query: string) {
+		logTerminalMessage(`Fetching embeddings for ${query}`);
+		const response = await fetch(`api/encode?query=${query}`, {
+			method: 'GET',
+			headers: { 'Content-Type': 'application/json' }
+		});
+		if (!response.ok) {
+			logTerminalMessage(`Fetching for ${query} failed: ${response.status}`, true);
+			return [];
+		}
+
+		const result = await response.json();
+		const textEmbeddings = result.embeddings as [];
+		logTerminalMessage(`Embeddings for ${query}: ${summarizeList(textEmbeddings)}`);
+
+		let scores = [];
+		for (const sample of samples) {
+			scores.push({
+				sample: sample,
+				score: dotProduct(textEmbeddings, sample.embeddings)
+			});
+		}
+		scores = scores.sort((a, b) => b.score - a.score);
+		filtered = scores.map((i) => i.sample);
+
+		const matches = scores.map((i) => `${i.sample.name} (${i.score.toFixed(2)})`).join('\n -');
+		logTerminalMessage(`Embeddings match for query ${query}: \n -${matches}`, true);
+	}
+
+	function logTerminalMessage(log: string, withSparator = false) {
 		terminalLogs.push(log);
 		if (withSparator) {
 			terminalLogs.push('--------------------------------------------');
@@ -48,73 +101,7 @@
 		}
 	}
 
-	function applyFuzzyFilter(query: string) {
-		registerLog(`Resolving query with fuzzy: ${query}`);
-
-		filtered = samples.filter((i) => i.name.toLowerCase().includes(query.toLowerCase()));
-
-		if (filtered.length === 0) {
-			registerLog(`No fuzzy matches for query ${query}`, true);
-		} else {
-			const matches = filtered.map((i) => i.name).join('\n -');
-			registerLog(`Fuzzy match for query ${query}: \n -${matches}`, true);
-		}
-	}
-
-	function summarizeList(list: number[]) {
-		if (list.length <= 10) {
-			return `[${list.join(',')}]`;
-		}
-
-		const start = list.slice(0, 5);
-		const end = list.slice(-5);
-
-		return `[${start.join(',')},...,${end.join(',')}]`;
-	}
-
-	async function applyEmbeddingsFilter(query: string) {
-		registerLog(`Fetching embeddings for ${query}`);
-		const response = await fetch(`api/encode?query=${query}`, {
-			method: 'GET',
-			headers: { 'Content-Type': 'application/json' }
-		});
-		if (!response.ok) {
-			registerLog(`Fetching for ${query} failed: ${response.status}`, true);
-			return [];
-		}
-
-		const result = await response.json();
-		const textEmbeddings = result.embeddings as [];
-		registerLog(`Embeddings for ${query}: ${summarizeList(textEmbeddings)}`);
-
-		let scores = [];
-		for (const sample of samples) {
-			scores.push({
-				sample: sample,
-				score: dotProduct(textEmbeddings, sample.embeddings)
-			});
-		}
-		scores = scores.sort((a, b) => b.score - a.score);
-		filtered = scores.map((i) => i.sample);
-
-		const matches = scores.map((i) => `${i.sample.name} (${i.score.toFixed(2)})`).join('\n -');
-		registerLog(`Embeddings match for query ${query}: \n -${matches}`, true);
-	}
-
-	function dotProduct(vectorA: number[], vectorB: number[]) {
-		if (vectorA.length !== vectorB.length) {
-			throw new Error('Vectors must have the same length');
-		}
-
-		let dotProduct = 0;
-		for (let i = 0; i < vectorA.length; i++) {
-			dotProduct += vectorA[i] * vectorB[i];
-		}
-
-		return dotProduct;
-	}
-
-	function updateCheckboxs(mode: string) {
+	function updateSearchMode(mode: string) {
 		const isFuzzy = mode === 'fuzzy';
 		fuzzyEnabled = isFuzzy;
 		embeddingsEnabled = !isFuzzy;
@@ -165,7 +152,7 @@
 						id="exampleCheckbox"
 						bind:checked={fuzzyEnabled}
 						onchange={(e) => {
-							if (e.currentTarget.checked) updateCheckboxs('fuzzy');
+							if (e.currentTarget.checked) updateSearchMode('fuzzy');
 						}}
 					/>
 					Fuzzy
@@ -176,7 +163,7 @@
 						type="checkbox"
 						bind:checked={embeddingsEnabled}
 						onchange={(e) => {
-							if (e.currentTarget.checked) updateCheckboxs('embeddings');
+							if (e.currentTarget.checked) updateSearchMode('embeddings');
 						}}
 					/>
 					Embeddings
@@ -186,7 +173,7 @@
 			<input
 				class="border-ide-border-dark text-ide-text mx-4 rounded-md border bg-transparent px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
 				type="text"
-				oninput={(e) => filterSamples(e.currentTarget.value)}
+				oninput={(e) => handleSearch(e.currentTarget.value)}
 			/>
 			<div class="mt-1 flex flex-col gap-3 overflow-y-auto p-4">
 				{#each filtered as sample}

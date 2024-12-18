@@ -71,7 +71,11 @@
 	}
 
 	async function applyEmbeddingsFilter(query: string) {
-		const response = await fetch(`/api?query=${query}`);
+		registerLog(`Fetching embeddings for ${query}`);
+		const response = await fetch(`api/encode?query=${query}`, {
+			method: 'GET',
+			headers: { 'Content-Type': 'application/json' }
+		});
 		if (!response.ok) {
 			return [];
 		}
@@ -116,8 +120,8 @@
 </svelte:head>
 
 <div class="grid h-screen grid-cols-2">
-	<div class="flex overflow-hidden bg-ide-bg">
-		<div class="flex flex-col gap-6 border-r border-ide-border-dark p-3 text-ide-text">
+	<div class="bg-ide-bg flex overflow-hidden">
+		<div class="border-ide-border-dark text-ide-text flex flex-col gap-6 border-r p-3">
 			<FolderIcon class="size-10 rounded-md p-2 hover:bg-zinc-700" />
 			<CommitIcon class="size-10 rounded-md p-2 hover:bg-zinc-700" />
 			<TelescopeIcon class="size-10 rounded-md bg-blue-500 p-2" />
@@ -135,7 +139,7 @@
 		</div>
 		<div class="flex w-full flex-col">
 			<div
-				class="flex h-12 shrink-0 items-center justify-center gap-6 border-b border-ide-border-dark px-4 text-ide-text"
+				class="border-ide-border-dark text-ide-text flex h-12 shrink-0 items-center justify-center gap-6 border-b px-4"
 			>
 				<div class="font-semibold">Telescope</div>
 				<div class="relative flex h-full px-4">
@@ -146,7 +150,7 @@
 				<DotsVertical class="ml-auto size-5" />
 				<LineIcon class="size-5" />
 			</div>
-			<div class="flex gap-4 p-4 text-ide-text">
+			<div class="text-ide-text flex gap-4 p-4">
 				<div>Filters:</div>
 				<label class="flex items-center gap-1.5">
 					<input
@@ -174,7 +178,7 @@
 				<SyncIcon class="ml-auto size-5" />
 			</div>
 			<input
-				class="mx-4 rounded-md border border-ide-border-dark bg-transparent px-4 py-2 text-ide-text outline-none focus:ring-2 focus:ring-blue-500"
+				class="border-ide-border-dark text-ide-text mx-4 rounded-md border bg-transparent px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
 				type="text"
 				oninput={(e) => filterSamples(e.currentTarget.value)}
 			/>
@@ -182,12 +186,12 @@
 				{#each filtered as sample}
 					<div class="flex gap-6">
 						<div
-							class="chess flex size-24 shrink-0 items-center justify-center border border-ide-border-dark"
+							class="chess border-ide-border-dark flex size-24 shrink-0 items-center justify-center border"
 						>
 							<img class="size-12" src={sample.path} alt="icon" />
 						</div>
 
-						<div class="flex w-full flex-col justify-between border-b border-ide-border-dark py-2">
+						<div class="border-ide-border-dark flex w-full flex-col justify-between border-b py-2">
 							<div class="text-ide-text">{sample.name}</div>
 							<div class="text-zinc-500">:app | 1 version</div>
 						</div>
@@ -198,7 +202,7 @@
 	</div>
 	<div class="flex flex-col">
 		<div
-			class="flex h-12 shrink-0 items-center gap-6 border-b border-ide-border-light text-ide-text"
+			class="border-ide-border-light text-ide-text flex h-12 shrink-0 items-center gap-6 border-b"
 		>
 			<div class="relative flex h-full px-4">
 				<div class="flex items-center gap-2">
@@ -211,7 +215,7 @@
 			<a
 				href="https://www.github.com/puntogris/telescope"
 				target="_blank"
-				class="flex h-full items-center gap-2 text-sm text-ide-text hover:text-white"
+				class="text-ide-text flex h-full items-center gap-2 text-sm hover:text-white"
 			>
 				<ClassKotlinIcon />
 				VisitGithubRepository.kt
@@ -219,7 +223,7 @@
 			<a
 				href="https://www.puntogris.com"
 				target="_blank"
-				class="flex h-full items-center gap-2 text-sm text-ide-text hover:text-white"
+				class="text-ide-text flex h-full items-center gap-2 text-sm hover:text-white"
 			>
 				<ClassKotlinIcon />
 				VisitPuntogrisWebsite.kt
@@ -227,12 +231,12 @@
 			<DotsVertical class="ml-auto mr-3 size-5" />
 		</div>
 		<div class="flex h-full flex-col gap-1 p-8">
-			<h1 class="text-xl font-semibold text-ide-text">Telescope, plugin for Android Studio</h1>
+			<h1 class="text-ide-text text-xl font-semibold">Telescope, plugin for Android Studio</h1>
 			<p class="mt-2 text-zinc-300">
 				Preview of the actual plugin, i got carried away and made a simplified web version of it.
 			</p>
 
-			<h1 class="mt-4 text-lg font-semibold text-ide-text">How it works</h1>
+			<h1 class="text-ide-text mt-4 text-lg font-semibold">How it works</h1>
 			<p class="mt-2 text-zinc-300">
 				It follows the same approach where we generate embeddings for text and images using
 				OpenCLIP-compatible models that are converted to the GGUF format. This allows us to leverage
@@ -242,12 +246,12 @@
 				I generated the image embeddings ahead of time, and stored them in a JSON file. When
 				searching, we generate the text embeddings and order them by similarity score.
 			</p>
-			<h1 class="mt-4 text-lg font-semibold text-ide-text">Tip of the day</h1>
+			<h1 class="text-ide-text mt-4 text-lg font-semibold">Tip of the day</h1>
 			<p class="mt-2 text-zinc-300">
 				In the bottom-left corner, you'll find the terminal button, where you can view the process
 				logs. You can also see the embeddings of the text and images being used for the search.
 			</p>
-			<h1 class="mt-4 text-lg font-semibold text-ide-text">So it goes</h1>
+			<h1 class="text-ide-text mt-4 text-lg font-semibold">So it goes</h1>
 			<p class="mt-2 text-zinc-300">
 				If you're here, you probably already know that this project, is open source and somewhat of
 				an experiment. Feel free to check out the code via the link at the top, compile and have
@@ -260,12 +264,12 @@
 
 {#if showTerminal}
 	<div
-		class="fixed bottom-0 right-0 flex h-1/2 w-1/2 flex-col border border-ide-border-dark bg-zinc-900"
+		class="border-ide-border-dark fixed bottom-0 right-0 flex h-1/2 w-1/2 flex-col border bg-zinc-900"
 	>
-		<div class="flex items-center justify-between bg-ide-bg p-2">
-			<div class="text-sm font-semibold text-ide-text">Terminal</div>
+		<div class="bg-ide-bg flex items-center justify-between p-2">
+			<div class="text-ide-text text-sm font-semibold">Terminal</div>
 			<button class="rounded p-1 hover:bg-zinc-700" onclick={() => (showTerminal = !showTerminal)}>
-				<LineIcon class="size-5 text-ide-text" />
+				<LineIcon class="text-ide-text size-5" />
 			</button>
 		</div>
 
@@ -274,7 +278,7 @@
 				puntogris@pc ~/telescope (main) &gt; ./start-telescope
 			</div>
 			{#each terminalLogs as log}
-				<div class="whitespace-pre-wrap text-sm text-ide-text">
+				<div class="text-ide-text whitespace-pre-wrap text-sm">
 					{log}
 				</div>
 			{/each}

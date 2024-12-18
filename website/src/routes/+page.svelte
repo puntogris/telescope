@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { data } from '$lib/data';
 	import ClassKotlinIcon from '$lib/icons/classKotlinIcon.svelte';
 	import CommitIcon from '$lib/icons/commitIcon.svelte';
 	import DotsIcon from '$lib/icons/dotsIcon.svelte';
@@ -11,8 +10,9 @@
 	import ShapesIcon from '$lib/icons/shapesIcon.svelte';
 	import SyncIcon from '$lib/icons/syncIcon.svelte';
 	import TelescopeIcon from '$lib/icons/telescopeIcon.svelte';
+	import { samples } from '$lib/samples';
 
-	let items = data;
+	let items = samples;
 	let filteredItems = items;
 
 	let fuzzyEnabled = false;
@@ -25,6 +25,7 @@
 			filteredItems = items;
 		}
 	}
+
 	function dotProduct(vectorA: number[], vectorB: number[]) {
 		if (vectorA.length !== vectorB.length) {
 			throw new Error('Vectors must have the same length');
@@ -123,7 +124,7 @@
 			<input
 				class="mx-4 rounded-md border border-ide-border-dark bg-transparent px-4 py-2 text-ide-text outline-none focus:ring-2 focus:ring-blue-500"
 				type="text"
-				on:input={(e) => filterItems(e.currentTarget.value)}
+				oninput={(e) => filterItems(e.currentTarget.value)}
 			/>
 			<div class="mt-1 flex flex-col gap-2 overflow-y-auto p-4">
 				{#each filteredItems as item}
@@ -131,7 +132,7 @@
 						<div
 							class="chess flex size-24 shrink-0 items-center justify-center border border-ide-border-dark"
 						>
-							<svelte:component this={item.icon} />
+							<img class="size-14" src={item.path} alt="icon" />
 						</div>
 
 						<div class="flex w-full flex-col justify-between border-b border-ide-border-dark py-2">

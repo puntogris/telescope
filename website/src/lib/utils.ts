@@ -16,8 +16,8 @@ function summarizeList(list: number[]) {
 		return `[${list.join(',')}]`;
 	}
 
-	const start = list.slice(0, 5);
-	const end = list.slice(-5);
+	const start = list.slice(0, 3).map((num) => num.toFixed(4));
+	const end = list.slice(-3).map((num) => num.toFixed(4));
 
 	return `[${start.join(',')},...,${end.join(',')}]`;
 }

@@ -47,8 +47,8 @@
 		if (filtered.length === 0) {
 			logTerminalMessage(`No fuzzy matches for query ${query}`, true);
 		} else {
-			const matches = filtered.map((i) => i.name).join('\n -');
-			logTerminalMessage(`Fuzzy match for query ${query}: \n -${matches}`, true);
+			const matches = filtered.map((i) => i.name).join('\n - ');
+			logTerminalMessage(`Fuzzy match for query ${query}: \n - ${matches}`, true);
 		}
 	}
 
@@ -82,8 +82,8 @@
 		scores = scores.sort((a, b) => b.score - a.score);
 		filtered = scores.map((i) => i.sample);
 
-		const matches = scores.map((i) => `${i.sample.name} (${i.score.toFixed(2)})`).join('\n -');
-		logTerminalMessage(`Embeddings match for query ${query}: \n -${matches}`, true);
+		const matches = scores.map((i) => `${i.sample.name} (${i.score.toFixed(4)})`).join('\n -');
+		logTerminalMessage(`Embeddings similarity scores for query ${query}: \n - ${matches}`, true);
 	}
 
 	function logTerminalMessage(log: string, withSparator = false) {

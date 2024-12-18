@@ -7,8 +7,10 @@ export default {
 		extend: {
 			colors: {
 				'ide-bg': '#2B2D30',
-				'ide-border': '#1E1F22',
-				'ide-text': '#DFE1E5'
+				'ide-border-dark': '#1E1F22',
+				'ide-text': '#DFE1E5',
+				'ide-bg-dark': '#1E1F22',
+				'ide-border-light': '#393B41'
 			}
 		}
 	},

@@ -144,8 +144,8 @@
 				<LineIcon class="size-5" />
 			</div>
 			<div class="text-ide-text flex gap-4 p-4">
-				<div>Filters:</div>
-				<label class="flex items-center gap-1.5">
+				<div class="text-sm">Filters:</div>
+				<label class="flex items-center gap-1.5 text-sm">
 					<input
 						class="rounded p-1 checked:bg-blue-500"
 						type="checkbox"
@@ -157,7 +157,7 @@
 					/>
 					Fuzzy
 				</label>
-				<label class="flex items-center gap-1.5">
+				<label class="flex items-center gap-1.5 text-sm">
 					<input
 						class="rounded p-1 checked:bg-blue-500"
 						type="checkbox"
@@ -171,20 +171,23 @@
 				<SyncIcon class="ml-auto size-5" />
 			</div>
 			<input
-				class="border-ide-border-dark text-ide-text mx-4 rounded-md border bg-transparent px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+				class="border-ide-border-dark text-ide-text mx-4 rounded-md border bg-transparent px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500"
 				type="text"
+				placeholder="try related words, adding icon will improve accuracy, e.g. edit icon"
 				oninput={(e) => handleSearch(e.currentTarget.value)}
 			/>
 			<div class="mt-1 flex flex-col gap-3 overflow-y-auto p-4">
 				{#each filtered as sample}
 					<div class="flex gap-6">
 						<div
-							class="chess border-ide-border-dark flex size-24 shrink-0 items-center justify-center border"
+							class="chess border-ide-border-dark flex size-20 shrink-0 items-center justify-center border"
 						>
 							<img class="size-12" src={sample.path} alt="icon" />
 						</div>
 
-						<div class="border-ide-border-dark flex w-full flex-col justify-between border-b py-2">
+						<div
+							class="border-ide-border-dark flex w-full flex-col justify-between border-b py-2 text-sm"
+						>
 							<div class="text-ide-text">{sample.name}</div>
 							<div class="text-zinc-500">:app | 1 version</div>
 						</div>
@@ -257,7 +260,7 @@
 
 {#if showTerminal}
 	<div
-		class="border-ide-border-dark fixed bottom-0 right-0 flex h-1/2 w-1/2 flex-col border bg-zinc-900"
+		class="border-ide-border-dark fixed bottom-0 right-0 flex h-2/3 w-1/2 flex-col border bg-zinc-900"
 	>
 		<div class="bg-ide-bg flex items-center justify-between p-2">
 			<div class="text-ide-text text-sm font-semibold">Terminal</div>

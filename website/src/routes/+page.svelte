@@ -126,13 +126,13 @@
 				type="text"
 				oninput={(e) => filterItems(e.currentTarget.value)}
 			/>
-			<div class="mt-1 flex flex-col gap-2 overflow-y-auto p-4">
+			<div class="mt-1 flex flex-col gap-3 overflow-y-auto p-4">
 				{#each filteredItems as item}
 					<div class="flex gap-6">
 						<div
 							class="chess flex size-24 shrink-0 items-center justify-center border border-ide-border-dark"
 						>
-							<img class="size-14" src={item.path} alt="icon" />
+							<img class="size-12" src={item.path} alt="icon" />
 						</div>
 
 						<div class="flex w-full flex-col justify-between border-b border-ide-border-dark py-2">
@@ -175,7 +175,5 @@
 <style>
 	.chess {
 		background: repeating-conic-gradient(#393a3b 0 90deg, #414243 0 180deg) 0 0/25% 25%;
-		margin: 15px;
-		padding: 10px;
 	}
 </style>

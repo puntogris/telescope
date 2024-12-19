@@ -20,11 +20,7 @@
 		}
 	});
 
-	function toggleExpanded() {
-		terminalHeight = isExpanded ? MIN_HEIGHT : DEFAULT_EXPANDED_HEIGHT;
-	}
-
-	export function sendLog(log: string, withSparator = false) {
+	export function send(log: string, withSparator = false) {
 		logs.push(log);
 		if (withSparator) {
 			logs.push('--------------------------------------------');
@@ -37,6 +33,10 @@
 		if (terminal) {
 			terminal.scrollTop = terminal.scrollHeight;
 		}
+	}
+
+	function toggleExpanded() {
+		terminalHeight = isExpanded ? MIN_HEIGHT : DEFAULT_EXPANDED_HEIGHT;
 	}
 
 	function onMouseUp(e: MouseEvent) {

@@ -34,19 +34,19 @@
 
 	function handleNoQuery() {
 		filtered = samples;
-		terminal.sendLog(`No query, returning all samples`, true);
+		terminal.send(`No query, returning all samples`, true);
 	}
 
 	function performFuzzySearch(query: string) {
-		terminal.sendLog(`Resolving query with fuzzy: ${query}`);
+		terminal.send(`Resolving query with fuzzy: ${query}`);
 
 		filtered = samples.filter((i) => i.name.toLowerCase().includes(query.toLowerCase()));
 
 		if (filtered.length === 0) {
-			terminal.sendLog(`No fuzzy matches for query ${query}`, true);
+			terminal.send(`No fuzzy matches for query ${query}`, true);
 		} else {
 			const matches = filtered.map((i) => i.name).join('\n - ');
-			terminal.sendLog(`Fuzzy match for query ${query}: \n - ${matches}`, true);
+			terminal.send(`Fuzzy match for query ${query}: \n - ${matches}`, true);
 		}
 	}
 
@@ -56,20 +56,20 @@
 	}
 
 	async function performEmbeddingsSearch(query: string) {
-		terminal.sendLog(`Fetching embeddings for ${query}`);
+		terminal.send(`Fetching embeddings for ${query}`);
 
 		const response = await fetch(`api/encode?query=${query}`, {
 			method: 'GET',
 			headers: { 'Content-Type': 'application/json' }
 		});
 		if (!response.ok) {
-			terminal.sendLog(`Encoded for ${query} failed: ${response.status}`, true);
+			terminal.send(`Encoded for ${query} failed: ${response.status}`, true);
 			return [];
 		}
 
 		const result = await response.json();
 		const textEmbeddings = result.embeddings as [];
-		terminal.sendLog(`Encoded ${query} as: ${summarizeList(textEmbeddings)}`);
+		terminal.send(`Encoded ${query} as: ${summarizeList(textEmbeddings)}`);
 
 		let scores = samples
 			.map((sample) => ({
@@ -81,14 +81,14 @@
 		filtered = scores.map((i) => i.sample);
 
 		const matches = scores.map((i) => `${i.sample.name} (${i.score.toFixed(4)})`).join('\n - ');
-		terminal.sendLog(`Similarity scores for query ${query}: \n - ${matches}`, true);
+		terminal.send(`Similarity scores for query ${query}: \n - ${matches}`, true);
 	}
 
 	function updateSearchMode(mode: string) {
 		const isFuzzy = mode === 'fuzzy';
 		fuzzyEnabled = isFuzzy;
 		embeddingsEnabled = !isFuzzy;
-		terminal.sendLog(`Search mode: ${mode}`, true);
+		terminal.send(`Search mode: ${mode}`, true);
 	}
 </script>
 

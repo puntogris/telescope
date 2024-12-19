@@ -1,16 +1,31 @@
 <script lang="ts">
-	import LineIcon from '$lib/icons/lineIcon.svelte';
+	import ChevronDownIcon from '$lib/icons/chevronDownIcon.svelte';
+	import ChevronUpIcon from '$lib/icons/chevronUpIcon.svelte';
 	import { tick } from 'svelte';
 
-	let { show = $bindable() }: { show: boolean } = $props();
-	let isDragging = $state(false);
+	const MIN_HEIGHT = 44;
+	const DEFAULT_EXPANDED_HEIGHT = 400;
+
 	let logs = $state(['running at telescope.puntogris.com...']);
+	let initialState = $state({ y: 0, height: 0 });
+	let windowHeight = $state(0);
+	let terminalHeight = $state(MIN_HEIGHT);
+	let isExpanded = $derived(terminalHeight > MIN_HEIGHT);
+	let isDragging = $state(false);
 
 	$effect(() => {
-		if (show) {
+		if (isExpanded) {
 			scrollToBottom();
 		}
 	});
+
+	function toggleExpanded() {
+		if (isExpanded) {
+			terminalHeight = MIN_HEIGHT;
+		} else {
+			terminalHeight = DEFAULT_EXPANDED_HEIGHT;
+		}
+	}
 
 	export function sendLog(log: string, withSparator = false) {
 		logs.push(log);
@@ -31,58 +46,62 @@
 		isDragging = false;
 	}
 
-	let initial = $state({
-		y: 0,
-		height: 0
-	});
-
-	function onMoouseDown(e: MouseEvent) {
+	function onMouseDown(e: MouseEvent) {
 		const element = document.getElementById('terminal');
 		if (!element) return;
 
 		isDragging = true;
-		initial.y = e.pageY;
-		initial.height = element.getBoundingClientRect().height;
+		initialState.y = e.pageY;
+		initialState.height = element.getBoundingClientRect().height;
 	}
 
 	function onMouseMove(e: MouseEvent) {
 		const element = document.getElementById('terminal');
 		if (!element || !isDragging) return;
 
-		const delta = initial.y - e.pageY;
-		let newHeight = initial.height + delta;
+		const delta = initialState.y - e.pageY;
+		let newHeight = initialState.height + delta;
 
-		element.style.height = `${newHeight}px`;
+		if (newHeight < MIN_HEIGHT) {
+			isDragging = false;
+			newHeight = MIN_HEIGHT;
+		}
+		if (newHeight > windowHeight) {
+			isDragging = false;
+			newHeight = windowHeight;
+		}
+		terminalHeight = newHeight;
 	}
 </script>
 
-<svelte:window onmousemove={onMouseMove} />
+<svelte:window onmousemove={onMouseMove} bind:innerHeight={windowHeight} />
 
-{#if show}
+<div
+	id="terminal"
+	style="height: {terminalHeight}px;"
+	class="border-ide-border-dark fixed bottom-0 right-0 flex h-1/2 w-1/2 flex-col border bg-zinc-900"
+>
+	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div
-		id="terminal"
-		class="border-ide-border-dark fixed bottom-0 right-0 flex h-2/3 w-1/2 flex-col border bg-zinc-900"
+		onmousedown={onMouseDown}
+		onmouseup={onMouseUp}
+		class="bg-ide-bg flex h-11 cursor-ns-resize select-none items-center justify-between p-2"
 	>
-		<!-- svelte-ignore a11y_no_static_element_interactions -->
-		<div
-			onmousedown={onMoouseDown}
-			onmouseup={onMouseUp}
-			class="bg-ide-bg flex cursor-ns-resize items-center justify-between p-2"
-		>
-			<div class="text-ide-text text-sm font-semibold">Terminal</div>
-			<button class="rounded p-1 hover:bg-zinc-700" onclick={() => (show = !show)}>
-				<LineIcon class="text-ide-text size-5" />
-			</button>
-		</div>
-		<div id="terminal-logs" class="flex flex-col gap-2 overflow-y-auto p-2">
-			<div class="text-sm text-green-400">
-				puntogris@pc ~/telescope (main) &gt; ./start-telescope
-			</div>
-			{#each logs as log}
-				<div class="text-ide-text whitespace-pre-wrap text-sm">
-					{log}
-				</div>
-			{/each}
-		</div>
+		<div class="text-ide-text text-sm font-semibold">Terminal</div>
+		<button class="rounded p-1 hover:bg-zinc-700" onclick={toggleExpanded}>
+			{#if isExpanded}
+				<ChevronDownIcon class="text-ide-text size-5" />
+			{:else}
+				<ChevronUpIcon class="text-ide-text size-5" />
+			{/if}
+		</button>
 	</div>
-{/if}
+	<div id="terminal-logs" class="flex flex-col gap-2 overflow-y-auto p-2">
+		<div class="text-sm text-green-400">puntogris@pc ~/telescope (main) &gt; ./start-telescope</div>
+		{#each logs as log}
+			<div class="text-ide-text whitespace-pre-wrap text-sm">
+				{log}
+			</div>
+		{/each}
+	</div>
+</div>

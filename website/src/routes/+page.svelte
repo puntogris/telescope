@@ -20,7 +20,6 @@
 	let filtered = $state(samples);
 	let fuzzyEnabled = $state(true);
 	let embeddingsEnabled = $state(false);
-	let showTerminal = $state(true);
 	let timeout: number;
 	let terminal: Terminal;
 
@@ -99,21 +98,14 @@
 
 <div class="grid h-screen grid-cols-2">
 	<div class="bg-ide-bg flex overflow-hidden">
-		<div class="border-ide-border-dark text-ide-text flex flex-col gap-6 border-r p-3">
-			<FolderIcon class="size-10 rounded-md p-2 hover:bg-zinc-700" />
-			<CommitIcon class="size-10 rounded-md p-2 hover:bg-zinc-700" />
+		<div class="border-ide-border-dark text-ide-text flex flex-col gap-5 border-r p-3">
+			<FolderIcon class="size-10 p-2" />
+			<CommitIcon class="size-10 p-2" />
 			<TelescopeIcon class="size-10 rounded-md bg-blue-500 p-2" />
-			<ShapesIcon class="size-10 rounded-md p-2 hover:bg-zinc-700" />
-			<PullRequestIcon class="size-10 rounded-md p-2 hover:bg-zinc-700" />
-			<DotsIcon class="size-10 rounded-md p-2 hover:bg-zinc-700" />
-			<button class="mt-auto" onclick={() => (showTerminal = !showTerminal)}>
-				<TerminalIcon
-					class={twMerge(
-						'size-10 rounded-md p-2 hover:bg-zinc-700',
-						showTerminal ? 'bg-zinc-700' : 'animate-pulse'
-					)}
-				/>
-			</button>
+			<ShapesIcon class="size-10 p-2" />
+			<PullRequestIcon class="size-10 p-2" />
+			<DotsIcon class="size-10 p-2" />
+			<TerminalIcon class="mt-auto size-10 rounded-md bg-zinc-700 p-2" />
 		</div>
 		<div class="flex w-full flex-col">
 			<div
@@ -230,7 +222,8 @@
 			<h1 class="text-ide-text mt-4 text-lg font-semibold">Tip of the day</h1>
 			<p class="mt-2 text-zinc-300">
 				In the bottom-left corner, you'll find the terminal button, where you can view the process
-				logs. You can also see the embeddings of the text and images being used for the search.
+				logs, including the generated embeddings for the search and similarity scores. Additionally,
+				the terminal is resizable!
 			</p>
 			<h1 class="text-ide-text mt-4 text-lg font-semibold">So it goes</h1>
 			<p class="mt-2 text-zinc-300">
@@ -243,7 +236,7 @@
 	</div>
 </div>
 
-<Terminal bind:show={showTerminal} bind:this={terminal} />
+<Terminal bind:this={terminal} />
 
 <style>
 	.chess {

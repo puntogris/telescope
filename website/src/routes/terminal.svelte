@@ -10,8 +10,9 @@
 	let initialState = $state({ y: 0, height: 0 });
 	let windowHeight = $state(0);
 	let terminalHeight = $state(MIN_HEIGHT);
-	let isExpanded = $derived(terminalHeight > MIN_HEIGHT);
 	let isDragging = $state(false);
+
+	let isExpanded = $derived(terminalHeight > MIN_HEIGHT);
 
 	$effect(() => {
 		if (isExpanded) {
@@ -20,11 +21,7 @@
 	});
 
 	function toggleExpanded() {
-		if (isExpanded) {
-			terminalHeight = MIN_HEIGHT;
-		} else {
-			terminalHeight = DEFAULT_EXPANDED_HEIGHT;
-		}
+		terminalHeight = isExpanded ? MIN_HEIGHT : DEFAULT_EXPANDED_HEIGHT;
 	}
 
 	export function sendLog(log: string, withSparator = false) {
@@ -50,9 +47,11 @@
 		const element = document.getElementById('terminal');
 		if (!element) return;
 
+		initialState = {
+			y: e.pageY,
+			height: element.getBoundingClientRect().height
+		};
 		isDragging = true;
-		initialState.y = e.pageY;
-		initialState.height = element.getBoundingClientRect().height;
 	}
 
 	function onMouseMove(e: MouseEvent) {

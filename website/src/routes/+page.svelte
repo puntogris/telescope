@@ -12,9 +12,8 @@
 	import TelescopeIcon from '$lib/icons/telescopeIcon.svelte';
 	import TerminalIcon from '$lib/icons/terminalIcon.svelte';
 	import XIcon from '$lib/icons/xIcon.svelte';
-	import { samples } from '$lib/samples';
+	import samples from '$lib/samples.json';
 	import { dotProduct, summarizeList } from '$lib/utils';
-	import { twMerge } from 'tailwind-merge';
 	import Terminal from './terminal.svelte';
 
 	let filtered = $state(samples);
@@ -231,7 +230,7 @@
 				an experiment. Feel free to check out the code via the link at the top, compile and have
 				fun!
 			</p>
-			<div class="ml-auto mt-auto text-sm text-zinc-600">puntogris corporation ltd</div>
+			<div class="ml-auto mt-6 text-sm text-zinc-600">puntogris corporation ltd</div>
 		</div>
 	</div>
 </div>

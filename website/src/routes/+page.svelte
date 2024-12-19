@@ -80,7 +80,7 @@
 
 		filtered = scores.map((i) => i.sample);
 
-		const matches = scores.map((i) => `${i.sample.name} (${i.score.toFixed(4)})`).join('\n -');
+		const matches = scores.map((i) => `${i.sample.name} (${i.score.toFixed(4)})`).join('\n - ');
 		terminal.sendLog(`Similarity scores for query ${query}: \n - ${matches}`, true);
 	}
 
@@ -150,7 +150,7 @@
 			<input
 				class="border-ide-border-dark text-ide-text mx-4 rounded-md border bg-transparent px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500"
 				type="text"
-				placeholder="try related words, adding icon will improve accuracy, e.g. edit icon"
+				placeholder="try related words, adding icon will improve accuracy, e.g. arrow right icon"
 				oninput={(e) => handleSearch(e.currentTarget.value)}
 			/>
 			<div class="mt-1 flex flex-col gap-3 overflow-y-auto p-4">
@@ -208,28 +208,27 @@
 			<p class="mt-2 text-zinc-300">
 				Preview of the actual plugin, i got carried away and made a simplified web version of it.
 			</p>
-
 			<h1 class="text-ide-text mt-4 text-lg font-semibold">How it works</h1>
 			<p class="mt-2 text-zinc-300">
-				It follows the same approach where we generate embeddings for text and images using
-				OpenCLIP-compatible models that are converted to the GGUF format. This allows us to leverage
-				the clip.cpp Python bindings to run inference.
+				It uses OpenCLIP-compatible models in GGUF format, leveraging clip.cpp Python bindings for
+				inference.
 			</p>
 			<p class="mt-2 text-zinc-300">
-				I generated the image embeddings ahead of time, and stored them in a JSON file. When
-				searching, we generate the text embeddings and order them by similarity score.
+				This demo runs the ViT-B-32 model with 4-bit quantized laion2B-s34B-b79K weights. Not as
+				accurate as others but for 38.6MB it's awesome!
+			</p>
+			<p class="mt-2 text-zinc-300">
+				Image embeddings were pre-generated and stored in JSON. Searches encode text and compare
+				similarity scores.
 			</p>
 			<h1 class="text-ide-text mt-4 text-lg font-semibold">Tip of the day</h1>
 			<p class="mt-2 text-zinc-300">
-				In the bottom-left corner, you'll find the terminal button, where you can view the process
-				logs, including the generated embeddings for the search and similarity scores. Additionally,
-				the terminal is resizable!
+				Use the terminal located in the bottom-right corner to view process logs, embeddings, and
+				similarity scores. It's resizable too!
 			</p>
 			<h1 class="text-ide-text mt-4 text-lg font-semibold">So it goes</h1>
 			<p class="mt-2 text-zinc-300">
-				If you're here, you probably already know that this project, is open source and somewhat of
-				an experiment. Feel free to check out the code via the link at the top, compile and have
-				fun!
+				This is an open-source experiment. Check out the code, compile it, and have fun!
 			</p>
 			<div class="ml-auto mt-6 text-sm text-zinc-600">puntogris corporation ltd</div>
 		</div>

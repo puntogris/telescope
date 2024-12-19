@@ -14,15 +14,15 @@
 	import XIcon from '$lib/icons/xIcon.svelte';
 	import { samples } from '$lib/samples';
 	import { dotProduct, summarizeList } from '$lib/utils';
-	import { tick } from 'svelte';
 	import { twMerge } from 'tailwind-merge';
+	import Terminal from './terminal.svelte';
 
 	let filtered = $state(samples);
 	let fuzzyEnabled = $state(true);
 	let embeddingsEnabled = $state(false);
-	let showTerminal = $state(false);
-	let terminalLogs: string[] = $state(['running at telescope.puntogris.com...']);
+	let showTerminal = $state(true);
 	let timeout: number;
+	let terminal: Terminal;
 
 	async function handleSearch(query: string) {
 		if (!query) {
@@ -36,19 +36,19 @@
 
 	function handleNoQuery() {
 		filtered = samples;
-		logTerminalMessage(`No query, returning all samples`, true);
+		terminal.sendLog(`No query, returning all samples`, true);
 	}
 
 	function performFuzzySearch(query: string) {
-		logTerminalMessage(`Resolving query with fuzzy: ${query}`);
+		terminal.sendLog(`Resolving query with fuzzy: ${query}`);
 
 		filtered = samples.filter((i) => i.name.toLowerCase().includes(query.toLowerCase()));
 
 		if (filtered.length === 0) {
-			logTerminalMessage(`No fuzzy matches for query ${query}`, true);
+			terminal.sendLog(`No fuzzy matches for query ${query}`, true);
 		} else {
 			const matches = filtered.map((i) => i.name).join('\n - ');
-			logTerminalMessage(`Fuzzy match for query ${query}: \n - ${matches}`, true);
+			terminal.sendLog(`Fuzzy match for query ${query}: \n - ${matches}`, true);
 		}
 	}
 
@@ -58,19 +58,19 @@
 	}
 
 	async function performEmbeddingsSearch(query: string) {
-		logTerminalMessage(`Fetching embeddings for ${query}`);
+		terminal.sendLog(`Fetching embeddings for ${query}`);
 		const response = await fetch(`api/encode?query=${query}`, {
 			method: 'GET',
 			headers: { 'Content-Type': 'application/json' }
 		});
 		if (!response.ok) {
-			logTerminalMessage(`Fetching for ${query} failed: ${response.status}`, true);
+			terminal.sendLog(`Fetching for ${query} failed: ${response.status}`, true);
 			return [];
 		}
 
 		const result = await response.json();
 		const textEmbeddings = result.embeddings as [];
-		logTerminalMessage(`Embeddings for ${query}: ${summarizeList(textEmbeddings)}`);
+		terminal.sendLog(`Embeddings for ${query}: ${summarizeList(textEmbeddings)}`);
 
 		let scores = [];
 		for (const sample of samples) {
@@ -83,22 +83,7 @@
 		filtered = scores.map((i) => i.sample);
 
 		const matches = scores.map((i) => `${i.sample.name} (${i.score.toFixed(4)})`).join('\n -');
-		logTerminalMessage(`Embeddings similarity scores for query ${query}: \n - ${matches}`, true);
-	}
-
-	function logTerminalMessage(log: string, withSparator = false) {
-		terminalLogs.push(log);
-		if (withSparator) {
-			terminalLogs.push('--------------------------------------------');
-		}
-		tick().then(() => scrollToBottom());
-	}
-
-	function scrollToBottom() {
-		const terminal = document.getElementById('terminal-logs');
-		if (terminal) {
-			terminal.scrollTop = terminal.scrollHeight;
-		}
+		terminal.sendLog(`Embeddings similarity scores for query ${query}: \n - ${matches}`, true);
 	}
 
 	function updateSearchMode(mode: string) {
@@ -258,29 +243,7 @@
 	</div>
 </div>
 
-{#if showTerminal}
-	<div
-		class="border-ide-border-dark fixed bottom-0 right-0 flex h-2/3 w-1/2 flex-col border bg-zinc-900"
-	>
-		<div class="bg-ide-bg flex items-center justify-between p-2">
-			<div class="text-ide-text text-sm font-semibold">Terminal</div>
-			<button class="rounded p-1 hover:bg-zinc-700" onclick={() => (showTerminal = !showTerminal)}>
-				<LineIcon class="text-ide-text size-5" />
-			</button>
-		</div>
-
-		<div id="terminal-logs" class="flex flex-col gap-2 overflow-y-auto p-2">
-			<div class="text-sm text-green-400">
-				puntogris@pc ~/telescope (main) &gt; ./start-telescope
-			</div>
-			{#each terminalLogs as log}
-				<div class="text-ide-text whitespace-pre-wrap text-sm">
-					{log}
-				</div>
-			{/each}
-		</div>
-	</div>
-{/if}
+<Terminal bind:show={showTerminal} bind:this={terminal} />
 
 <style>
 	.chess {

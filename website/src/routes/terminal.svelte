@@ -62,11 +62,9 @@
 		let newHeight = initialState.height + delta;
 
 		if (newHeight < MIN_HEIGHT) {
-			isDragging = false;
 			newHeight = MIN_HEIGHT;
 		}
 		if (newHeight > windowHeight) {
-			isDragging = false;
 			newHeight = windowHeight;
 		}
 		terminalHeight = newHeight;

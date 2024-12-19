@@ -98,25 +98,25 @@
 
 <div class="grid h-screen grid-cols-2">
 	<div class="bg-ide-bg flex overflow-hidden">
-		<div class="border-ide-border-dark text-ide-text flex flex-col gap-5 border-r p-3">
-			<FolderIcon class="size-10 p-2" />
-			<CommitIcon class="size-10 p-2" />
-			<TelescopeIcon class="size-10 rounded-md bg-blue-500 p-2" />
-			<ShapesIcon class="size-10 p-2" />
-			<PullRequestIcon class="size-10 p-2" />
-			<DotsIcon class="size-10 p-2" />
-			<TerminalIcon class="mt-auto size-10 rounded-md bg-zinc-700 p-2" />
+		<div class="border-ide-border-dark text-ide-text flex flex-col gap-4 border-r px-2 py-3">
+			<FolderIcon class="size-9 p-2" />
+			<CommitIcon class="size-9 p-2" />
+			<TelescopeIcon class="size-9 rounded-lg bg-blue-500 p-2" />
+			<ShapesIcon class="size-9 p-2" />
+			<PullRequestIcon class="size-9 p-2" />
+			<DotsIcon class="size-9 p-2" />
+			<TerminalIcon class="mt-auto size-9 rounded-lg bg-zinc-700 p-2" />
 		</div>
 		<div class="flex w-full flex-col">
 			<div
 				class="border-ide-border-dark text-ide-text flex h-12 shrink-0 items-center justify-center gap-6 border-b px-4"
 			>
-				<div class="font-semibold">Telescope</div>
+				<div class="text-sm font-semibold">Telescope</div>
 				<div class="relative flex h-full px-4">
-					<div class="self-center">Home</div>
+					<div class="self-center text-sm">Home</div>
 					<div class="absolute bottom-0 left-0 h-1 w-full rounded-full bg-blue-500"></div>
 				</div>
-				<div>Settings</div>
+				<div class="text-sm">Settings</div>
 				<DotsVertical class="ml-auto size-5" />
 				<LineIcon class="size-5" />
 			</div>
@@ -204,30 +204,30 @@
 			<DotsVertical class="ml-auto mr-3 size-5" />
 		</div>
 		<div class="flex h-full flex-col gap-1 p-8">
-			<h1 class="text-ide-text text-xl font-semibold">Telescope, plugin for Android Studio</h1>
-			<p class="mt-2 text-zinc-300">
+			<h1 class="text-ide-text text-lg font-semibold">Telescope, plugin for Android Studio</h1>
+			<p class="mt-2 text-sm text-zinc-300">
 				Preview of the actual plugin, i got carried away and made a simplified web version of it.
 			</p>
-			<h1 class="text-ide-text mt-4 text-lg font-semibold">How it works</h1>
-			<p class="mt-2 text-zinc-300">
+			<h1 class="text-ide-text mt-4 font-semibold">How it works</h1>
+			<p class="mt-2 text-sm text-zinc-300">
 				It uses OpenCLIP-compatible models in GGUF format, leveraging clip.cpp Python bindings for
 				inference.
 			</p>
-			<p class="mt-2 text-zinc-300">
+			<p class="mt-2 text-sm text-zinc-300">
 				This demo runs the ViT-B-32 model with 4-bit quantized laion2B-s34B-b79K weights. Not as
 				accurate as others but for 38.6MB it's awesome!
 			</p>
-			<p class="mt-2 text-zinc-300">
+			<p class="mt-2 text-sm text-zinc-300">
 				Image embeddings were pre-generated and stored in JSON. Searches encode text and compare
 				similarity scores.
 			</p>
-			<h1 class="text-ide-text mt-4 text-lg font-semibold">Tip of the day</h1>
-			<p class="mt-2 text-zinc-300">
+			<h1 class="text-ide-text mt-4 font-semibold">Tip of the day</h1>
+			<p class="mt-2 text-sm text-zinc-300">
 				Use the terminal located in the bottom-right corner to view process logs, embeddings, and
 				similarity scores. It's resizable too!
 			</p>
-			<h1 class="text-ide-text mt-4 text-lg font-semibold">So it goes</h1>
-			<p class="mt-2 text-zinc-300">
+			<h1 class="text-ide-text mt-4 font-semibold">So it goes</h1>
+			<p class="mt-2 text-sm text-zinc-300">
 				This is an open-source experiment. Check out the code, compile it, and have fun!
 			</p>
 			<div class="ml-auto mt-6 text-sm text-zinc-600">puntogris corporation ltd</div>

@@ -57,18 +57,19 @@
 
 	async function performEmbeddingsSearch(query: string) {
 		terminal.sendLog(`Fetching embeddings for ${query}`);
+
 		const response = await fetch(`api/encode?query=${query}`, {
 			method: 'GET',
 			headers: { 'Content-Type': 'application/json' }
 		});
 		if (!response.ok) {
-			terminal.sendLog(`Fetching for ${query} failed: ${response.status}`, true);
+			terminal.sendLog(`Encoded for ${query} failed: ${response.status}`, true);
 			return [];
 		}
 
 		const result = await response.json();
 		const textEmbeddings = result.embeddings as [];
-		terminal.sendLog(`Embeddings for ${query}: ${summarizeList(textEmbeddings)}`);
+		terminal.sendLog(`Encoded ${query} as: ${summarizeList(textEmbeddings)}`);
 
 		let scores = [];
 		for (const sample of samples) {
@@ -81,13 +82,14 @@
 		filtered = scores.map((i) => i.sample);
 
 		const matches = scores.map((i) => `${i.sample.name} (${i.score.toFixed(4)})`).join('\n -');
-		terminal.sendLog(`Embeddings similarity scores for query ${query}: \n - ${matches}`, true);
+		terminal.sendLog(`Similarity scores for query ${query}: \n - ${matches}`, true);
 	}
 
 	function updateSearchMode(mode: string) {
 		const isFuzzy = mode === 'fuzzy';
 		fuzzyEnabled = isFuzzy;
 		embeddingsEnabled = !isFuzzy;
+		terminal.sendLog(`Search mode: ${mode}`, true);
 	}
 </script>
 

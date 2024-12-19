@@ -71,14 +71,13 @@
 		const textEmbeddings = result.embeddings as [];
 		terminal.sendLog(`Encoded ${query} as: ${summarizeList(textEmbeddings)}`);
 
-		let scores = [];
-		for (const sample of samples) {
-			scores.push({
+		let scores = samples
+			.map((sample) => ({
 				sample: sample,
 				score: dotProduct(textEmbeddings, sample.embeddings)
-			});
-		}
-		scores = scores.sort((a, b) => b.score - a.score);
+			}))
+			.sort((a, b) => b.score - a.score);
+
 		filtered = scores.map((i) => i.sample);
 
 		const matches = scores.map((i) => `${i.sample.name} (${i.score.toFixed(4)})`).join('\n -');

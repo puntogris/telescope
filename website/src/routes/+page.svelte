@@ -96,9 +96,9 @@
 	<title>telescope.puntogris</title>
 </svelte:head>
 
-<div class="grid h-screen grid-cols-2">
-	<div class="bg-ide-bg flex overflow-hidden">
-		<div class="border-ide-border-dark text-ide-text flex flex-col gap-4 border-r px-2 py-3">
+<main class="grid h-screen grid-cols-2 bg-ide-bg-dark">
+	<div class="flex overflow-hidden bg-ide-bg">
+		<nav class="flex flex-col gap-4 border-r border-ide-border-dark px-2 py-3 text-ide-text">
 			<FolderIcon class="size-9 p-2" />
 			<CommitIcon class="size-9 p-2" />
 			<TelescopeIcon class="size-9 rounded-lg bg-blue-500 p-2" />
@@ -106,10 +106,10 @@
 			<PullRequestIcon class="size-9 p-2" />
 			<DotsIcon class="size-9 p-2" />
 			<TerminalIcon class="mt-auto size-9 rounded-lg bg-zinc-700 p-2" />
-		</div>
+		</nav>
 		<div class="flex w-full flex-col">
-			<div
-				class="border-ide-border-dark text-ide-text flex h-12 shrink-0 items-center justify-center gap-6 border-b px-4"
+			<header
+				class="flex h-12 shrink-0 items-center justify-center gap-6 border-b border-ide-border-dark px-4 text-ide-text"
 			>
 				<div class="text-sm font-semibold">Telescope</div>
 				<div class="relative flex h-full px-4">
@@ -119,8 +119,8 @@
 				<div class="text-sm">Settings</div>
 				<DotsVertical class="ml-auto size-5" />
 				<LineIcon class="size-5" />
-			</div>
-			<div class="text-ide-text flex gap-4 p-4">
+			</header>
+			<div class="flex gap-4 p-4 text-ide-text">
 				<div class="text-sm">Filters:</div>
 				<label class="flex items-center gap-1.5 text-sm">
 					<input
@@ -148,7 +148,7 @@
 				<SyncIcon class="ml-auto size-5" />
 			</div>
 			<input
-				class="border-ide-border-dark text-ide-text mx-4 rounded-md border bg-transparent px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+				class="mx-4 rounded-md border border-ide-border-dark bg-transparent px-4 py-2 text-sm text-ide-text outline-none focus:ring-2 focus:ring-blue-500"
 				type="text"
 				placeholder="try related words, adding icon will improve accuracy, e.g. arrow right icon"
 				oninput={(e) => handleSearch(e.currentTarget.value)}
@@ -157,13 +157,13 @@
 				{#each filtered as sample}
 					<div class="flex gap-6">
 						<div
-							class="chess border-ide-border-dark flex size-20 shrink-0 items-center justify-center border"
+							class="chess flex size-20 shrink-0 items-center justify-center border border-ide-border-dark"
 						>
 							<img class="size-12" src={sample.path} alt="icon" />
 						</div>
 
 						<div
-							class="border-ide-border-dark flex w-full flex-col justify-between border-b py-2 text-sm"
+							class="flex w-full flex-col justify-between border-b border-ide-border-dark py-2 text-sm"
 						>
 							<div class="text-ide-text">{sample.name}</div>
 							<div class="text-zinc-500">:app | 1 version</div>
@@ -174,8 +174,8 @@
 		</div>
 	</div>
 	<div class="flex flex-col">
-		<div
-			class="border-ide-border-light text-ide-text flex h-12 shrink-0 items-center gap-6 border-b"
+		<header
+			class="flex h-12 shrink-0 items-center gap-6 border-b border-ide-border-light text-ide-text"
 		>
 			<div class="relative flex h-full px-4">
 				<div class="flex items-center gap-2">
@@ -188,7 +188,7 @@
 			<a
 				href="https://www.github.com/puntogris/telescope"
 				target="_blank"
-				class="text-ide-text flex h-full items-center gap-2 text-sm hover:text-white"
+				class="flex h-full items-center gap-2 text-sm text-ide-text hover:text-white"
 			>
 				<ClassKotlinIcon />
 				VisitGithubRepository.kt
@@ -196,19 +196,19 @@
 			<a
 				href="https://www.puntogris.com"
 				target="_blank"
-				class="text-ide-text flex h-full items-center gap-2 text-sm hover:text-white"
+				class="flex h-full items-center gap-2 text-sm text-ide-text hover:text-white"
 			>
 				<ClassKotlinIcon />
 				VisitPuntogrisWebsite.kt
 			</a>
 			<DotsVertical class="ml-auto mr-3 size-5" />
-		</div>
+		</header>
 		<div class="flex h-full flex-col gap-1 p-8">
-			<h1 class="text-ide-text text-lg font-semibold">Telescope, plugin for Android Studio</h1>
+			<h1 class="text-lg font-semibold text-ide-text">Telescope, plugin for Android Studio</h1>
 			<p class="mt-2 text-sm text-zinc-300">
 				Preview of the actual plugin, i got carried away and made a simplified web version of it.
 			</p>
-			<h1 class="text-ide-text mt-4 font-semibold">How it works</h1>
+			<h1 class="mt-4 font-semibold text-ide-text">How it works</h1>
 			<p class="mt-2 text-sm text-zinc-300">
 				It uses OpenCLIP-compatible models in GGUF format, leveraging clip.cpp Python bindings for
 				inference.
@@ -221,19 +221,19 @@
 				Image embeddings were pre-generated and stored in JSON. Searches encode text and compare
 				similarity scores.
 			</p>
-			<h1 class="text-ide-text mt-4 font-semibold">Tip of the day</h1>
+			<h1 class="mt-4 font-semibold text-ide-text">Tip of the day</h1>
 			<p class="mt-2 text-sm text-zinc-300">
 				Use the terminal located in the bottom-right corner to view process logs, embeddings, and
 				similarity scores. It's resizable too!
 			</p>
-			<h1 class="text-ide-text mt-4 font-semibold">So it goes</h1>
+			<h1 class="mt-4 font-semibold text-ide-text">So it goes</h1>
 			<p class="mt-2 text-sm text-zinc-300">
 				This is an open-source experiment. Check out the code, compile it, and have fun!
 			</p>
 			<div class="ml-auto mt-6 text-sm text-zinc-600">puntogris corporation ltd</div>
 		</div>
 	</div>
-</div>
+</main>
 
 <Terminal bind:this={terminal} />
 

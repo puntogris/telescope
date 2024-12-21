@@ -76,29 +76,31 @@
 <div
 	id="terminal"
 	style="height: {terminalHeight}px;"
-	class="border-ide-border-dark fixed bottom-0 right-0 flex h-1/2 w-1/2 flex-col border bg-zinc-900"
+	class="fixed bottom-0 right-0 flex h-1/2 w-1/2 flex-col border border-ide-border-dark bg-zinc-900"
 >
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
-	<div
+	<header
 		onmousedown={onMouseDown}
 		onmouseup={onMouseUp}
-		class="bg-ide-bg flex h-11 cursor-ns-resize select-none items-center justify-between p-2"
+		class="flex h-11 cursor-ns-resize select-none items-center justify-between bg-ide-bg p-2"
 	>
-		<div class="text-ide-text text-sm font-semibold">Terminal</div>
+		<h2 class="text-sm font-semibold text-ide-text">Terminal</h2>
 		<button class="rounded p-1 hover:bg-zinc-700" onclick={toggleExpanded}>
 			{#if isExpanded}
-				<ChevronDownIcon class="text-ide-text size-5" />
+				<ChevronDownIcon class="size-5 text-ide-text" />
 			{:else}
-				<ChevronUpIcon class="text-ide-text size-5" />
+				<ChevronUpIcon class="size-5 text-ide-text" />
 			{/if}
 		</button>
-	</div>
+	</header>
 	<div id="terminal-logs" class="flex flex-col gap-2 overflow-y-auto p-2">
-		<div class="text-sm text-green-400">puntogris@pc ~/telescope (main) &gt; ./start-telescope</div>
+		<span class="text-sm text-green-400">
+			puntogris@pc ~/telescope (main) &gt; ./start-telescope
+		</span>
 		{#each logs as log}
-			<div class="text-ide-text whitespace-pre-wrap text-sm">
+			<p class="whitespace-pre-wrap text-sm text-ide-text">
 				{log}
-			</div>
+			</p>
 		{/each}
 	</div>
 </div>

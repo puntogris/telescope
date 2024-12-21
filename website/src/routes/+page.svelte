@@ -17,7 +17,7 @@
 	import Terminal from './terminal.svelte';
 
 	let filtered = $state(samples);
-	let fuzzyEnabled = $state(true);
+	let partialEnabled = $state(true);
 	let embeddingsEnabled = $state(false);
 	let timeout: number;
 	let terminal: Terminal;
@@ -25,8 +25,8 @@
 	async function handleSearch(query: string) {
 		if (!query) {
 			handleNoQuery();
-		} else if (fuzzyEnabled) {
-			performFuzzySearch(query);
+		} else if (partialEnabled) {
+			performPartialSearch(query);
 		} else {
 			debounceEmbeddingsSearch(query);
 		}
@@ -37,16 +37,16 @@
 		terminal.send(`No query, returning all samples`, true);
 	}
 
-	function performFuzzySearch(query: string) {
-		terminal.send(`Resolving query with fuzzy: ${query}`);
+	function performPartialSearch(query: string) {
+		terminal.send(`Searching for partial matches with query: ${query}`);
 
 		filtered = samples.filter((i) => i.name.toLowerCase().includes(query.toLowerCase()));
 
 		if (filtered.length === 0) {
-			terminal.send(`No fuzzy matches for query ${query}`, true);
+			terminal.send(`No partial matches found for query: "${query}"`, true);
 		} else {
 			const matches = filtered.map((i) => i.name).join('\n - ');
-			terminal.send(`Fuzzy match for query ${query}: \n - ${matches}`, true);
+			terminal.send(`Partial matches for query "${query}": \n - ${matches}`, true);
 		}
 	}
 
@@ -56,20 +56,20 @@
 	}
 
 	async function performEmbeddingsSearch(query: string) {
-		terminal.send(`Fetching embeddings for ${query}`);
+		terminal.send(`Fetching embeddings for query: "${query}"`);
 
 		const response = await fetch(`api/encode?query=${query}`, {
 			method: 'GET',
 			headers: { 'Content-Type': 'application/json' }
 		});
 		if (!response.ok) {
-			terminal.send(`Encoded for ${query} failed: ${response.status}`, true);
+			terminal.send(`Failed to encode query "${query}": ${response.status}`, true);
 			return [];
 		}
 
 		const result = await response.json();
 		const textEmbeddings = result.embeddings as [];
-		terminal.send(`Encoded ${query} as: ${summarizeList(textEmbeddings)}`);
+		terminal.send(`Encoded query "${query}" with embeddings: ${summarizeList(textEmbeddings)}`);
 
 		let scores = samples
 			.map((sample) => ({
@@ -85,9 +85,9 @@
 	}
 
 	function updateSearchMode(mode: string) {
-		const isFuzzy = mode === 'fuzzy';
-		fuzzyEnabled = isFuzzy;
-		embeddingsEnabled = !isFuzzy;
+		const isPartial = mode === 'partial';
+		partialEnabled = isPartial;
+		embeddingsEnabled = !isPartial;
 		terminal.send(`Search mode: ${mode}`, true);
 	}
 </script>
@@ -127,12 +127,12 @@
 						class="rounded p-1 checked:bg-blue-500"
 						type="checkbox"
 						id="exampleCheckbox"
-						bind:checked={fuzzyEnabled}
+						bind:checked={partialEnabled}
 						onchange={(e) => {
-							if (e.currentTarget.checked) updateSearchMode('fuzzy');
+							if (e.currentTarget.checked) updateSearchMode('partial');
 						}}
 					/>
-					Fuzzy
+					Partial Match
 				</label>
 				<label class="flex items-center gap-1.5 text-sm">
 					<input

@@ -4,19 +4,26 @@
 	import { tick } from 'svelte';
 
 	const MIN_HEIGHT = 44;
-	const DEFAULT_EXPANDED_HEIGHT = 400;
+	const HEIGHT_NOT_SET = -1;
 
 	let logs = $state(['running at telescope.puntogris.com...']);
-	let initialState = $state({ y: 0, height: 0 });
+	let initialRect = $state({ y: 0, height: 0 });
 	let windowHeight = $state(0);
-	let terminalHeight = $state(MIN_HEIGHT);
+	let defaultHeight = $state(HEIGHT_NOT_SET);
+	let currentHeight = $state(MIN_HEIGHT);
 	let isDragging = $state(false);
 
-	let isExpanded = $derived(terminalHeight > MIN_HEIGHT);
+	let isExpanded = $derived(currentHeight > MIN_HEIGHT);
 
 	$effect(() => {
 		if (isExpanded) {
 			scrollToBottom();
+		}
+	});
+
+	$effect(() => {
+		if (defaultHeight === HEIGHT_NOT_SET) {
+			defaultHeight = (windowHeight / 3) * 2;
 		}
 	});
 
@@ -36,7 +43,7 @@
 	}
 
 	function toggleExpanded() {
-		terminalHeight = isExpanded ? MIN_HEIGHT : DEFAULT_EXPANDED_HEIGHT;
+		currentHeight = isExpanded ? MIN_HEIGHT : defaultHeight;
 	}
 
 	function onMouseUp(e: MouseEvent) {
@@ -47,7 +54,7 @@
 		const element = document.getElementById('terminal');
 		if (!element) return;
 
-		initialState = {
+		initialRect = {
 			y: e.pageY,
 			height: element.getBoundingClientRect().height
 		};
@@ -58,8 +65,8 @@
 		const element = document.getElementById('terminal');
 		if (!element || !isDragging) return;
 
-		const delta = initialState.y - e.pageY;
-		let newHeight = initialState.height + delta;
+		const delta = initialRect.y - e.pageY;
+		let newHeight = initialRect.height + delta;
 
 		if (newHeight < MIN_HEIGHT) {
 			newHeight = MIN_HEIGHT;
@@ -67,7 +74,7 @@
 		if (newHeight > windowHeight) {
 			newHeight = windowHeight;
 		}
-		terminalHeight = newHeight;
+		currentHeight = newHeight;
 	}
 </script>
 
@@ -75,7 +82,7 @@
 
 <div
 	id="terminal"
-	style="height: {terminalHeight}px;"
+	style="height: {currentHeight}px;"
 	class="fixed bottom-0 right-0 flex h-1/2 w-1/2 flex-col border border-ide-border-dark bg-zinc-900"
 >
 	<!-- svelte-ignore a11y_no_static_element_interactions -->

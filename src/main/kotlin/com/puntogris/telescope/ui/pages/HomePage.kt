@@ -29,6 +29,7 @@ class HomePage(project: Project) : JPanel() {
     )
 
     private val controls = ControlsPanel(
+        project = project,
         onRefreshClicked = { syncService.sync(onComplete = list::update) }
     )
 

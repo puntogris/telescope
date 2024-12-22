@@ -1,11 +1,15 @@
 package com.puntogris.telescope.ui.components
 
 import com.intellij.icons.AllIcons
+import com.intellij.notification.NotificationType
+import com.intellij.openapi.project.Project
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBLabel
 import com.intellij.util.ui.JBUI
 import com.puntogris.telescope.application.Clip
+import com.puntogris.telescope.application.GetModelsPath
 import com.puntogris.telescope.storage.GlobalStorage
+import com.puntogris.telescope.utils.sendNotification
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.FlowLayout
@@ -15,8 +19,11 @@ import javax.swing.JPanel
 private const val COMPONENT_HEIGHT = 30
 
 class ControlsPanel(
+    private val project: Project,
     private val onRefreshClicked: () -> Unit
 ) : JPanel() {
+
+    private val modelsPath = GetModelsPath()
 
     private val partialMatchCheckbox = JBCheckBox("Partial Match").apply {
         isSelected = GlobalStorage.getPartialMatchState()
@@ -30,7 +37,12 @@ class ControlsPanel(
         isEnabled = Clip.canEnableClip()
         isSelected = GlobalStorage.getEmbeddingsState()
         addActionListener {
-            GlobalStorage.setEmbeddingsState(isSelected)
+            if (modelsPath().areValid) {
+                GlobalStorage.setEmbeddingsState(isSelected)
+            } else {
+                isSelected = false
+                sendNotification(project, "It looks like no AI models are configured. Please set them up in the settings page.", NotificationType.ERROR)
+            }
         }
     }
 

@@ -28,9 +28,6 @@
     <extensions defaultExtensionNs="com.intellij">
         <postStartupActivity implementation="com.puntogris.telescope.plugin.PluginInitializer"/>
         <notificationGroup id="Telescope" displayType="BALLOON"/>
-    </extensions>
-
-    <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="Telescope"
                     icon="/icons/pluginIcon.svg"
                     anchor="left"

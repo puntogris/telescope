@@ -2,7 +2,6 @@ plugins {
     id("org.jetbrains.kotlin.jvm") version "2.0.21"
     id("org.jetbrains.kotlin.kapt") version "2.0.21"
     id("org.jetbrains.intellij.platform") version "2.1.0"
-    id("io.objectbox") version "4.0.3"
 }
 
 group = "com.puntogris.telescope"
@@ -19,6 +18,9 @@ repositories {
 dependencies {
     implementation(project(":clip"))
 
+    // Forked the library and included the native files here because it couldn't find them otherwise
+    implementation(files("libs/objectbox-java-4.0.3.jar"))
+    implementation("io.objectbox:objectbox-kotlin:4.0.3")
     kapt("io.objectbox:objectbox-processor:4.0.3")
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.9.0")

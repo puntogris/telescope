@@ -1,6 +1,5 @@
 package com.puntogris.telescope.service
 
-import com.android.tools.idea.concurrency.coroutineScope
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.Service
@@ -14,6 +13,7 @@ import com.puntogris.telescope.application.GetModelsPath
 import com.puntogris.telescope.models.DrawableRes
 import com.puntogris.telescope.models.ImageEntity
 import com.puntogris.telescope.utils.sendNotification
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -26,7 +26,7 @@ class SyncService(private val project: Project): Disposable {
     private val getModelsPath = GetModelsPath()
 
     fun sync(onComplete: (List<DrawableRes>) -> Unit) {
-        project.coroutineScope.launch(Dispatchers.Default) {
+        CoroutineScope(Dispatchers.Default).launch {
             try {
                 databaseService.removeAll()
                 DrawableCache.createImageCache(disposable).clear()

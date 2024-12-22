@@ -24,9 +24,9 @@ import javax.swing.JEditorPane
 import kotlin.io.path.absolutePathString
 
 private const val DEFAULT_VISION_MODEL_URL =
-    "https://huggingface.co/mys/ggml_CLIP-ViT-B-32-laion2B-s34B-b79K/resolve/main/CLIP-ViT-B-32-laion2B-s34B-b79K_ggml-model-f32.gguf"
+    "https://huggingface.co/mys/ggml_CLIP-ViT-B-32-laion2B-s34B-b79K/resolve/main/CLIP-ViT-B-32-laion2B-s34B-b79K_ggml-vision-model-q4_1.gguf"
 private const val DEFAULT_TEXT_MODEL_URL =
-    "https://huggingface.co/mys/ggml_CLIP-ViT-B-32-laion2B-s34B-b79K/resolve/main/CLIP-ViT-B-32-laion2B-s34B-b79K_ggml-model-f16.gguf"
+    "https://huggingface.co/mys/ggml_CLIP-ViT-B-32-laion2B-s34B-b79K/resolve/main/CLIP-ViT-B-32-laion2B-s34B-b79K_ggml-text-model-q4_1.gguf"
 private const val GITHUB_URL = "https://github.com/puntogris/telescope"
 private const val PUNTOGRIS_URL = "https://www.puntogris.com"
 

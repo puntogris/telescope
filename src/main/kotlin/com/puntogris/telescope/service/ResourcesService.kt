@@ -1,5 +1,7 @@
-package com.puntogris.telescope.domain.usecase
+package com.puntogris.telescope.service
 
+import com.intellij.openapi.components.Service
+import com.intellij.openapi.components.service
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
@@ -7,13 +9,13 @@ import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.findDirectory
 import com.puntogris.telescope.models.DrawableRes
-import com.puntogris.telescope.models.Resources
 
 private const val MAIN_MODULE = "main"
 private const val ROOT_MAIN_MODULE_SUFFIX = ".main"
 private const val DRAWABLES_DIR_PATH = "res/drawable"
 
-class GetResources {
+@Service(Service.Level.PROJECT)
+class ResourcesService(private val project: Project) {
 
     private val dpiVariants = listOf(
         "mipmap-hdpi",
@@ -23,13 +25,11 @@ class GetResources {
         "mipmap-xxxhdpi"
     )
 
-    operator fun invoke(project: Project): Resources {
+    fun getDrawableResources(): List<DrawableRes> {
         val manager = ModuleManager.getInstance(project)
         val modules = manager.modules.filter { it.name.endsWith(ROOT_MAIN_MODULE_SUFFIX) }
 
-        return Resources(
-            drawables = getDrawableResources(modules)
-        )
+        return getDrawableResources(modules)
     }
 
     private fun getDrawableResources(modules: List<Module>): List<DrawableRes> {
@@ -62,5 +62,9 @@ class GetResources {
             ?.children.orEmpty()
 
         return drawables.map { DrawableRes.Simple.from(it, module) }
+    }
+
+    companion object {
+        fun getInstance(project: Project): ResourcesService = project.service()
     }
 }

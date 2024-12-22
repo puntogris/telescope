@@ -1,4 +1,4 @@
-package com.puntogris.telescope.domain.usecase
+package com.puntogris.telescope.application.usecase
 
 import com.puntogris.telescope.models.DrawableRes
 import com.puntogris.telescope.models.ImageResult

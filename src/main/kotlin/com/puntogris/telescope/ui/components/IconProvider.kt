@@ -5,7 +5,7 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.util.concurrency.AppExecutorUtil
 import com.intellij.util.ui.JBImageIcon
-import com.puntogris.telescope.domain.DrawableCache
+import com.puntogris.telescope.storage.DrawableCache
 import com.puntogris.telescope.icons.MyIcons
 import com.puntogris.telescope.models.DrawableRes
 import com.puntogris.telescope.utils.toImage
@@ -30,7 +30,8 @@ class IconProvider {
         refreshCallback: () -> Unit,
         shouldBeRendered: () -> Boolean
     ): Icon {
-        val image = drawableCache.computeAndGet(drawable.file, BufferedImage(300, 300, 1), false, refreshCallback) {
+        imageIcon.image
+        val image = drawableCache.computeAndGet(drawable.file, BufferedImage(50, 50, 1), false, refreshCallback) {
             if (shouldBeRendered()) {
                 CompletableFuture.supplyAsync(
                     { if (shouldBeRendered()) drawableRenderer.render(drawable) else null },

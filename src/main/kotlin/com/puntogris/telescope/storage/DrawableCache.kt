@@ -1,5 +1,4 @@
-package com.puntogris.telescope.domain
-
+package com.puntogris.telescope.storage
 /*
  * Copyright (C) 2020 The Android Open Source Project
  *

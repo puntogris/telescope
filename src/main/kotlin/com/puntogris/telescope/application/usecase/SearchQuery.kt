@@ -1,8 +1,8 @@
-package com.puntogris.telescope.domain.usecase
+package com.puntogris.telescope.application.usecase
 
-import com.puntogris.telescope.domain.Clip
-import com.puntogris.telescope.domain.GlobalStorage
-import com.puntogris.telescope.domain.ImagesDB
+import com.puntogris.telescope.application.Clip
+import com.puntogris.telescope.storage.GlobalStorage
+import com.puntogris.telescope.storage.ImagesDB
 import com.puntogris.telescope.models.SearchResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

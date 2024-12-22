@@ -24,7 +24,7 @@ class ListPanel(
 
     private val list = AssetList().apply {
         layoutOrientation = JList.VERTICAL
-        cellRenderer = FileListCellRenderer()
+        cellRenderer = DrawableCellRenderer()
         model = listModel
 
         selectionModel = object : DefaultListSelectionModel() {

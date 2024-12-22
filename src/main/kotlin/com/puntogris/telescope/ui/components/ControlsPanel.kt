@@ -3,16 +3,18 @@ package com.puntogris.telescope.ui.components
 import com.intellij.icons.AllIcons
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBLabel
-import com.intellij.ui.util.maximumHeight
 import com.intellij.util.ui.JBUI
-import com.puntogris.telescope.domain.Clip
-import com.puntogris.telescope.domain.GlobalStorage
+import com.puntogris.telescope.application.Clip
+import com.puntogris.telescope.storage.GlobalStorage
 import java.awt.BorderLayout
+import java.awt.Dimension
 import java.awt.FlowLayout
 import javax.swing.JButton
 import javax.swing.JPanel
 
-class CheckboxPanel(
+private const val COMPONENT_HEIGHT = 30
+
+class ControlsPanel(
     private val onRefreshClicked: () -> Unit
 ) : JPanel() {
 
@@ -47,9 +49,10 @@ class CheckboxPanel(
     init {
         border = JBUI.Borders.empty(0, 6)
         layout = BorderLayout()
-        maximumHeight = 30
 
         add(leftPanel, BorderLayout.WEST)
         add(rightPanel, BorderLayout.EAST)
     }
+
+    override fun getMaximumSize(): Dimension = Dimension(Int.MAX_VALUE, COMPONENT_HEIGHT)
 }

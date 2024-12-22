@@ -2,10 +2,10 @@ package com.puntogris.telescope.ui.pages
 
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
-import com.puntogris.telescope.domain.usecase.GetResources
-import com.puntogris.telescope.domain.usecase.RefreshState
-import com.puntogris.telescope.domain.usecase.SearchQuery
-import com.puntogris.telescope.ui.components.CheckboxPanel
+import com.puntogris.telescope.service.ResourcesService
+import com.puntogris.telescope.service.SyncService
+import com.puntogris.telescope.application.usecase.SearchQuery
+import com.puntogris.telescope.ui.components.ControlsPanel
 import com.puntogris.telescope.ui.components.ListPanel
 import com.puntogris.telescope.ui.components.SearchPanel
 import kotlinx.coroutines.CoroutineScope
@@ -18,18 +18,16 @@ import javax.swing.JPanel
 
 class HomePage(project: Project) : JPanel() {
 
+    private val syncService = SyncService.getInstance(project)
+    private val resourcesService = ResourcesService.getInstance(project)
+
     private val list = ListPanel(
-        files = GetResources().invoke(project).drawables,
+        files = resourcesService.getDrawableResources(),
         onClick = { FileEditorManager.getInstance(project).openFile(it, true) }
     )
 
-    private val checkbox = CheckboxPanel(
-        onRefreshClicked = {
-            RefreshState().invoke(
-                project = project,
-                onComplete = list::update
-            )
-        }
+    private val controls = ControlsPanel(
+        onRefreshClicked = { syncService.sync(onComplete = list::update) }
     )
 
     private val search = SearchPanel(
@@ -39,7 +37,7 @@ class HomePage(project: Project) : JPanel() {
     init {
         layout = BoxLayout(this, BoxLayout.Y_AXIS)
 
-        add(checkbox)
+        add(controls)
         add(search)
         add(list)
     }

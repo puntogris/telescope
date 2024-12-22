@@ -1,6 +1,7 @@
-package com.puntogris.telescope.domain.usecase
+package com.puntogris.telescope.application.usecase
 
-import com.puntogris.telescope.domain.GlobalStorage
+import com.puntogris.telescope.models.ModelsPath
+import com.puntogris.telescope.storage.GlobalStorage
 
 class GetModelsPath {
 
@@ -17,11 +18,4 @@ class GetModelsPath {
             )
         }
     }
-}
-
-data class ModelsPath(
-    val textModel: String,
-    val visionModel: String
-) {
-    val areValid: Boolean = textModel.isNotEmpty() && visionModel.isNotEmpty()
 }

@@ -1,4 +1,4 @@
-package com.puntogris.telescope.domain
+package com.puntogris.telescope.storage
 
 import com.intellij.ide.util.PropertiesComponent
 

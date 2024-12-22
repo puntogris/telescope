@@ -11,8 +11,8 @@ import com.intellij.ui.dsl.builder.bind
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.dsl.builder.selected
 import com.intellij.ui.dsl.builder.text
-import com.puntogris.telescope.domain.GlobalStorage
-import com.puntogris.telescope.models.DslComponent
+import com.puntogris.telescope.storage.GlobalStorage
+import com.puntogris.telescope.ui.components.DslComponent
 import com.puntogris.telescope.utils.GGUF
 import com.puntogris.telescope.utils.configPath
 import com.puntogris.telescope.utils.downloadFileWithProgress

@@ -7,9 +7,9 @@ import javax.swing.JLabel
 import javax.swing.JList
 import javax.swing.ListCellRenderer
 
-class FileListCellRenderer : ListCellRenderer<DrawableRes> {
-    private val label = JLabel().apply { horizontalAlignment = JLabel.CENTER }
+class DrawableCellRenderer : ListCellRenderer<DrawableRes> {
 
+    private val label = JLabel().apply { horizontalAlignment = JLabel.CENTER }
     private val iconProvider = IconProvider()
 
     override fun getListCellRendererComponent(

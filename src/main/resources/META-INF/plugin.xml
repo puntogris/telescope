@@ -35,7 +35,6 @@
                     icon="/icons/pluginIcon.svg"
                     anchor="left"
                     factoryClass="com.puntogris.telescope.plugin.ToolWindow"/>
-
     </extensions>
 
 </idea-plugin>

@@ -8,8 +8,7 @@ import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.puntogris.telescope.application.Clip
 import com.puntogris.telescope.storage.DrawableCache
-import com.puntogris.telescope.storage.ImagesDB
-import com.puntogris.telescope.application.usecase.GetModelsPath
+import com.puntogris.telescope.application.GetModelsPath
 import com.puntogris.telescope.models.DrawableRes
 import com.puntogris.telescope.models.ImageEntity
 import com.puntogris.telescope.utils.sendNotification
@@ -20,12 +19,13 @@ import kotlinx.coroutines.launch
 class SyncService(private val project: Project) {
 
     private val resourcesService = ResourcesService.getInstance(project)
+    private val databaseService = ResourcesDatabase.getInstance(project)
     private val getModelsPath = GetModelsPath()
 
     fun sync(onComplete: (List<DrawableRes>) -> Unit) {
         project.coroutineScope.launch(Dispatchers.Default) {
             try {
-                ImagesDB.removeAll()
+                databaseService.removeAll()
                 DrawableCache.createImageCache({}).clear()
                 val files = indexFiles()
                 onComplete(files)
@@ -56,13 +56,13 @@ class SyncService(private val project: Project) {
                     embedding = Clip.encodeFileImage(drawable).getOrDefault(floatArrayOf())
                 )
             }
-            ImagesDB.addBatched(encodedEntities, 20)
+            databaseService.addBatched(encodedEntities, 20)
         }
     }
 
     private suspend fun processInvalidModels(drawables: List<DrawableRes>) {
         val entities = drawables.map { drawable -> ImageEntity(uri = drawable.path) }
-        ImagesDB.addBatched(entities, 100)
+        databaseService.addBatched(entities, 100)
     }
 
     companion object {

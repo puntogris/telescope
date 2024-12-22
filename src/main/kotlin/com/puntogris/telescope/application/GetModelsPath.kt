@@ -1,4 +1,4 @@
-package com.puntogris.telescope.application.usecase
+package com.puntogris.telescope.application
 
 import com.puntogris.telescope.models.ModelsPath
 import com.puntogris.telescope.storage.GlobalStorage

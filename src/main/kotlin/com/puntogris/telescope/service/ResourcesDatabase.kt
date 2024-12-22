@@ -1,40 +1,32 @@
-package com.puntogris.telescope.storage
+package com.puntogris.telescope.service
 
+import com.intellij.openapi.components.Service
+import com.intellij.openapi.components.service
+import com.intellij.openapi.project.Project
 import com.puntogris.telescope.models.ImageEntity
 import com.puntogris.telescope.models.ImageEntity_
 import com.puntogris.telescope.models.MyObjectBox
 import com.puntogris.telescope.models.SearchResult
 import com.puntogris.telescope.utils.configPath
 import io.objectbox.Box
-import io.objectbox.BoxStore
 import io.objectbox.query.QueryBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-object ImagesDB {
+private const val DB_DIR = "db"
 
-    private const val DB_DIR = "db"
+@Service(Service.Level.PROJECT)
+class ResourcesDatabase(project: Project) {
 
-    private lateinit var store: BoxStore
+    private val databaseDirectory = configPath.resolve(project.name).toFile()
 
-    fun init(projectName: String) {
-        if (this::store.isInitialized) {
-            return
-        }
-        val configPath = configPath.resolve(projectName)
-
-        store = MyObjectBox.builder()
-            .baseDirectory(configPath.toFile())
-            .name(DB_DIR)
-            .build()
-    }
+    private val store = MyObjectBox.builder()
+        .baseDirectory(databaseDirectory)
+        .name(DB_DIR)
+        .build()
 
     private val imagesBox: Box<ImageEntity> by lazy {
         store.boxFor(ImageEntity::class.java)
-    }
-
-    suspend fun add(uri: String, embedding: FloatArray) = withContext(Dispatchers.IO) {
-        imagesBox.put(ImageEntity(uri = uri, embedding = embedding))
     }
 
     suspend fun addBatched(entities: List<ImageEntity>, batchSize: Int = 50) = withContext(Dispatchers.IO) {
@@ -43,7 +35,6 @@ object ImagesDB {
 
     suspend fun getSimilarUri(uri: String): List<SearchResult> = withContext(Dispatchers.IO) {
         val query = imagesBox.query(ImageEntity_.uri.contains(uri, QueryBuilder.StringOrder.CASE_INSENSITIVE)).build()
-
         val results = query.find()
 
         results.map {
@@ -58,10 +49,7 @@ object ImagesDB {
     }
 
     suspend fun getNearestNeighbors(embedding: FloatArray): List<SearchResult> = withContext(Dispatchers.IO) {
-        val query = imagesBox
-            .query(ImageEntity_.embedding.nearestNeighbors(embedding, 10))
-            .build()
-
+        val query = imagesBox.query(ImageEntity_.embedding.nearestNeighbors(embedding, 10)).build()
         val results = query.findWithScores()
 
         results.map {
@@ -70,5 +58,9 @@ object ImagesDB {
                 score = it.score.toFloat()
             )
         }
+    }
+
+    companion object {
+        fun getInstance(project: Project): ResourcesDatabase = project.service()
     }
 }

@@ -1,8 +1,6 @@
 package com.puntogris.telescope.application
 
 import android.clip.cpp.CLIPAndroid
-import com.puntogris.telescope.application.usecase.FileToClip
-import com.puntogris.telescope.application.usecase.GetModelsPath
 import com.puntogris.telescope.models.DrawableRes
 import kotlin.io.path.Path
 import kotlin.io.path.absolutePathString

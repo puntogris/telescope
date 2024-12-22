@@ -4,7 +4,7 @@ import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.puntogris.telescope.service.ResourcesService
 import com.puntogris.telescope.service.SyncService
-import com.puntogris.telescope.application.usecase.SearchQuery
+import com.puntogris.telescope.application.SearchQuery
 import com.puntogris.telescope.ui.components.ControlsPanel
 import com.puntogris.telescope.ui.components.ListPanel
 import com.puntogris.telescope.ui.components.SearchPanel
@@ -20,6 +20,8 @@ class HomePage(project: Project) : JPanel() {
 
     private val syncService = SyncService.getInstance(project)
     private val resourcesService = ResourcesService.getInstance(project)
+    private val searchQuery = SearchQuery(project)
+    private var searchJob: Job? = null
 
     private val list = ListPanel(
         files = resourcesService.getDrawableResources(),
@@ -41,9 +43,6 @@ class HomePage(project: Project) : JPanel() {
         add(search)
         add(list)
     }
-
-    private var searchJob: Job? = null
-    private val searchQuery = SearchQuery()
 
     private fun onNewSearch(query: String) {
         searchJob?.cancel()

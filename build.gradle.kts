@@ -17,15 +17,7 @@ repositories {
 }
 
 dependencies {
-    implementation("org.apache.xmlgraphics:batik-all:1.18") {
-        exclude("xml-apis")
-    }
-
-    implementation("xml-apis:xml-apis-ext:1.3.04")
-
     implementation(project(":clip"))
-
-    implementation(files("libs/svgSalamander-1.1.4.jar"))
 
     kapt("io.objectbox:objectbox-processor:4.0.3")
 

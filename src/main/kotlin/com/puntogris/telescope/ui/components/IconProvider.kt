@@ -1,8 +1,10 @@
 package com.puntogris.telescope.ui.components
 
 import com.android.tools.idea.ui.resourcemanager.plugin.DesignAssetRendererManager
+import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
+import com.intellij.openapi.util.Disposer
 import com.intellij.util.concurrency.AppExecutorUtil
 import com.intellij.util.ui.JBImageIcon
 import com.puntogris.telescope.storage.DrawableCache
@@ -18,11 +20,14 @@ import javax.swing.Icon
 
 private const val DEFAULT_SIZE = 50
 
-class IconProvider {
+class IconProvider : Disposable {
+
+    private val disposable = Disposer.newDisposable(this, IconProvider::javaClass.name)
     private val imageIcon = JBImageIcon(MyIcons.NotSupportedIcon.toImage())
     private val fetchImageExecutor = service<FetchImageExecutor>()
-    private val drawableCache = DrawableCache.createImageCache({})
+    private val drawableCache = DrawableCache.createImageCache(disposable)
     private val drawableRenderer = DrawableRenderer()
+    private val placeholder = BufferedImage(50, 50, 1)
 
     fun getIcon(
         drawable: DrawableRes,
@@ -30,8 +35,7 @@ class IconProvider {
         refreshCallback: () -> Unit,
         shouldBeRendered: () -> Boolean
     ): Icon {
-        imageIcon.image
-        val image = drawableCache.computeAndGet(drawable.file, BufferedImage(50, 50, 1), false, refreshCallback) {
+        val image = drawableCache.computeAndGet(drawable.file, placeholder, false, refreshCallback) {
             if (shouldBeRendered()) {
                 CompletableFuture.supplyAsync(
                     { if (shouldBeRendered()) drawableRenderer.render(drawable) else null },
@@ -50,6 +54,10 @@ class IconProvider {
         FetchImageExecutor::class.java.simpleName,
         1
     )
+
+    override fun dispose() {
+        disposable.dispose()
+    }
 }
 
 class DrawableRenderer {

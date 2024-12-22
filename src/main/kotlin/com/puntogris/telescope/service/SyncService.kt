@@ -2,10 +2,12 @@ package com.puntogris.telescope.service
 
 import com.android.tools.idea.concurrency.coroutineScope
 import com.intellij.notification.NotificationType
+import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.Disposer
 import com.puntogris.telescope.application.Clip
 import com.puntogris.telescope.storage.DrawableCache
 import com.puntogris.telescope.application.GetModelsPath
@@ -16,8 +18,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Service(Service.Level.PROJECT)
-class SyncService(private val project: Project) {
+class SyncService(private val project: Project): Disposable {
 
+    private val disposable = Disposer.newDisposable(this, SyncService::javaClass.name)
     private val resourcesService = ResourcesService.getInstance(project)
     private val databaseService = ResourcesDatabase.getInstance(project)
     private val getModelsPath = GetModelsPath()
@@ -26,7 +29,7 @@ class SyncService(private val project: Project) {
         project.coroutineScope.launch(Dispatchers.Default) {
             try {
                 databaseService.removeAll()
-                DrawableCache.createImageCache({}).clear()
+                DrawableCache.createImageCache(disposable).clear()
                 val files = indexFiles()
                 onComplete(files)
                 sendNotification(project, "Telescope sync completed", NotificationType.INFORMATION)
@@ -63,6 +66,10 @@ class SyncService(private val project: Project) {
     private suspend fun processInvalidModels(drawables: List<DrawableRes>) {
         val entities = drawables.map { drawable -> ImageEntity(uri = drawable.path) }
         databaseService.addBatched(entities, 100)
+    }
+
+    override fun dispose() {
+        disposable.dispose()
     }
 
     companion object {

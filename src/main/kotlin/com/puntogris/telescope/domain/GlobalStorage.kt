@@ -6,7 +6,7 @@ private const val DEFAULT_TEXT_MODEL_PATH_KEY = "TELESCOPE_DEFAULT_TEXT_MODEL_PA
 private const val DEFAULT_VISION_MODEL_PATH_KEY = "TELESCOPE_DEFAULT_VISION_MODEL_PATH"
 private const val CUSTOM_TEXT_MODEL_PATH_KEY = "TELESCOPE_CUSTOM_TEXT_MODEL_PATH"
 private const val CUSTOM_VISION_MODEL_PATH_KEY = "TELESCOPE_CUSTOM_VISION_MODEL_PATH"
-private const val FUZZY_CHECKBOX_STATE_KEY = "TELESCOPE_FUZZY_CHECKBOX_STATE"
+private const val PARTIAL_MATCH_CHECKBOX_STATE_KEY = "TELESCOPE_PARTIAL_MATCH_CHECKBOX_STATE"
 private const val EMBEDDING_CHECKBOX_STATE_KEY = "TELESCOPE_EMBEDDING_CHECKBOX_STATE"
 private const val USE_DEFAULT_MODELS_KEY = "TELESCOPE_USE_DEFAULT_MODELS"
 
@@ -46,12 +46,12 @@ object GlobalStorage {
         return PropertiesComponent.getInstance().getValue(CUSTOM_VISION_MODEL_PATH_KEY, EMPTY_STRING)
     }
 
-    fun setFuzzyState(value: Boolean) {
-        PropertiesComponent.getInstance().setSecureBoolean(FUZZY_CHECKBOX_STATE_KEY, value)
+    fun sePartialMatchState(value: Boolean) {
+        PropertiesComponent.getInstance().setSecureBoolean(PARTIAL_MATCH_CHECKBOX_STATE_KEY, value)
     }
 
-    fun getFuzzyState(): Boolean {
-        return PropertiesComponent.getInstance().getSecureBoolean(FUZZY_CHECKBOX_STATE_KEY, true)
+    fun getPartialMatchState(): Boolean {
+        return PropertiesComponent.getInstance().getSecureBoolean(PARTIAL_MATCH_CHECKBOX_STATE_KEY, true)
     }
 
     fun setEmbeddingsState(value: Boolean) {

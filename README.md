@@ -1,53 +1,47 @@
-# Telescope Plugin for AS
+# Telescope Plugin for Android Studio
 
-Telescope is an Android Studio plugin designed to make finding drawables across all your modules a breeze.
+Telescope is an Android Studio plugin designed to make finding drawables across all your modules simple and efficient.
 
 ## Features
+Telescope has two search modes to help you find what you need:
 
-Telescope offers two powerful search modes:
+- **Partial Match Search:** A simple and fast way to locate drawables by name.
+- **AI-Powered Search (experimental):** Context-aware search using OpenCLIP models.
 
-- **Fuzzy Search:** A classic approach for quick and straightforward lookups.
-- **AI-Powered Search:** Advanced search capabilities using OpenCLIP models converted to the efficient GGUF format.
+### Partial Match Search
 
-### Fuzzy Search
+This mode scans all modules, including nested ones, to find drawables based on partial matches in their names.
 
-No surprises here—fuzzy search works just as you'd expect. It performs global scans across all modules, including nested
-ones, to locate your drawables based on partial matches or misspellings.
+### AI-Powered Search
 
-### AI-Powered Search with OpenCLIP (The Fun Stuff 🎉)
+AI search goes beyond names by understanding context. For instance, if you’re searching for `ic_pencil` but use terms like `edit` or `update`, the AI can still identify relevant matches.
 
-AI search takes your drawable hunting to the next level by understanding context and intent. For instance, imagine
-you’re looking for a drawable of a pencil icon named `ic_pencil.xml`. Fuzzy search might not help if you search for
-terms
-like **edit** or **update**, but AI search will intelligently connect the dots and provide accurate matches.
+#### How it works
 
-#### Why OpenCLIP and GGUF?
+The plugin uses OpenCLIP-compatible models in the GGUF format for efficient and lightweight operation, such as `ViT-B/32` models with `laion2B-s34B-b79K` weights. For inference, it leverages clip.cpp through JNI Java bindings, ensuring smooth integration and performance.
 
-Telescope leverages OpenCLIP-compatible models in GGUF format to balance performance and memory efficiency. By using
-separate models for text and vision encoders, the plugin avoids loading unnecessarily large models into memory. These
-encoders are used on demand, ensuring smooth operation without compromising capabilities.
+Text and image models are loaded only when needed, keeping the plugin lightweight. Additionally, images are resized internally to 224x224 pixels for optimal results.
 
-#### About the models
+## Try it out!
 
-The models use the `ViT-B/32` architecture with pretrained `laion2B-s34B-b79K` weights. For optimal results, images
-should be resized to a resolution of 224x224 pixels. In the plugin we do this internally.
+### Web version
+I got carried away and made a simplified web version, check it out at [telescope.puntogris.com](https://telescope.puntogri.com
+). It includes a terminal where you can see logs in real-time.
 
-### How it looks
+![preview](./screenshots/website.jpeg)
+*Don't let it fool you, this is the web version*
 
-Entirely with Swing and some Kotlin UI DSL
+### Android Studio
+The plugin isn’t published yet, but you can install it manually:
 
-![preview](./screenshots/preview.png)
-
-### Useful links
-
-https://github.com/mlfoundations/open_clip
-
-https://github.com/monatis/clip.cpp
+ - Clone the repository
+ - Run the `buildPlugin` Gradle task to generate a .zip file.
+ - In Android Studio, go to Settings > Plugins > Gear Icon > Install Plugin from Disk, and select the .zip file.
 
 ### TODO
 
 - Check if it's worth migrating to the way ResourceManager fetches resources
 - Fix crash in clip.cpp when encoding text multiple times in a short amount of time
-- Implement fuzzy search
+- Publish it or create an upload a release version
 
 

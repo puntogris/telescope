@@ -69,7 +69,7 @@ object Clip {
             )
             Result.success(emb)
         } catch (e: Throwable) {
-            //TODO we should return the error mb, if it fails we should save the file in the db for fuzzy
+            //TODO we should return the error mb, if it fails we should save the file in the db for partial match
             return Result.success(floatArrayOf())
         }
     }

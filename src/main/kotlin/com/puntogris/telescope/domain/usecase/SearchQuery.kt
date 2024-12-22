@@ -11,7 +11,7 @@ class SearchQuery {
 
     suspend operator fun invoke(query: String): List<SearchResult> = withContext(Dispatchers.Default) {
         buildList {
-            if (GlobalStorage.getFuzzyState()) {
+            if (GlobalStorage.getPartialMatchState()) {
                 val matches = ImagesDB.getSimilarUri(query)
                 addAll(matches)
             }

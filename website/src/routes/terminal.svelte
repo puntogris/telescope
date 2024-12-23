@@ -91,7 +91,7 @@
 		onmouseup={onMouseUp}
 		class="flex h-11 cursor-ns-resize select-none items-center justify-between bg-ide-bg p-2"
 	>
-		<h2 class="text-sm font-semibold text-ide-text">Terminal</h2>
+		<h2 class="text-sm font-semibold text-ide-text">Terminal <span class="text-xs text-zinc-500 font-normal"> (resizable)</span></h2>
 		<button class="rounded p-1 hover:bg-zinc-700" onclick={toggleExpanded}>
 			{#if isExpanded}
 				<ChevronDownIcon class="size-5 text-ide-text" />
@@ -102,7 +102,7 @@
 	</header>
 	<div id="terminal-logs" class="flex flex-col gap-2 overflow-y-auto p-2">
 		<span class="text-sm text-green-400">
-			puntogris@pc ~/telescope (main) &gt; ./start-telescope
+			puntogris@pc ~/telescope (main) &gt; ./start
 		</span>
 		{#each logs as log}
 			<p class="whitespace-pre-wrap text-sm text-ide-text">

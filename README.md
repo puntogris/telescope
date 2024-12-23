@@ -15,26 +15,20 @@ Telescope has two search modes to help you find what you need:
 
 This mode scans all modules, including nested ones, to find drawables based on partial matches in their names.
 
-### AI-Powered Search
+### AI-Powered Search (experimental)
 
-AI search goes beyond names by understanding context. For instance, if you’re searching for `ic_pencil` but use terms
-like `edit` or `update`, the AI can still identify relevant matches.
+The AI search is context-aware, so it can find relevant matches even with related terms, like finding `ic_pencil` when
+searching for `edit` or `update`.
 
-#### How it works
-
-The plugin uses OpenCLIP-compatible models in the GGUF format for efficient and lightweight operation, such as
-`ViT-B/32` models with `laion2B-s34B-b79K` weights. For inference, it leverages clip.cpp through JNI Java bindings,
-ensuring smooth integration and performance.
-
-Text and image models are loaded only when needed, keeping the plugin lightweight. Additionally, images are resized
-internally to 224x224 pixels for optimal results.
+The plugin uses OpenCLIP-compatible models in the GGUF format for efficient and lightweight operation, specifically the
+`ViT-B/32` model with `laion2B-s34B-b79K` weights. For inference, it leverages clip.cpp through JNI Java bindings.
 
 ## Try it out!
 
 ### Web version
 
 I got carried away and made a simplified web version, check it out
-at [telescope.puntogris.com](https://telescope.puntogri.com
+at [telescope.puntogris.com](https://telescope.puntogris.com
 ). It includes a terminal where you can see logs in real-time.
 
 ![preview](./screenshots/website.jpeg)

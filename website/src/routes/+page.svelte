@@ -201,14 +201,6 @@
 				<ClassKotlinIcon />
 				Puntogris.kt
 			</a>
-			<a
-				href="https://plugins.jetbrains.com/plugin/26174-telescope"
-				target="_blank"
-				class="flex h-full items-center gap-2 text-sm text-ide-text hover:text-white"
-			>
-				<ClassKotlinIcon />
-				IntelliJMarketplace.kt
-			</a>
 			<DotsVertical class="ml-auto mr-3 size-5" />
 		</header>
 		<div class="flex h-full flex-col gap-1 p-8">

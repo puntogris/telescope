@@ -191,7 +191,7 @@
 				class="flex h-full items-center gap-2 text-sm text-ide-text hover:text-white"
 			>
 				<ClassKotlinIcon />
-				VisitGithubRepository.kt
+				Github.kt
 			</a>
 			<a
 				href="https://www.puntogris.com"
@@ -199,7 +199,15 @@
 				class="flex h-full items-center gap-2 text-sm text-ide-text hover:text-white"
 			>
 				<ClassKotlinIcon />
-				VisitPuntogrisWebsite.kt
+				Puntogris.kt
+			</a>
+			<a
+				href="https://plugins.jetbrains.com/plugin/26174-telescope"
+				target="_blank"
+				class="flex h-full items-center gap-2 text-sm text-ide-text hover:text-white"
+			>
+				<ClassKotlinIcon />
+				IntelliJMarketplace.kt
 			</a>
 			<DotsVertical class="ml-auto mr-3 size-5" />
 		</header>

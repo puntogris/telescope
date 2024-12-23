@@ -65,7 +65,7 @@ fun downloadFileWithProgress(
 
         if (localFileSize == contentLength) {
             inputStream.close()
-            return Result.success(destinationDir.absolutePathString())
+            return Result.success(destinationFile.absolutePathString())
         }
 
         var bytesRead: Int
@@ -86,7 +86,7 @@ fun downloadFileWithProgress(
 
         inputStream.close()
         outputStream.close()
-        return Result.success(destinationDir.absolutePathString())
+        return Result.success(destinationFile.absolutePathString())
     } catch (e: Exception) {
         return Result.failure(e)
     }

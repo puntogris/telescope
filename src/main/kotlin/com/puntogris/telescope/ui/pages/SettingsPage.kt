@@ -74,18 +74,24 @@ class SettingsPage(private val project: Project) : DslComponent {
     }
 
     private fun Panel.defaultPanel(): Panel = panel {
+        var commentCell: Cell<JEditorPane>? = null
+        val initialComment = if (areDefaultModelsPathsValid()) {
+            "Models stored at:\n${configPath.resolve("models").absolutePathString()}"
+        } else {
+            "None downloaded"
+        }
         row {
             text("This model was trained and optimized specifically for this plugin's tasks.")
         }
         row {
             button("Download models") {
-                downloadDefaultModels()
+                downloadDefaultModels {
+                    commentCell?.text(
+                        "Models stored at:\n${configPath.resolve("models").absolutePathString()}"
+                    )
+                }
             }
-            rowComment(
-                "Models are about 100MB each and we will store at:\n${
-                    configPath.resolve("models").absolutePathString()
-                }"
-            )
+            commentCell = comment(initialComment)
         }
     }
 
@@ -127,7 +133,12 @@ class SettingsPage(private val project: Project) : DslComponent {
         }
     }
 
-    private fun downloadDefaultModels() {
+    private fun areDefaultModelsPathsValid(): Boolean {
+        return GlobalStorage.getCustomTextModelPath().isNotEmpty() &&
+                GlobalStorage.getCustomVisionModelPath().isNotEmpty()
+    }
+
+    private fun downloadDefaultModels(onSuccess: () -> Unit) {
         runBackgroundableTask("Downloading AI models", project, true) { indicator ->
             val modelsDir = configPath.resolve("models")
 
@@ -152,6 +163,7 @@ class SettingsPage(private val project: Project) : DslComponent {
             if (indicator.isCanceled) {
                 sendNotification(project, "AI models download canceled", NotificationType.WARNING)
             } else {
+                onSuccess()
                 sendNotification(project, "AI models download completed", NotificationType.INFORMATION)
             }
         }

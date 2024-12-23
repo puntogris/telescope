@@ -2,7 +2,11 @@
 <idea-plugin>
     <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
     <id>com.puntogris.telescope</id>
-    <depends>org.jetbrains.android</depends>
+
+    <!-- Product and plugin compatibility requirements.
+      Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.androidstudio</depends>
 
     <!-- Public plugin name should be written in Title Case.
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
@@ -45,10 +49,6 @@
     This plugin is open source and was created as a hobby project. Feel free to check out the code and contribute with a pull request. You can find the project on <a href="https://github.com/puntogris/telescope" target="_blank">GitHub</a>.
     </p>
   ]]></description>
-
-    <!-- Product and plugin compatibility requirements.
-         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
-    <depends>com.intellij.modules.platform</depends>
 
     <!-- Extension points defined by the plugin.
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->

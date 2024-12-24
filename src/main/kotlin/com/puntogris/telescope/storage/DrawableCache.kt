@@ -24,7 +24,6 @@ import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.concurrency.EdtExecutorService
 import com.intellij.util.ui.update.MergingUpdateQueue
-import com.intellij.util.ui.update.Update
 import org.jetbrains.annotations.Async
 import java.awt.image.BufferedImage
 import java.util.concurrent.CompletableFuture
@@ -79,12 +78,14 @@ class DrawableCache private constructor(
         // We map to null to mark that the computation for asset has started and avoid any new computation.
         // It will then be replaced by the computation future once it is created.
         pendingFutures[asset] = null
-        if (executeImmediately) {
-            runnable()
-        } else {
-            val update = Update.create(asset.name, runnable)
-            updateQueue.queue(update)
-        }
+        runnable()
+        // TODO this would be cool but Update import is breaking things
+//        if (executeImmediately) {
+//            runnable()
+//        } else {
+//            val update = Update.create(asset.name, runnable)
+//            updateQueue.queue(update)
+//        }
     }
 
     override fun dispose() {
@@ -120,14 +121,19 @@ class DrawableCache private constructor(
         executor: Executor = EdtExecutorService.getInstance(),
         computationFutureProvider: (() -> CompletableFuture<out BufferedImage?>)
     ): BufferedImage {
-        val cachedImage = objectToImage.getIfPresent(asset.path)
-        if ((cachedImage == null || forceComputation) && !pendingFutures.containsKey(asset)) {
-            val executeImmediately = cachedImage == null // If we don't have any image, no need to wait.
-            runOrQueue(asset, executeImmediately) {
+        val memoryCache = objectToImage.getIfPresent(asset.path)
+        if (memoryCache != null) {
+            return memoryCache.image
+        }
+
+        val diskCache = DiskCache.getIfPresent(asset.path)
+
+        if (!pendingFutures.containsKey(asset)) {
+            runOrQueue(asset, true) {
                 startComputation(computationFutureProvider, asset, onImageCached, executor)
             }
         }
-        return cachedImage?.image ?: placeholder
+        return diskCache ?: placeholder
     }
 
     private fun startComputation(
@@ -142,6 +148,7 @@ class DrawableCache private constructor(
             }
             if (image != null) {
                 objectToImage.put(asset.path, CachedImage(image, 0))
+                DiskCache.put(image, asset.path)
                 executor.execute(onImageCached)
             } else {
                 objectToImage.invalidate(asset.path)

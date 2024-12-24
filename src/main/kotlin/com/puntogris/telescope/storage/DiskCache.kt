@@ -1,5 +1,6 @@
 package com.puntogris.telescope.storage
 
+import com.puntogris.telescope.utils.PNG
 import com.puntogris.telescope.utils.configPath
 import com.puntogris.telescope.utils.toBufferedImage
 import java.awt.Image
@@ -22,15 +23,15 @@ object DiskCache {
         }
     }
 
-    fun put(image: Image, format: String, path: String) {
+    fun put(image: Image, path: String) {
         val worker = object : SwingWorker<Unit, Unit>() {
             override fun doInBackground() {
                 try {
-                    val dir = File(cacheDir, path.hashCode().toString() + ".$format")
+                    val dir = File(cacheDir, path.hashCode().toString())
                     if (!dir.exists()) {
                         dir.mkdirs()
                     }
-                    ImageIO.write(image.toBufferedImage(), format.uppercase(), dir)
+                    ImageIO.write(image.toBufferedImage(), PNG, dir)
                 } catch (ignored: Throwable) {
                 }
             }

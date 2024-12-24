@@ -23,8 +23,6 @@ dependencies {
     implementation("io.objectbox:objectbox-kotlin:4.0.3")
     kapt("io.objectbox:objectbox-processor:4.0.3")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.9.0")
-
     // https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin.html
     intellijPlatform {
         // https://plugins.jetbrains.com/docs/intellij/android-studio.html#open-source-plugins-for-android-studio

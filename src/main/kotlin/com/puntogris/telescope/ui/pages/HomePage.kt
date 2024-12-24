@@ -1,5 +1,6 @@
 package com.puntogris.telescope.ui.pages
 
+import com.intellij.openapi.application.EDT
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.puntogris.telescope.service.ResourcesService
@@ -12,7 +13,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.swing.Swing
 import javax.swing.BoxLayout
 import javax.swing.JPanel
 
@@ -51,7 +51,7 @@ class HomePage(project: Project) : JPanel() {
         if (query.isBlank()) {
             list.reset()
         } else {
-            searchJob = CoroutineScope(Dispatchers.Swing).launch {
+            searchJob = CoroutineScope(Dispatchers.EDT).launch {
                 val result = searchQuery(query)
                 list.filter(result)
             }

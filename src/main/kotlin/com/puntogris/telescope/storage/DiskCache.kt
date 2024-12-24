@@ -11,6 +11,7 @@ import javax.imageio.ImageIO
 import javax.swing.SwingWorker
 import kotlin.io.path.absolutePathString
 
+// TODO would could make this a service
 object DiskCache {
 
     private const val CACHE_DIR = "cache"
@@ -24,6 +25,9 @@ object DiskCache {
     }
 
     fun put(image: Image, path: String) {
+        if (cacheDir == null) {
+            return
+        }
         val worker = object : SwingWorker<Unit, Unit>() {
             override fun doInBackground() {
                 try {
@@ -40,6 +44,9 @@ object DiskCache {
     }
 
     fun getIfPresent(path: String): BufferedImage? {
+        if (cacheDir == null) {
+            return null
+        }
         val dir = File(cacheDir, path.hashCode().toString())
 
         if (dir.exists()) {
@@ -49,6 +56,9 @@ object DiskCache {
     }
 
     fun invalidateAll() {
+        if (cacheDir == null) {
+            return
+        }
         val worker = object : SwingWorker<Unit, Unit>() {
             override fun doInBackground() {
                 try {

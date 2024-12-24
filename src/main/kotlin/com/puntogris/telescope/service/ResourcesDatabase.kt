@@ -1,5 +1,6 @@
 package com.puntogris.telescope.service
 
+import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
@@ -16,7 +17,7 @@ import kotlinx.coroutines.withContext
 private const val DB_DIR = "db"
 
 @Service(Service.Level.PROJECT)
-class ResourcesDatabase(project: Project) {
+class ResourcesDatabase(project: Project): Disposable {
 
     private val databaseDirectory = configPath.resolve(project.name).toFile()
 
@@ -62,5 +63,9 @@ class ResourcesDatabase(project: Project) {
 
     companion object {
         fun getInstance(project: Project): ResourcesDatabase = project.service()
+    }
+
+    override fun dispose() {
+        store.close()
     }
 }

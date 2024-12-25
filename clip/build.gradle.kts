@@ -6,7 +6,6 @@ plugins {
 }
 
 group = "android.clip.cpp"
-version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()

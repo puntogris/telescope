@@ -1,0 +1,3 @@
+[submodule "clip.cpp"]
+	path = clip.cpp
+	url = https://github.com/monatis/clip.cpp.git

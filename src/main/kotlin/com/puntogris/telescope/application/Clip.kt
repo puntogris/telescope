@@ -1,6 +1,8 @@
 package com.puntogris.telescope.application
 
 import android.clip.cpp.CLIPAndroid
+import com.puntogris.telescope.models.Colors
+import com.puntogris.telescope.models.Dependencies
 import com.puntogris.telescope.models.DrawableRes
 import kotlin.io.path.Path
 import kotlin.io.path.absolutePathString
@@ -52,10 +54,10 @@ object Clip {
         return null
     }
 
-    fun encodeFileImage(res: DrawableRes): Result<FloatArray> {
+    fun encodeFileImage(res: DrawableRes, colors: Colors, dependencies: Dependencies): Result<FloatArray> {
         return try {
             val converted = requireNotNull(
-                fileToClip(res)
+                fileToClip(res, colors, dependencies)
             )
             val emb = requireNotNull(visionClip()).encodeImage(
                 converted.byteBuffer,

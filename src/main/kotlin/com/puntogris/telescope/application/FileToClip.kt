@@ -1,5 +1,7 @@
 package com.puntogris.telescope.application
 
+import com.puntogris.telescope.models.Colors
+import com.puntogris.telescope.models.Dependencies
 import com.puntogris.telescope.models.DrawableRes
 import com.puntogris.telescope.models.ImageResult
 import com.puntogris.telescope.ui.components.DrawableRenderer
@@ -16,8 +18,8 @@ class FileToClip {
 
     private val drawableRenderer = DrawableRenderer()
 
-    operator fun invoke(drawable: DrawableRes): ImageResult? {
-        val image = drawableRenderer.render(drawable, IMAGE_SIZE) ?: return null
+    operator fun invoke(drawable: DrawableRes, colors: Colors, dependencies: Dependencies): ImageResult? {
+        val image = drawableRenderer.render(drawable,colors, dependencies, IMAGE_SIZE) ?: return null
         val imageWhiteBg = addWhiteBackground(image)
         val byteBuffer = bufferedImageToByteBuffer(imageWhiteBg)
 

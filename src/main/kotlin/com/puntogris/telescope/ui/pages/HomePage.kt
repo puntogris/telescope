@@ -24,7 +24,7 @@ class HomePage(project: Project) : JPanel() {
     private var searchJob: Job? = null
 
     private val list = ListPanel(
-        files = resourcesService.getDrawableResources(),
+        resources = resourcesService.getResources(),
         onClick = { FileEditorManager.getInstance(project).openFile(it, true) }
     )
 

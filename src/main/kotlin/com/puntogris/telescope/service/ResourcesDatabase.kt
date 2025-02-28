@@ -50,7 +50,7 @@ class ResourcesDatabase(project: Project): Disposable {
     }
 
     suspend fun getNearestNeighbors(embedding: FloatArray): List<SearchResult> = withContext(Dispatchers.IO) {
-        val query = imagesBox.query(ImageEntity_.embedding.nearestNeighbors(embedding, 10)).build()
+        val query = imagesBox.query(ImageEntity_.embedding.nearestNeighbors(embedding, 30)).build()
         val results = query.findWithScores()
 
         results.map {

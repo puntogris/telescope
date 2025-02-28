@@ -19,13 +19,9 @@ class DrawableCellRenderer : ListCellRenderer<DrawableRes> {
         isSelected: Boolean,
         cellHasFocus: Boolean
     ): Component {
-        val view = (list as AssetList).assetView
-        label.icon = iconProvider.getIcon(
-            drawable = value,
-            component = view,
-            refreshCallback = { list.getCellBounds(index, index)?.let(list::repaint) },
-            shouldBeRendered = { index in list.firstVisibleIndex..list.lastVisibleIndex }
-        )
+        val asset = (list as AssetList)
+        val view = asset.assetView
+
         view.apply {
             selected = isSelected
             focused = cellHasFocus
@@ -43,6 +39,15 @@ class DrawableCellRenderer : ListCellRenderer<DrawableRes> {
             // image size plus some padding
             viewWidth = 70
         }
+
+        label.icon = iconProvider.getIcon(
+            drawable = value,
+            refreshCallback = { list.getCellBounds(index, index)?.let(list::repaint) },
+            shouldBeRendered = { index in list.firstVisibleIndex..list.lastVisibleIndex },
+            colors = asset.colors.orEmpty(),
+            dependencies = asset.dependencies.orEmpty()
+        )
+
         return view
     }
 }

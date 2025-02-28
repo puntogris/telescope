@@ -134,8 +134,8 @@ class SettingsPage(private val project: Project) : DslComponent {
     }
 
     private fun areDefaultModelsPathsValid(): Boolean {
-        return GlobalStorage.getCustomTextModelPath().isNotEmpty() &&
-                GlobalStorage.getCustomVisionModelPath().isNotEmpty()
+        return GlobalStorage.getDefaultTextModelPath().isNotEmpty() &&
+                GlobalStorage.getDefaultVisionModelPath().isNotEmpty()
     }
 
     private fun downloadDefaultModels(onSuccess: () -> Unit) {

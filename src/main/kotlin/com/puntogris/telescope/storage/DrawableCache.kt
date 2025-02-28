@@ -126,6 +126,7 @@ class DrawableCache private constructor(
             return memoryCache.image
         }
 
+        // we trigger disk cache for fast drawing, it should only run once, then hit the memory cache
         val diskCache = DiskCache.getIfPresent(asset.path)
 
         if (!pendingFutures.containsKey(asset)) {

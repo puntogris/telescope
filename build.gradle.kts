@@ -15,6 +15,10 @@ repositories {
     }
 }
 
+intellijPlatform {
+    instrumentCode.set(false)
+}
+
 dependencies {
     implementation(project(":clip"))
 
@@ -23,13 +27,14 @@ dependencies {
     implementation("io.objectbox:objectbox-kotlin:4.0.3")
     kapt("io.objectbox:objectbox-processor:4.0.3")
 
+    implementation(files("libs/svgSalamander-1.1.4.jar"))
+
     // https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin.html
     intellijPlatform {
         // https://plugins.jetbrains.com/docs/intellij/android-studio.html#open-source-plugins-for-android-studio
         // https://plugins.jetbrains.com/docs/intellij/android-studio-releases-list.html
         // https://plugins.jetbrains.com/plugin/22989-android/versions/stable
         bundledPlugin("org.jetbrains.android")
-        instrumentationTools()
 
         // TODO maybe is a workspace error but having trouble using ide.localPath on AS, plugin path seems broken
         if (hasProperty("ide.localPath")) {

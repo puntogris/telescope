@@ -12,13 +12,15 @@ import com.puntogris.telescope.storage.DrawableCache
 import com.puntogris.telescope.application.GetModelsPath
 import com.puntogris.telescope.models.DrawableRes
 import com.puntogris.telescope.models.ImageEntity
+import com.puntogris.telescope.models.Resources
+import com.puntogris.telescope.storage.DiskCache
 import com.puntogris.telescope.utils.sendNotification
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Service(Service.Level.PROJECT)
-class SyncService(private val project: Project): Disposable {
+class SyncService(private val project: Project) : Disposable {
 
     private val disposable = Disposer.newDisposable(this, SyncService::javaClass.name)
     private val resourcesService = ResourcesService.getInstance(project)
@@ -30,6 +32,7 @@ class SyncService(private val project: Project): Disposable {
             try {
                 databaseService.removeAll()
                 DrawableCache.createImageCache(disposable).clear()
+                DiskCache.invalidateAll()
                 val files = indexFiles()
                 onComplete(files)
                 sendNotification(project, "Telescope sync completed", NotificationType.INFORMATION)
@@ -41,30 +44,33 @@ class SyncService(private val project: Project): Disposable {
     }
 
     private suspend fun indexFiles(): List<DrawableRes> {
-        val drawables = resourcesService.getDrawableResources()
+        val resources = resourcesService.getResources()
 
         if (getModelsPath().areValid) {
-            processValidModels(drawables)
+            processValidModels(resources)
         } else {
-            processInvalidModels(drawables)
+            processInvalidModels(resources)
         }
-        return drawables
+        // TODO we should update everything
+        return resources.drawables
     }
 
-    private suspend fun processValidModels(drawables: List<DrawableRes>) {
-        drawables.chunked(100).forEach { chunk ->
+    private suspend fun processValidModels(resources: Resources) {
+        resources.drawables.chunked(100).forEach { chunk ->
             val encodedEntities = chunk.map { drawable ->
                 ImageEntity(
                     uri = drawable.path,
-                    embedding = Clip.encodeFileImage(drawable).getOrDefault(floatArrayOf())
+                    //TODO not sure about passing colors and dependencies to encode each image
+                    embedding = Clip.encodeFileImage(drawable, resources.colors, resources.dependencies)
+                        .getOrDefault(floatArrayOf())
                 )
             }
             databaseService.addBatched(encodedEntities, 20)
         }
     }
 
-    private suspend fun processInvalidModels(drawables: List<DrawableRes>) {
-        val entities = drawables.map { drawable -> ImageEntity(uri = drawable.path) }
+    private suspend fun processInvalidModels(resources: Resources) {
+        val entities = resources.drawables.map { drawable -> ImageEntity(uri = drawable.path) }
         databaseService.addBatched(entities, 100)
     }
 

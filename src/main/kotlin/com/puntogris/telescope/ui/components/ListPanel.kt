@@ -5,8 +5,12 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.components.JBList
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.util.ui.JBUI
+import com.puntogris.telescope.models.Colors
+import com.puntogris.telescope.models.Dependencies
 import com.puntogris.telescope.models.DrawableRes
+import com.puntogris.telescope.models.Resources
 import com.puntogris.telescope.models.SearchResult
+import java.awt.Dimension
 import javax.swing.DefaultListModel
 import javax.swing.DefaultListSelectionModel
 import javax.swing.JList
@@ -15,17 +19,20 @@ import javax.swing.event.ListSelectionEvent
 import javax.swing.event.ListSelectionListener
 
 class ListPanel(
-    private var files: List<DrawableRes>,
+    private val resources: Resources,
     private val onClick: (VirtualFile) -> Unit
 ) : JBScrollPane(), ListSelectionListener {
 
     private val listModel = DefaultListModel<DrawableRes>()
     private var lastSelectedPath: String? = null
+    private var files = resources.drawables
 
     private val list = AssetList().apply {
         layoutOrientation = JList.VERTICAL
         cellRenderer = DrawableCellRenderer()
         model = listModel
+        colors = this@ListPanel.resources.colors
+        dependencies = this@ListPanel.resources.dependencies
 
         selectionModel = object : DefaultListSelectionModel() {
             override fun setSelectionInterval(index0: Int, index1: Int) {
@@ -104,8 +111,13 @@ class ListPanel(
 
 class AssetList : JBList<DrawableRes>() {
     val assetView = RowAssetView()
+    var colors: Colors? = null
+    var dependencies: Dependencies? = null
 
     init {
+        assetView.preferredSize = Dimension(70,70)
+        fixedCellWidth = assetView.preferredSize.width
+        fixedCellHeight = assetView.preferredSize.height
         layoutOrientation = JList.VERTICAL
     }
 }

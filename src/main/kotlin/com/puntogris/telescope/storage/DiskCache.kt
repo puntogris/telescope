@@ -11,7 +11,7 @@ import javax.imageio.ImageIO
 import javax.swing.SwingWorker
 import kotlin.io.path.absolutePathString
 
-// TODO would could make this a service
+// TODO could/should be a service?
 object DiskCache {
 
     private const val CACHE_DIR = "cache"

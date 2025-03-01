@@ -34,7 +34,7 @@ class SyncService(private val project: Project) : Disposable {
                 DrawableCache.createImageCache(disposable).clear()
                 DiskCache.invalidateAll()
                 val files = indexFiles()
-                onComplete(files)
+                onComplete(files.drawables)
                 sendNotification(project, "Telescope sync completed", NotificationType.INFORMATION)
             } catch (e: Exception) {
                 thisLogger().error(e)
@@ -43,7 +43,7 @@ class SyncService(private val project: Project) : Disposable {
         }
     }
 
-    private suspend fun indexFiles(): List<DrawableRes> {
+    private suspend fun indexFiles(): Resources {
         val resources = resourcesService.getResources()
 
         if (getModelsPath().areValid) {
@@ -51,8 +51,7 @@ class SyncService(private val project: Project) : Disposable {
         } else {
             processInvalidModels(resources)
         }
-        // TODO we should update everything
-        return resources.drawables
+        return resources
     }
 
     private suspend fun processValidModels(resources: Resources) {

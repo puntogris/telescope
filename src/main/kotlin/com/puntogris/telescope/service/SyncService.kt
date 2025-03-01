@@ -7,6 +7,7 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
+import com.intellij.platform.ide.progress.withBackgroundProgress
 import com.puntogris.telescope.application.Clip
 import com.puntogris.telescope.storage.DrawableCache
 import com.puntogris.telescope.application.GetModelsPath
@@ -29,16 +30,18 @@ class SyncService(private val project: Project) : Disposable {
 
     fun sync(onComplete: (List<DrawableRes>) -> Unit) {
         CoroutineScope(Dispatchers.Default).launch {
-            try {
-                databaseService.removeAll()
-                DrawableCache.createImageCache(disposable).clear()
-                DiskCache.invalidateAll()
-                val files = indexFiles()
-                onComplete(files.drawables)
-                sendNotification(project, "Telescope sync completed", NotificationType.INFORMATION)
-            } catch (e: Exception) {
-                thisLogger().error(e)
-                sendNotification(project, "Telescope sync completed failed", NotificationType.ERROR)
+            withBackgroundProgress(project, "Syncing Telescope") {
+                try {
+                    databaseService.removeAll()
+                    DrawableCache.createImageCache(disposable).clear()
+                    DiskCache.invalidateAll()
+                    val files = indexFiles()
+                    onComplete(files.drawables)
+                    sendNotification(project, "Telescope sync completed", NotificationType.INFORMATION)
+                } catch (e: Exception) {
+                    thisLogger().error(e)
+                    sendNotification(project, "Telescope sync completed failed", NotificationType.ERROR)
+                }
             }
         }
     }

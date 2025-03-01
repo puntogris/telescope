@@ -16,6 +16,8 @@ data class ImageEntity(
     @Index
     var name: String = "",
 
+    var timestamp: Long = 0,
+
     @HnswIndex(dimensions = 512, distanceType = VectorDistanceType.DOT_PRODUCT)
     var embedding: FloatArray = floatArrayOf()
 )

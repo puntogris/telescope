@@ -47,6 +47,10 @@ class ResourcesDatabase(project: Project) : Disposable {
         imagesBox.removeAll()
     }
 
+    suspend fun remove(entities: List<ImageEntity>) = withContext(Dispatchers.IO) {
+        imagesBox.remove(entities)
+    }
+
     suspend fun getNearestNeighbors(embedding: FloatArray): List<SearchResult> = withContext(Dispatchers.IO) {
         val query = imagesBox.query(ImageEntity_.embedding.nearestNeighbors(embedding, 30)).build()
         val results = query.findWithScores()
@@ -57,6 +61,10 @@ class ResourcesDatabase(project: Project) : Disposable {
                 score = it.score.toFloat()
             )
         }
+    }
+
+    suspend fun getAll(): List<ImageEntity> = withContext(Dispatchers.IO) {
+        imagesBox.all
     }
 
     companion object {

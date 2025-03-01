@@ -11,6 +11,8 @@ import com.intellij.platform.ide.progress.withBackgroundProgress
 import com.puntogris.telescope.application.Clip
 import com.puntogris.telescope.storage.DrawableCache
 import com.puntogris.telescope.application.GetModelsPath
+import com.puntogris.telescope.models.Colors
+import com.puntogris.telescope.models.Dependencies
 import com.puntogris.telescope.models.DrawableRes
 import com.puntogris.telescope.models.ImageEntity
 import com.puntogris.telescope.models.Resources
@@ -29,28 +31,18 @@ class SyncService(private val project: Project) : Disposable {
     private val databaseService = ResourcesDatabase.getInstance(project)
     private val getModelsPath = GetModelsPath()
 
-    private var initJob: Job? = null
+    private var syncJob: Job? = null
 
     fun init() {
-        initJob = CoroutineScope(Dispatchers.Default).launch {
+        syncJob = CoroutineScope(Dispatchers.Default).launch {
             DrawableCache.createImageCache(disposable).clear()
-
-            val resources = resourcesService.getResources()
-
-            // TODO for now only when AI is not enabled, as it's supper expensive to do in all the files
-            // we should use the file.timestamp to check if the file was updated
-            if (!getModelsPath().areValid) {
-                databaseService.removeAll()
-                processInvalidModels(resources)
-            }
+            indexFiles()
         }
     }
 
     fun sync(onComplete: (List<DrawableRes>) -> Unit) {
-        // cancel the init job if a hard sync is needed at the same time
-        initJob?.cancel()
-
-        CoroutineScope(Dispatchers.Default).launch {
+        syncJob?.cancel()
+        syncJob = CoroutineScope(Dispatchers.Default).launch {
             withBackgroundProgress(project, "Syncing Telescope") {
                 try {
                     databaseService.removeAll()
@@ -71,39 +63,71 @@ class SyncService(private val project: Project) : Disposable {
         val resources = resourcesService.getResources()
 
         if (getModelsPath().areValid) {
-            processValidModels(resources)
+            processEmbeddingsModels(resources)
         } else {
-            processInvalidModels(resources)
+            processDefaultModels(resources)
         }
         return resources
     }
 
-    private suspend fun processValidModels(resources: Resources) {
-        resources.drawables.chunked(100).forEach { chunk ->
+    private suspend fun processEmbeddingsModels(resources: Resources) {
+        val drawables = resources.drawables
+        val inDb = databaseService.getAll()
+        val toAdd = mutableListOf<DrawableRes>()
+        val toDelete = mutableListOf<ImageEntity>()
+
+        for (drawable in drawables) {
+            val match = inDb.find { it.uri == drawable.path }
+            if (match == null || match.timestamp < drawable.file.timeStamp || match.embedding.isEmpty()) {
+                toAdd.add(drawable)
+            }
+        }
+        for (entity in inDb) {
+            val match = drawables.find { it.path == entity.uri }
+            if (match == null) {
+                toDelete.add(entity)
+            }
+        }
+
+        databaseService.remove(toDelete)
+
+        toAdd.chunked(100).forEach { chunk ->
             val encodedEntities = chunk.map { drawable ->
-                ImageEntity(
-                    name = drawable.name,
-                    uri = drawable.path,
-                    //TODO not sure about passing colors and dependencies to encode each image
-                    embedding = Clip.encodeFileImage(drawable, resources.colors, resources.dependencies)
-                        .getOrDefault(floatArrayOf())
-                )
+                encodeDrawable(drawable, resources.colors, resources.dependencies)
             }
             databaseService.addBatched(encodedEntities, 20)
         }
     }
 
-    private suspend fun processInvalidModels(resources: Resources) {
+    private fun encodeDrawable(
+        drawable: DrawableRes,
+        colors: Colors,
+        dependencies: Dependencies
+    ): ImageEntity {
+        val embedding = Clip.encodeFileImage(drawable, colors, dependencies).getOrDefault(floatArrayOf())
+
+        return ImageEntity(
+            name = drawable.name,
+            uri = drawable.path,
+            timestamp = drawable.file.timeStamp,
+            embedding = embedding
+        )
+    }
+
+    private suspend fun processDefaultModels(resources: Resources) {
+        databaseService.removeAll()
         val entities = resources.drawables.map { drawable ->
             ImageEntity(
                 name = drawable.name,
-                uri = drawable.path
+                uri = drawable.path,
+                timestamp = drawable.file.timeStamp
             )
         }
         databaseService.addBatched(entities, 100)
     }
 
     override fun dispose() {
+        syncJob?.cancel()
         disposable.dispose()
     }
 

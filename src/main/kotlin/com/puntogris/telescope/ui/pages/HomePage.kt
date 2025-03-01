@@ -43,6 +43,8 @@ class HomePage(project: Project) : JPanel() {
         add(controls)
         add(search)
         add(list)
+
+        syncService.init()
     }
 
     private fun onNewSearch(query: String) {

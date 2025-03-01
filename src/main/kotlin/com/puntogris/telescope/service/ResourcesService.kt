@@ -4,7 +4,6 @@ import com.android.tools.idea.gradle.variant.conflict.displayName
 import com.android.tools.idea.projectsystem.gradle.getAllDependencies
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
-import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
@@ -82,9 +81,7 @@ class ResourcesService(private val project: Project) {
             val root = manager.contentRoots.find { it.name == MAIN_MODULE } ?: continue
             val colorsFile = root.findFile(COLORS_FILE_PATH) ?: continue
 
-            colorRes[module.displayName] = extractColorFromFile(colorsFile).also {
-                thisLogger().warn(it.toString())
-            }
+            colorRes[module.displayName] = extractColorFromFile(colorsFile)
         }
         return colorRes
     }

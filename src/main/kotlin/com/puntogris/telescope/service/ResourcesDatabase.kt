@@ -17,7 +17,7 @@ import kotlinx.coroutines.withContext
 private const val DB_DIR = "db"
 
 @Service(Service.Level.PROJECT)
-class ResourcesDatabase(project: Project): Disposable {
+class ResourcesDatabase(project: Project) : Disposable {
 
     private val databaseDirectory = configPath.resolve(project.name).toFile()
 
@@ -34,14 +34,12 @@ class ResourcesDatabase(project: Project): Disposable {
         imagesBox.putBatched(entities, batchSize)
     }
 
-    suspend fun getSimilarUri(uri: String): List<SearchResult> = withContext(Dispatchers.IO) {
-        val query = imagesBox.query(ImageEntity_.uri.contains(uri, QueryBuilder.StringOrder.CASE_INSENSITIVE)).build()
+    suspend fun getSimilarName(name: String): List<SearchResult> = withContext(Dispatchers.IO) {
+        val query = imagesBox.query(ImageEntity_.name.contains(name, QueryBuilder.StringOrder.CASE_INSENSITIVE)).build()
         val results = query.find()
 
         results.map {
-            SearchResult(
-                uri = it.uri
-            )
+            SearchResult(uri = it.uri)
         }
     }
 

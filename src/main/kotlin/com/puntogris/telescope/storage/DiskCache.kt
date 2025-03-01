@@ -70,11 +70,10 @@ object DiskCache {
         worker.execute()
     }
 
-    private fun getCacheDir(projectName: String): String? {
+    private fun getCacheDir(projectName: String): String {
         val configPath = configPath.resolve(projectName).resolve(CACHE_DIR)
         Files.createDirectories(configPath)
 
-        cacheDir = configPath.absolutePathString()
-        return cacheDir
+        return configPath.absolutePathString()
     }
 }

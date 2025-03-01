@@ -59,6 +59,7 @@ class SyncService(private val project: Project) : Disposable {
         resources.drawables.chunked(100).forEach { chunk ->
             val encodedEntities = chunk.map { drawable ->
                 ImageEntity(
+                    name = drawable.name,
                     uri = drawable.path,
                     //TODO not sure about passing colors and dependencies to encode each image
                     embedding = Clip.encodeFileImage(drawable, resources.colors, resources.dependencies)
@@ -70,7 +71,12 @@ class SyncService(private val project: Project) : Disposable {
     }
 
     private suspend fun processInvalidModels(resources: Resources) {
-        val entities = resources.drawables.map { drawable -> ImageEntity(uri = drawable.path) }
+        val entities = resources.drawables.map { drawable ->
+            ImageEntity(
+                name = drawable.name,
+                uri = drawable.path
+            )
+        }
         databaseService.addBatched(entities, 100)
     }
 

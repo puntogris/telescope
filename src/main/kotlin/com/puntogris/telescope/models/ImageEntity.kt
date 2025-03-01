@@ -9,6 +9,7 @@ import io.objectbox.annotation.VectorDistanceType
 data class ImageEntity(
     @Id var id: Long = 0,
     var uri: String = "",
+    var name: String = "",
     @HnswIndex(dimensions = 512, distanceType = VectorDistanceType.DOT_PRODUCT)
     var embedding: FloatArray = floatArrayOf()
 )

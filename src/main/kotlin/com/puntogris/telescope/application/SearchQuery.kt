@@ -14,7 +14,7 @@ class SearchQuery(project: Project) {
     suspend operator fun invoke(query: String): List<SearchResult> = withContext(Dispatchers.Default) {
         buildList {
             if (GlobalStorage.getPartialMatchState()) {
-                val matches = databaseService.getSimilarUri(query)
+                val matches = databaseService.getSimilarName(query)
                 addAll(matches)
             }
             if (GlobalStorage.getEmbeddingsState()) {

@@ -8,6 +8,7 @@ import com.intellij.ui.components.JBLabel
 import com.intellij.util.ui.JBUI
 import com.puntogris.telescope.application.Clip
 import com.puntogris.telescope.application.GetModelsPath
+import com.puntogris.telescope.application.SettingsEvents
 import com.puntogris.telescope.storage.GlobalStorage
 import com.puntogris.telescope.utils.sendNotification
 import java.awt.BorderLayout
@@ -41,7 +42,11 @@ class ControlsPanel(
                 GlobalStorage.setEmbeddingsState(isSelected)
             } else {
                 isSelected = false
-                sendNotification(project, "It looks like no AI models are configured. Please set them up in the settings page.", NotificationType.ERROR)
+                sendNotification(
+                    project,
+                    "It looks like no AI models are configured. Please set them up in the settings page.",
+                    NotificationType.ERROR
+                )
             }
         }
     }
@@ -58,13 +63,26 @@ class ControlsPanel(
         add(button)
     }
 
+    private val messageBusConnection = project.messageBus.connect()
+
     init {
         border = JBUI.Borders.empty(0, 6)
         layout = BorderLayout()
 
         add(leftPanel, BorderLayout.WEST)
         add(rightPanel, BorderLayout.EAST)
+
+        messageBusConnection.subscribe(SettingsEvents.TOPIC, object : SettingsEvents {
+            override fun embeddingsModelDownloaded() {
+                embeddingCheckbox.isEnabled = true
+            }
+        })
     }
 
     override fun getMaximumSize(): Dimension = Dimension(Int.MAX_VALUE, COMPONENT_HEIGHT)
+
+    override fun removeNotify() {
+        super.removeNotify()
+        messageBusConnection.disconnect()
+    }
 }

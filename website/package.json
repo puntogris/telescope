@@ -28,6 +28,7 @@
   },
   "type": "module",
   "dependencies": {
-    "@sveltejs/adapter-vercel": "^5.5.2"
+    "@sveltejs/adapter-vercel": "^5.5.2",
+    "fuse.js": "^7.1.0"
   }
 }

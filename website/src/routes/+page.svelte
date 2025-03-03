@@ -15,18 +15,21 @@
 	import samples from '$lib/samples.json';
 	import { dotProduct, summarizeList } from '$lib/utils';
 	import Terminal from './terminal.svelte';
+	import Fuse from 'fuse.js';
 
 	let filtered = $state(samples);
-	let partialEnabled = $state(true);
+	let fuzzyEnabled = $state(true);
 	let embeddingsEnabled = $state(false);
 	let timeout: number;
 	let terminal: Terminal;
 
+	const fuse = new Fuse(samples, { keys: ['name'], includeScore: true, threshold: 0.5 });
+
 	async function handleSearch(query: string) {
 		if (!query) {
 			handleNoQuery();
-		} else if (partialEnabled) {
-			performPartialSearch(query);
+		} else if (fuzzyEnabled) {
+			performFuzzySearch(query);
 		} else {
 			debounceEmbeddingsSearch(query);
 		}
@@ -37,16 +40,16 @@
 		terminal.send(`No query, returning all samples`, true);
 	}
 
-	function performPartialSearch(query: string) {
-		terminal.send(`Searching for partial matches with query: ${query}`);
+	function performFuzzySearch(query: string) {
+		terminal.send(`Searching fuzzy matches with query: ${query}`);
 
-		filtered = samples.filter((i) => i.name.toLowerCase().includes(query.toLowerCase()));
+		filtered = fuse.search(query).map((i) => i.item);
 
 		if (filtered.length === 0) {
-			terminal.send(`No partial matches found for query: "${query}"`, true);
+			terminal.send(`No fuzzy matches found for query: "${query}"`, true);
 		} else {
 			const matches = filtered.map((i) => i.name).join('\n - ');
-			terminal.send(`Partial matches for query "${query}": \n - ${matches}`, true);
+			terminal.send(`Fuzzy matches for query "${query}": \n - ${matches}`, true);
 		}
 	}
 
@@ -85,9 +88,9 @@
 	}
 
 	function updateSearchMode(mode: string) {
-		const isPartial = mode === 'partial';
-		partialEnabled = isPartial;
-		embeddingsEnabled = !isPartial;
+		const isFuzzy = mode === 'fuzzy';
+		fuzzyEnabled = isFuzzy;
+		embeddingsEnabled = !isFuzzy;
 		terminal.send(`Search mode: ${mode}`, true);
 	}
 </script>
@@ -126,13 +129,12 @@
 					<input
 						class="rounded p-1 checked:bg-blue-500"
 						type="checkbox"
-						id="exampleCheckbox"
-						bind:checked={partialEnabled}
+						bind:checked={fuzzyEnabled}
 						onchange={(e) => {
-							if (e.currentTarget.checked) updateSearchMode('partial');
+							if (e.currentTarget.checked) updateSearchMode('fuzzy');
 						}}
 					/>
-					Partial Match
+					Fuzzy
 				</label>
 				<label class="flex items-center gap-1.5 text-sm">
 					<input

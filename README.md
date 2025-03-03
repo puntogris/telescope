@@ -8,12 +8,13 @@ Telescope is an Android Studio plugin designed to make finding drawables across 
 
 Telescope has two search modes to help you find what you need:
 
-- **Partial Match Search:** A simple and fast way to locate drawables by name.
+- **Fuzzy Search:** A simple and fast way to locate drawables by name.
 - **AI-Powered Search (experimental):** Context-aware search using OpenCLIP models.
 
-### Partial Match Search
+### Fuzzy Search
 
-This mode scans all modules, including nested ones, to find drawables based on partial matches in their names.
+This mode scans all modules, including nested ones, to find drawables based on fuzzy matching in their names. It
+provides more flexible results by accounting for minor typos or approximate matches.
 
 ### AI-Powered Search (experimental)
 

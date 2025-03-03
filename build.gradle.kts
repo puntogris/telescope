@@ -29,6 +29,8 @@ dependencies {
 
     implementation(files("libs/svgSalamander-1.1.4.jar"))
 
+    implementation("me.xdrop:fuzzywuzzy:1.4.0")
+
     // https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin.html
     intellijPlatform {
         // https://plugins.jetbrains.com/docs/intellij/android-studio.html#open-source-plugins-for-android-studio

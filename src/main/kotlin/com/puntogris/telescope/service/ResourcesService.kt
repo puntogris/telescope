@@ -22,6 +22,9 @@ import javax.xml.parsers.DocumentBuilderFactory
 @Service(Service.Level.PROJECT)
 class ResourcesService(private val project: Project) {
 
+    var currentResources = Resources(emptyList(), emptyMap(), emptyMap())
+        private set
+
     private val dpiVariants = listOf(
         "mipmap-hdpi",
         "mipmap-mdpi",
@@ -34,11 +37,15 @@ class ResourcesService(private val project: Project) {
         val manager = ModuleManager.getInstance(project)
         val modules = manager.modules.filter { it.name.endsWith(ROOT_MAIN_MODULE_SUFFIX) }
 
-        return Resources(
+        val resources = Resources(
             drawables = getDrawableResources(modules),
             colors = getColorsResources(modules),
             dependencies = getModuleDependencies(modules)
         )
+
+        currentResources = resources
+
+        return resources
     }
 
     private fun getDrawableResources(modules: List<Module>): List<DrawableRes> {

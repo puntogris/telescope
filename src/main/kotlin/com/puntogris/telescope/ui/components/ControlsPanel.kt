@@ -26,10 +26,10 @@ class ControlsPanel(
 
     private val modelsPath = GetModelsPath()
 
-    private val partialMatchCheckbox = JBCheckBox("Partial Match").apply {
-        isSelected = GlobalStorage.getPartialMatchState()
+    private val fuzzyCheckbox = JBCheckBox("Fuzzy").apply {
+        isSelected = GlobalStorage.getFuzzyMatchState()
         addActionListener {
-            GlobalStorage.sePartialMatchState(isSelected)
+            GlobalStorage.setFuzzyMatchState(isSelected)
         }
     }
 
@@ -53,7 +53,7 @@ class ControlsPanel(
 
     private val leftPanel = JPanel(FlowLayout(FlowLayout.LEFT, 5, 5)).apply {
         add(JBLabel("Filters:"))
-        add(partialMatchCheckbox)
+        add(fuzzyCheckbox)
         add(embeddingCheckbox)
     }
 

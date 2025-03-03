@@ -39,10 +39,9 @@ at [telescope.puntogris.com](https://telescope.puntogris.com
 
 The plugin isn’t published yet, but you can install it manually:
 
-- Download the release version from the repo
-- Clone the repo and run the `buildPlugin` gradle task to generate a .zip file
+Download the latest `.zip` build from the [releases page](https://github.com/puntogris/telescope/releases), or clone the repository and run the `buildPlugin` Gradle task to generate one.
 
-Then, in Android Studio go to Settings > Plugins > Gear Icon > Install Plugin from Disk, and select the .zip file
+Then, in Android Studio go to Settings > Plugins > Gear Icon > Install Plugin from Disk, and select the file
 
 ## TODO
 

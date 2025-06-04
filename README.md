@@ -37,11 +37,8 @@ at [telescope.puntogris.com](https://telescope.puntogris.com
 
 ### Android Studio
 
-The plugin isn’t published yet, but you can install it manually:
-
-Download the latest `.zip` build from the [releases page](https://github.com/puntogris/telescope/releases), or clone the repository and run the `buildPlugin` Gradle task to generate one.
-
-Then, in Android Studio go to Settings > Plugins > Gear Icon > Install Plugin from Disk, and select the file
+- Available at the [JetBrains Marketplace](https://plugins.jetbrains.com/plugin/26174-telescope) or search "Telescope" in Android Studio plugin section.
+- Download the latest build from the [releases page](https://github.com/puntogris/telescope/releases).
 
 ## TODO
 

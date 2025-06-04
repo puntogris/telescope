@@ -10,7 +10,6 @@ import com.puntogris.telescope.models.MyObjectBox
 import com.puntogris.telescope.models.SearchResult
 import com.puntogris.telescope.utils.configPath
 import io.objectbox.Box
-import io.objectbox.query.QueryBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -32,15 +31,6 @@ class ResourcesDatabase(project: Project) : Disposable {
 
     suspend fun addBatched(entities: List<ImageEntity>, batchSize: Int = 50) = withContext(Dispatchers.IO) {
         imagesBox.putBatched(entities, batchSize)
-    }
-
-    suspend fun getSimilarName(name: String): List<SearchResult> = withContext(Dispatchers.IO) {
-        val query = imagesBox.query(ImageEntity_.name.contains(name, QueryBuilder.StringOrder.CASE_INSENSITIVE)).build()
-        val results = query.find()
-
-        results.map {
-            SearchResult(uri = it.uri)
-        }
     }
 
     suspend fun removeAll() = withContext(Dispatchers.IO) {

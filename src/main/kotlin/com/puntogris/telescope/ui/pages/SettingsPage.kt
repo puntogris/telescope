@@ -12,6 +12,7 @@ import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.dsl.builder.selected
 import com.intellij.ui.dsl.builder.text
 import com.puntogris.telescope.application.SettingsEvents
+import com.puntogris.telescope.service.SyncService
 import com.puntogris.telescope.storage.GlobalStorage
 import com.puntogris.telescope.ui.components.DslComponent
 import com.puntogris.telescope.utils.GGUF
@@ -32,6 +33,8 @@ private const val GITHUB_URL = "https://github.com/puntogris/telescope"
 private const val PUNTOGRIS_URL = "https://www.puntogris.com"
 
 class SettingsPage(private val project: Project) : DslComponent {
+
+    private val syncService = SyncService.getInstance(project)
 
     private lateinit var defaultButton: Cell<JBRadioButton>
     private lateinit var advancedButton: Cell<JBRadioButton>
@@ -91,6 +94,7 @@ class SettingsPage(private val project: Project) : DslComponent {
                         "Models stored at:\n${configPath.resolve("models").absolutePathString()}"
                     )
                     project.messageBus.syncPublisher(SettingsEvents.TOPIC).embeddingsModelDownloaded()
+                    syncService.sync {  }
                 }
             }
             commentCell = comment(initialComment)

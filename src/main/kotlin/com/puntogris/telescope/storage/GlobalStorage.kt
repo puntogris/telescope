@@ -46,19 +46,19 @@ object GlobalStorage {
         return PropertiesComponent.getInstance().getValue(CUSTOM_VISION_MODEL_PATH_KEY, EMPTY_STRING)
     }
 
-    fun setFuzzyMatchState(value: Boolean) {
+    fun setIsFuzzySearchEnabled(value: Boolean) {
         PropertiesComponent.getInstance().setSecureBoolean(FUZZY_MATCH_CHECKBOX_STATE_KEY, value)
     }
 
-    fun getFuzzyMatchState(): Boolean {
+    fun getIsFuzzySearchEnabled(): Boolean {
         return PropertiesComponent.getInstance().getSecureBoolean(FUZZY_MATCH_CHECKBOX_STATE_KEY, true)
     }
 
-    fun setEmbeddingsState(value: Boolean) {
+    fun setIsEmbeddingsSearchEnabled(value: Boolean) {
         PropertiesComponent.getInstance().setSecureBoolean(EMBEDDING_CHECKBOX_STATE_KEY, value)
     }
 
-    fun getEmbeddingsState(): Boolean {
+    fun getIsEmbeddingsSearchEnabled(): Boolean {
         return PropertiesComponent.getInstance().getSecureBoolean(EMBEDDING_CHECKBOX_STATE_KEY, false)
     }
 

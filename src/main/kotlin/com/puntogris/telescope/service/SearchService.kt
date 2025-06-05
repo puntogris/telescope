@@ -17,7 +17,7 @@ class SearchService(project: Project) {
 
     suspend fun search(query: String): List<SearchResult> = withContext(Dispatchers.Default) {
         buildList {
-            if (GlobalStorage.getFuzzyMatchState()) {
+            if (GlobalStorage.getIsFuzzySearchEnabled()) {
                 val matches = FuzzySearch.extractSorted(
                     query,
                     resourcesService.currentResources.drawables,
@@ -26,7 +26,7 @@ class SearchService(project: Project) {
                 ).map { SearchResult(uri = it.referent.path) }
                 addAll(matches)
             }
-            if (GlobalStorage.getEmbeddingsState()) {
+            if (GlobalStorage.getIsEmbeddingsSearchEnabled()) {
                 Clip.encodeText(query).onSuccess { emb ->
                     val matches = databaseService.getNearestNeighbors(emb).filter { m -> none { it.uri == m.uri } }
                     addAll(matches)

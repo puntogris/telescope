@@ -27,19 +27,19 @@ class ControlsPanel(
     private val modelsPath = GetModelsPath()
 
     private val fuzzyCheckbox = JBCheckBox("Fuzzy").apply {
-        isSelected = GlobalStorage.getFuzzyMatchState()
+        isSelected = GlobalStorage.getIsFuzzySearchEnabled()
         addActionListener {
-            GlobalStorage.setFuzzyMatchState(isSelected)
+            GlobalStorage.setIsFuzzySearchEnabled(isSelected)
         }
     }
 
     private val embeddingCheckbox = JBCheckBox("Embeddings").apply {
         toolTipText = "To enable this enable on the settings page."
         isEnabled = Clip.canEnableClip()
-        isSelected = GlobalStorage.getEmbeddingsState()
+        isSelected = GlobalStorage.getIsEmbeddingsSearchEnabled()
         addActionListener {
             if (modelsPath().areValid) {
-                GlobalStorage.setEmbeddingsState(isSelected)
+                GlobalStorage.setIsEmbeddingsSearchEnabled(isSelected)
             } else {
                 isSelected = false
                 sendNotification(

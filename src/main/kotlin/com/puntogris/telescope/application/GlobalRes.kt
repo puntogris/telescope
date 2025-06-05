@@ -1,7 +1,7 @@
 package com.puntogris.telescope.application
 
 // TODO unsure if this should be global state or pass it down to the converters directly
-object Globals {
+object GlobalRes {
 
     private var moduleColors = mapOf<String, Map<String, String>>()
 

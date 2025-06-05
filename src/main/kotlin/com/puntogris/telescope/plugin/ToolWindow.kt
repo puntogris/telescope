@@ -43,7 +43,7 @@ private fun displayInToolWindow(toolWindow: ToolWindow, project: Project) {
     contentManager.removeAllContents(true)
 
     val home = contentManager.factory.createContent(HomePage(project), "Home", false)
-    val settings = contentManager.factory.createContent(SettingsPage(project).createContent(), "Settings", false)
+    val settings = contentManager.factory.createContent(SettingsPage(project).createPage(), "Settings", false)
 
     toolWindow.contentManager.addContent(home)
     toolWindow.contentManager.addContent(settings)

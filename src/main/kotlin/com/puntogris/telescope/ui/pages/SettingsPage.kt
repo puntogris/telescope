@@ -14,7 +14,6 @@ import com.intellij.ui.dsl.builder.text
 import com.puntogris.telescope.application.SettingsEvents
 import com.puntogris.telescope.service.SyncService
 import com.puntogris.telescope.storage.GlobalStorage
-import com.puntogris.telescope.ui.components.DslComponent
 import com.puntogris.telescope.utils.GGUF
 import com.puntogris.telescope.utils.configPath
 import com.puntogris.telescope.utils.downloadFileWithProgress
@@ -25,14 +24,13 @@ import javax.swing.JComponent
 import javax.swing.JEditorPane
 import kotlin.io.path.absolutePathString
 
-private const val DEFAULT_VISION_MODEL_URL =
-    "https://huggingface.co/mys/ggml_CLIP-ViT-B-32-laion2B-s34B-b79K/resolve/main/CLIP-ViT-B-32-laion2B-s34B-b79K_ggml-vision-model-q4_1.gguf"
-private const val DEFAULT_TEXT_MODEL_URL =
-    "https://huggingface.co/mys/ggml_CLIP-ViT-B-32-laion2B-s34B-b79K/resolve/main/CLIP-ViT-B-32-laion2B-s34B-b79K_ggml-text-model-q4_1.gguf"
+private const val BASE_MODEL_URL = "https://huggingface.co/mys/ggml_CLIP-ViT-B-32-laion2B-s34B-b79K/resolve/main/"
+private const val VISION_MODEL_URL = BASE_MODEL_URL + "CLIP-ViT-B-32-laion2B-s34B-b79K_ggml-vision-model-q4_1.gguf"
+private const val TEXT_MODEL_URL = BASE_MODEL_URL + "CLIP-ViT-B-32-laion2B-s34B-b79K_ggml-text-model-q4_1.gguf"
 private const val GITHUB_URL = "https://github.com/puntogris/telescope"
 private const val PUNTOGRIS_URL = "https://www.puntogris.com"
 
-class SettingsPage(private val project: Project) : DslComponent {
+class SettingsPage(private val project: Project) {
 
     private val syncService = SyncService.getInstance(project)
 
@@ -40,7 +38,7 @@ class SettingsPage(private val project: Project) : DslComponent {
     private lateinit var advancedButton: Cell<JBRadioButton>
     private var useDefaultModels = GlobalStorage.getUseDefaultModels()
 
-    override fun createContent(): JComponent {
+    fun createPage(): JComponent {
         return panel {
             row {
                 text("Settings")
@@ -94,7 +92,7 @@ class SettingsPage(private val project: Project) : DslComponent {
                         "Models stored at:\n${configPath.resolve("models").absolutePathString()}"
                     )
                     project.messageBus.syncPublisher(SettingsEvents.TOPIC).embeddingsModelDownloaded()
-                    syncService.sync {  }
+                    syncService.sync { }
                 }
             }
             commentCell = comment(initialComment)
@@ -149,7 +147,7 @@ class SettingsPage(private val project: Project) : DslComponent {
             val modelsDir = configPath.resolve("models")
 
             indicator.text = "Downloading text model"
-            downloadFileWithProgress(DEFAULT_TEXT_MODEL_URL, modelsDir, indicator)
+            downloadFileWithProgress(TEXT_MODEL_URL, modelsDir, indicator)
                 .onSuccess {
                     GlobalStorage.setDefaultTextModelPath(it)
                 }
@@ -158,7 +156,7 @@ class SettingsPage(private val project: Project) : DslComponent {
                 }
 
             indicator.text = "Downloading vision model"
-            downloadFileWithProgress(DEFAULT_VISION_MODEL_URL, modelsDir, indicator)
+            downloadFileWithProgress(VISION_MODEL_URL, modelsDir, indicator)
                 .onSuccess {
                     GlobalStorage.setDefaultVisionModelPath(it)
                 }

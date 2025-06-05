@@ -56,8 +56,8 @@ class VectorToSvg {
 
     operator fun invoke(content: String, module: String, colors: Colors, dependencies: Dependencies): String {
         this.module = module
-        Globals.setModuleColors(colors)
-        Globals.setModuleDependencies(dependencies)
+        GlobalRes.setModuleColors(colors)
+        GlobalRes.setModuleDependencies(dependencies)
         return transform(content)
     }
 
@@ -296,9 +296,9 @@ class VectorToSvg {
     //TODO check if the alpha colors are mapped correctly
     private fun getColorFromRes(color: String): String {
         val hex = if (color.startsWith("@android:color/")) {
-            Globals.searchInAndroidColors(color.substringAfter("/"))
+            GlobalRes.searchInAndroidColors(color.substringAfter("/"))
         } else {
-            Globals.searchInModuleColors(color.substringAfter("/"), module)
+            GlobalRes.searchInModuleColors(color.substringAfter("/"), module)
         }
         val c =  hex ?: "#000000"
 

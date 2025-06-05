@@ -12,7 +12,7 @@ import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.dsl.builder.selected
 import com.intellij.ui.dsl.builder.text
 import com.puntogris.telescope.application.SettingsEvents
-import com.puntogris.telescope.service.SyncService
+import com.puntogris.telescope.services.SyncService
 import com.puntogris.telescope.storage.GlobalStorage
 import com.puntogris.telescope.utils.GGUF
 import com.puntogris.telescope.utils.configPath

@@ -1,4 +1,4 @@
-package com.puntogris.telescope.service
+package com.puntogris.telescope.services
 
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project

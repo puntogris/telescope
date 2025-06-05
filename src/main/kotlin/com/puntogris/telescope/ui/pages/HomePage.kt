@@ -3,9 +3,9 @@ package com.puntogris.telescope.ui.pages
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
-import com.puntogris.telescope.service.ResourcesService
-import com.puntogris.telescope.service.SearchService
-import com.puntogris.telescope.service.SyncService
+import com.puntogris.telescope.services.ResourcesService
+import com.puntogris.telescope.services.SearchService
+import com.puntogris.telescope.services.SyncService
 import com.puntogris.telescope.ui.components.ControlsPanel
 import com.puntogris.telescope.ui.components.ListPanel
 import com.puntogris.telescope.ui.components.SearchPanel

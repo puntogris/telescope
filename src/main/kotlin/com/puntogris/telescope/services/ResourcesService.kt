@@ -1,4 +1,4 @@
-package com.puntogris.telescope.service
+package com.puntogris.telescope.services
 
 import com.android.tools.idea.gradle.variant.conflict.displayName
 import com.android.tools.idea.projectsystem.gradle.getAllDependencies

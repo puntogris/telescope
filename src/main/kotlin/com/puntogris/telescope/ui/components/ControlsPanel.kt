@@ -8,7 +8,7 @@ import com.intellij.ui.components.JBLabel
 import com.intellij.util.ui.JBUI
 import com.puntogris.telescope.application.GetModelsPath
 import com.puntogris.telescope.application.SettingsEvents
-import com.puntogris.telescope.service.ClipService
+import com.puntogris.telescope.services.ClipService
 import com.puntogris.telescope.storage.GlobalStorage
 import com.puntogris.telescope.utils.sendNotification
 import java.awt.BorderLayout

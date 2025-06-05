@@ -1,4 +1,4 @@
-package com.puntogris.telescope.service
+package com.puntogris.telescope.services
 
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.Disposable

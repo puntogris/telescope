@@ -1,4 +1,4 @@
-package com.puntogris.telescope.service
+package com.puntogris.telescope.services
 
 import android.clip.cpp.CLIPAndroid
 import com.intellij.openapi.components.Service

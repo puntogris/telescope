@@ -44,4 +44,7 @@ at [telescope.puntogris.com](https://telescope.puntogris.com
 
 - Check if it's worth migrating to the way ResourceManager fetches resources
 - Fix crash in clip.cpp when encoding text multiple times in a short amount of time
-- Publish it
+- Improve project structure 
+- Add linux support
+- Improve preview scaling in small drawables
+- Improve embeddings for light drawables, white background makes us lose details

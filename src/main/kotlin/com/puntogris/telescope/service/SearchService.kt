@@ -12,7 +12,7 @@ import me.xdrop.fuzzywuzzy.FuzzySearch
 @Service(Service.Level.PROJECT)
 class SearchService(project: Project) {
 
-    private val databaseService = ResourcesDatabase.getInstance(project)
+    private val databaseService = DatabaseService.getInstance(project)
     private val resourcesService = ResourcesService.getInstance(project)
 
     suspend fun search(query: String): List<SearchResult> = withContext(Dispatchers.Default) {

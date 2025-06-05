@@ -16,7 +16,7 @@ import kotlinx.coroutines.withContext
 private const val DB_DIR = "db"
 
 @Service(Service.Level.PROJECT)
-class ResourcesDatabase(project: Project) : Disposable {
+class DatabaseService(project: Project) : Disposable {
 
     private val databaseDirectory = configPath.resolve(project.name).toFile()
 
@@ -58,7 +58,7 @@ class ResourcesDatabase(project: Project) : Disposable {
     }
 
     companion object {
-        fun getInstance(project: Project): ResourcesDatabase = project.service()
+        fun getInstance(project: Project): DatabaseService = project.service()
     }
 
     override fun dispose() {

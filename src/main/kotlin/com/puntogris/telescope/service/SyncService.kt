@@ -28,7 +28,7 @@ class SyncService(private val project: Project) : Disposable {
 
     private val disposable = Disposer.newDisposable(this, SyncService::javaClass.name)
     private val resourcesService = ResourcesService.getInstance(project)
-    private val databaseService = ResourcesDatabase.getInstance(project)
+    private val databaseService = DatabaseService.getInstance(project)
     private val getModelsPath = GetModelsPath()
 
     private var syncJob: Job? = null

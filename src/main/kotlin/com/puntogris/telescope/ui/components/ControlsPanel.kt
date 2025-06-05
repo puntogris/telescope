@@ -6,9 +6,9 @@ import com.intellij.openapi.project.Project
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBLabel
 import com.intellij.util.ui.JBUI
-import com.puntogris.telescope.application.Clip
 import com.puntogris.telescope.application.GetModelsPath
 import com.puntogris.telescope.application.SettingsEvents
+import com.puntogris.telescope.service.ClipService
 import com.puntogris.telescope.storage.GlobalStorage
 import com.puntogris.telescope.utils.sendNotification
 import java.awt.BorderLayout
@@ -24,6 +24,7 @@ class ControlsPanel(
     private val onRefreshClicked: () -> Unit
 ) : JPanel() {
 
+    private val clipService = ClipService.getInstance(project)
     private val modelsPath = GetModelsPath()
 
     private val fuzzyCheckbox = JBCheckBox("Fuzzy").apply {
@@ -35,7 +36,7 @@ class ControlsPanel(
 
     private val embeddingCheckbox = JBCheckBox("Embeddings").apply {
         toolTipText = "To enable this enable on the settings page."
-        isEnabled = Clip.canEnableClip()
+        isEnabled = clipService.canEnableClip()
         isSelected = GlobalStorage.getIsEmbeddingsSearchEnabled()
         addActionListener {
             if (modelsPath().areValid) {

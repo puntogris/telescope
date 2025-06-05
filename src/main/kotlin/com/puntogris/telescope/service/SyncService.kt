@@ -8,7 +8,6 @@ import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.platform.ide.progress.withBackgroundProgress
-import com.puntogris.telescope.application.Clip
 import com.puntogris.telescope.storage.DrawableCache
 import com.puntogris.telescope.application.GetModelsPath
 import com.puntogris.telescope.models.Colors
@@ -29,6 +28,7 @@ class SyncService(private val project: Project) : Disposable {
     private val disposable = Disposer.newDisposable(this, SyncService::javaClass.name)
     private val resourcesService = ResourcesService.getInstance(project)
     private val databaseService = DatabaseService.getInstance(project)
+    private val clipService = ClipService.getInstance(project)
     private val getModelsPath = GetModelsPath()
 
     private var syncJob: Job? = null
@@ -104,7 +104,7 @@ class SyncService(private val project: Project) : Disposable {
         colors: Colors,
         dependencies: Dependencies
     ): ImageEntity {
-        val embedding = Clip.encodeFileImage(drawable, colors, dependencies).getOrDefault(floatArrayOf())
+        val embedding = clipService.encodeFileImage(drawable, colors, dependencies).getOrDefault(floatArrayOf())
 
         return ImageEntity(
             name = drawable.name,

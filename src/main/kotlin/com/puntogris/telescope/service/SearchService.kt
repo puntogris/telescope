@@ -2,7 +2,6 @@ package com.puntogris.telescope.service
 
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
-import com.puntogris.telescope.application.Clip
 import com.puntogris.telescope.models.SearchResult
 import com.puntogris.telescope.storage.GlobalStorage
 import kotlinx.coroutines.Dispatchers
@@ -14,6 +13,7 @@ class SearchService(project: Project) {
 
     private val databaseService = DatabaseService.getInstance(project)
     private val resourcesService = ResourcesService.getInstance(project)
+    private val clipService = ClipService.getInstance(project)
 
     suspend fun search(query: String): List<SearchResult> = withContext(Dispatchers.Default) {
         buildList {
@@ -27,7 +27,7 @@ class SearchService(project: Project) {
                 addAll(matches)
             }
             if (GlobalStorage.getIsEmbeddingsSearchEnabled()) {
-                Clip.encodeText(query).onSuccess { emb ->
+                clipService.encodeText(query).onSuccess { emb ->
                     val matches = databaseService.getNearestNeighbors(emb).filter { m -> none { it.uri == m.uri } }
                     addAll(matches)
                 }

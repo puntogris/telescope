@@ -1,5 +1,6 @@
 package com.puntogris.telescope.ui.components
 
+import com.intellij.openapi.editor.event.DocumentListener
 import com.intellij.ui.DocumentAdapter
 import com.intellij.ui.SearchTextField
 import com.intellij.util.ui.JBUI
@@ -16,7 +17,7 @@ private val GAP_SIZE = JBUI.scale(10)
 
 class SearchPanel(
     private val onChange: (String) -> Unit
-) : SearchTextField(true) {
+) : SearchTextField(true) , DocumentListener{
 
     private var debounceTimer: Timer? = null
 

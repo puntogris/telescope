@@ -4,8 +4,8 @@ import com.intellij.openapi.application.EDT
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.puntogris.telescope.service.ResourcesService
+import com.puntogris.telescope.service.SearchService
 import com.puntogris.telescope.service.SyncService
-import com.puntogris.telescope.application.SearchQuery
 import com.puntogris.telescope.ui.components.ControlsPanel
 import com.puntogris.telescope.ui.components.ListPanel
 import com.puntogris.telescope.ui.components.SearchPanel
@@ -20,7 +20,7 @@ class HomePage(project: Project) : JPanel() {
 
     private val syncService = SyncService.getInstance(project)
     private val resourcesService = ResourcesService.getInstance(project)
-    private val searchQuery = SearchQuery(project)
+    private val searchService = SearchService(project)
     private var searchJob: Job? = null
 
     private val list = ListPanel(
@@ -54,7 +54,7 @@ class HomePage(project: Project) : JPanel() {
             list.reset()
         } else {
             searchJob = CoroutineScope(Dispatchers.EDT).launch {
-                val result = searchQuery(query)
+                val result = searchService.search(query)
                 list.filter(result)
             }
         }
